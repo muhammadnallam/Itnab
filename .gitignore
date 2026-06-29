@@ -1,0 +1,6 @@
+.env
+node_modules/
+.next/
+.vscode/
+.git/
+NOTES.md

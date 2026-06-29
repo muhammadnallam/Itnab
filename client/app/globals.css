@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        direction: rtl;
+    }
+    body {
+        font-family: "Noto Sans Arabic", "Cairo", "Segoe UI", sans-serif;
+        background-color: #f9f9f9;
+        color: #1a1a1a;
+        min-height: 100vh;
+    }
+    ::selection {
+        background-color: #3c2416;
+        color: white;
+    }
+}
+
+@layer utilities {
+    .hide-scroll {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .hide-scroll::-webkit-scrollbar {
+        display: none;
+    }
+}

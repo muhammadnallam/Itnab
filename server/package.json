@@ -1,0 +1,27 @@
+{
+    "name": "publishing-platform",
+    "version": "1.0.0",
+    "description": "An Arabic publishing platform.",
+    "license": "ISC",
+    "author": "Mohamed Nasser",
+    "type": "commonjs",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "nodemon server.js",
+        "start": "node server.js",
+        "format": "npx prettier --write . --tab-width 4"
+    },
+    "dependencies": {
+        "@prisma/client": "^7.8.0",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.6",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.14",
+        "prettier": "^3.9.1",
+        "prisma": "^7.8.0"
+    }
+}

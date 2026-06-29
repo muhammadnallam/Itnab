@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  name      String
+  bio       String?
+  avatarUrl String?
+  password  String
+  createdAt DateTime @default(now())
+
+  articles  Article[]
+  following Follow[]  @relation("follower")
+  followers Follow[]  @relation("following")
+  likes     Like[]
+  bookmarks Bookmark[]
+}
+
+model Article {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  subtitle     String?
+  content      Json
+  coverImage   String?
+  published    Boolean  @default(false)
+  searchVector String?
+  score        Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  authorId  String
+  author    User         @relation(fields: [authorId], references: [id])
+  tags      ArticleTag[]
+  likes     Like[]
+  bookmarks Bookmark[]
+}
+
+model Tag {
+  id       String       @id @default(cuid())
+  name     String       @unique
+  articles ArticleTag[]
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id])
+  tag       Tag     @relation(fields: [tagId], references: [id])
+
+  @@id([articleId, tagId])
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  follower    User @relation("follower", fields: [followerId], references: [id])
+  following   User @relation("following", fields: [followingId], references: [id])
+
+  @@id([followerId, followingId])
+}
+
+model Like {
+  userId    String
+  articleId String
+  user      User    @relation(fields: [userId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id])
+
+  @@id([userId, articleId])
+}
+
+model Bookmark {
+  userId    String
+  articleId String
+  user      User    @relation(fields: [userId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id])
+
+  @@id([userId, articleId])
+}
