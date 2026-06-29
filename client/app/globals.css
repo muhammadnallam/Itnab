@@ -1,19 +1,40 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+    --font-family-sans: "Noto Sans Arabic", Cairo, "Segoe UI", sans-serif;
+    --font-family-serif: Georgia, "Noto Serif Arabic", serif;
+    --color-accent: #3C2416;
+    --color-accent-hover: #5a3820;
+    --color-accent-light: #f5ede8;
+    --color-accent-med: #7a4a32;
+    --color-accent-ring: rgba(60, 36, 22, 0.25);
+    --color-gold: #C9A84C;
+    --color-navy: #1B2D4F;
+    --color-surface: #ffffff;
+    --color-bg: #f9f9f9;
+    --color-page-bg: #e0e0e0;
+    --color-parchment: #F7F4EE;
+    --color-ink: #1A1A1A;
+    --color-mid: #6b6b6b;
+    --color-light: #9e9e9e;
+    --color-tag-bg: #f2ede9;
+    --color-dark-card: #1a1a1a;
+    --color-dark-surface: #2a2a2a;
+    --color-border: #e8e8e8;
+}
 
 @layer base {
     html {
         direction: rtl;
     }
     body {
-        font-family: "Noto Sans Arabic", "Cairo", "Segoe UI", sans-serif;
-        background-color: #f9f9f9;
-        color: #1a1a1a;
+        font-family: var(--font-family-sans);
+        background-color: var(--color-bg);
+        color: var(--color-ink);
         min-height: 100vh;
     }
     ::selection {
-        background-color: #3c2416;
+        background-color: var(--color-accent);
         color: white;
     }
 }
