@@ -6,25 +6,30 @@ datasource db {
   provider = "postgresql"
 }
 
+// UUID is chosen over CUID2 to leverage the native support and database optimization.
+// Additionally, the platform manages articles URLs with slugs not with IDs (CUID2's main benefit).
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  name      String
-  bio       String?
-  avatarUrl String?
-  password  String
-  createdAt DateTime @default(now())
+  id          String   @id @default(uuid()) @db.Uuid
+  email       String   @unique
+  username    String   @unique
+  name        String
+  bio         String?
+  avatarUrl   String?
+  password    String
+  preferences Json?
+  createdAt   DateTime @default(now())
 
   articles  Article[]
-  following Follow[]  @relation("follower")
-  followers Follow[]  @relation("following")
+  following Follow[]   @relation("follower")
+  followers Follow[]   @relation("following")
   likes     Like[]
   bookmarks Bookmark[]
+  shares    Share[]
+  views     View[]     @relation("userViews")
 }
 
 model Article {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid()) @db.Uuid
   slug         String   @unique
   title        String
   subtitle     String?
@@ -36,51 +41,83 @@ model Article {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  authorId  String
-  author    User         @relation(fields: [authorId], references: [id])
+  authorId String @db.Uuid
+  author   User   @relation(fields: [authorId], references: [id])
+
   tags      ArticleTag[]
   likes     Like[]
   bookmarks Bookmark[]
+  shares    Share[]
+  views     View[]   @relation("articleViews")
 }
 
 model Tag {
-  id       String       @id @default(cuid())
+  id       String       @id @default(uuid()) @db.Uuid
   name     String       @unique
   articles ArticleTag[]
 }
 
 model ArticleTag {
-  articleId String
-  tagId     String
+  articleId String  @db.Uuid
+  tagId     String  @db.Uuid
   article   Article @relation(fields: [articleId], references: [id])
   tag       Tag     @relation(fields: [tagId], references: [id])
 
   @@id([articleId, tagId])
 }
 
+// Interactions were separated to simplify queries and make indexing more efficient.
+// createdAt are recorded for a planned writer statistics feature.
 model Follow {
-  followerId  String
-  followingId String
-  follower    User @relation("follower", fields: [followerId], references: [id])
-  following   User @relation("following", fields: [followingId], references: [id])
+  followerId  String   @db.Uuid
+  followingId String   @db.Uuid
+  follower    User     @relation("follower", fields: [followerId], references: [id])
+  following   User     @relation("following", fields: [followingId], references: [id])
+  createdAt   DateTime @default(now())
 
   @@id([followerId, followingId])
 }
 
 model Like {
-  userId    String
-  articleId String
-  user      User    @relation(fields: [userId], references: [id])
-  article   Article @relation(fields: [articleId], references: [id])
+  userId    String   @db.Uuid
+  articleId String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now())
 
   @@id([userId, articleId])
 }
 
 model Bookmark {
-  userId    String
-  articleId String
-  user      User    @relation(fields: [userId], references: [id])
-  article   Article @relation(fields: [articleId], references: [id])
+  userId    String   @db.Uuid
+  articleId String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now())
 
   @@id([userId, articleId])
 }
+
+model Share {
+  userId    String   @db.Uuid
+  articleId String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@id([userId, articleId])
+}
+
+// Logged in views are counted once per user (@@unique), unlike unlimited guest views.
+model View {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @db.Uuid // Optional for counting guests views
+  articleId String   @db.Uuid
+  user      User?    @relation("userViews", fields: [userId], references: [id])
+  article   Article  @relation("articleViews", fields: [articleId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+}
+
+// TODO: model Comment (Manage threaded comments, nesting replies).

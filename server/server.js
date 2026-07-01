@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT;
+const ENV = process.env.NODE_ENV;
 
 app.use(express.json());
 app.use(
@@ -19,5 +20,34 @@ app.get("/api/health", (req, res) => {
 });
 
 app.listen(PORT, (e) => {
-    console.log(`Listening on port ${PORT}`);
+    console.log(`> server
+> Running on port ${PORT}
+
+                                           
+                                           
+                             MNMMM         
+                           NMMMMMMMN       
+                         MMMMMMMMMMMMN     
+                          MMMMMMMMMMMMM    
+                     NMM    MNMMMMMMMMM    
+                   NNMMMNN    MMMMMMMN     
+                 NNMMMMMMMMN    NNMNM      
+               MNMMMMMMMMMMMMN   MM        
+              NMMMMMMMMMMMMMMMMM           
+            NMMMMMMMMMMMMMMMMMN            
+          MNMMMMMMMMMMMMMMMMM              
+        MMMMMMMMMMMMMMMMMMNM               
+       MMMMMMMMMMMMMMMMMNM                 
+      NMMMMMMMMMMMMMMMNM                   
+      MMMMMMMMMMMMMMMM                     
+      MMMMMMMMMMMMMMN                       
+      MMMMMMMMMMMMM                         
+      MMMMMMMNNMM                                                            
+                                           
+                                           
+
+⚪ Express.js 5.2.1
+- Local:         http://localhost:${PORT}
+- Network:       http://192.168.1.5:${PORT}
+- Environment: ${ENV}`);
 });

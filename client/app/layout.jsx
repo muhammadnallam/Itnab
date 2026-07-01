@@ -1,13 +1,40 @@
 import "./globals.css";
+import localFont from "next/font/local"
+
+const nastaliqUrdu = localFont({
+    src: [
+        {
+            path: "../fonts/NotoNastaliqUrdu-Regular.ttf",
+            weight: "400",
+            style: "normal",
+        },
+        {
+            path: "../fonts/NotoNastaliqUrdu-Medium.ttf",
+            weight: "500",
+            style: "normal",
+        },
+        {
+            path: "../fonts/NotoNastaliqUrdu-SemiBold.ttf",
+            weight: "600",
+            style: "normal",
+        },
+        {
+            path: "../fonts/NotoNastaliqUrdu-Bold.ttf",
+            weight: "700",
+            style: "normal",
+        },
+    ],
+    variable: "--font-wordmark"
+});
 
 export const metadata = {
-    title: "منصة وسيلة",
+    title: "مَشْرَقَة",
     description: "نافذة على الفكر والقلم العربي",
 };
 
 export default function RootLayout({ children }) {
     return (
-        <html dir="rtl" lang="ar">
+        <html dir="rtl" lang="ar" className={nastaliqUrdu.variable}>
             <head>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link

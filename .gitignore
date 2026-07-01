@@ -4,3 +4,4 @@ node_modules/
 .vscode/
 .git/
 NOTES.md
+client-test/

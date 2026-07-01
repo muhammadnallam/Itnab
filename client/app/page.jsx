@@ -1,16 +1,19 @@
-"use client";
+// A temporary API testing page
 
-import { useEffect, useState } from "react";
+import { redirect, RedirectType } from "next/navigation";
 
-export default function App() {
-    const [status, setStatus] = useState("Loading...");
-
-    useEffect(() => {
-        fetch("http://localhost:3000/api/health")
-            .then((res) => res.json())
-            .then((data) => setStatus(`Server is ${data.status}`))
-            .catch((err) => setStatus(`Error: ${err.message}`));
-    }, []);
-
-    return <h1>{status}</h1>;
+export default async function Health() {
+    let data;
+    try {
+        const res = await fetch("http://localhost:3000/api/health");
+        data = await res.json();
+    } catch (e) {
+        return <p>Error: {e.message}</p>
+    } finally {
+        if (data.status === "ok") {
+            redirect("/feed");
+        } else {
+            return <p>Status: {data.status}</p>;
+        }
+    }
 }

@@ -1,2 +1,2 @@
-# Arabic Publishing Platform
-This platform is designed for Arabic readers and writers, a place where they share culture and knowledge.
+# Mashraqah
+A platform for Arabic readers and writers to share culture and knowledge by publishing authentic Arabic content.
