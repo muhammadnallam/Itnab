@@ -3,7 +3,7 @@ CREATE TABLE "User" (
     "id" UUID NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" TEXT,
     "bio" TEXT,
     "avatarUrl" TEXT,
     "password" TEXT NOT NULL,
