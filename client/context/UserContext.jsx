@@ -1,0 +1,28 @@
+"use client";
+
+import { createContext, useContext, useEffect, useState } from "react";
+
+// Not give the user access until its authentication state is fetched
+const UserContext = createContext(null);
+// TODO: Add a loading animation while verifying authentication status. Unauthenticated content flashes
+
+export default function UserProvider({ children }) {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        fetch("http://localhost:3000/api/auth/me")
+            .then((res) => {
+                return res.json();
+            })
+            .then((data) => {
+                setUser(data || null);
+            })
+            .catch(() => setUser(null));
+    }, []);
+
+    return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+}
+
+export function useUser() {
+    return useContext(UserContext);
+}
