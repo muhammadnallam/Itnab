@@ -163,6 +163,7 @@ export default function ArticlePage() {
     // TODO: Remove useState and "use client" to use SSG/SSR for better performance and SEO.
     const [saved, setSaved] = useState(false);
     const [followed, setFollowed] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [width, setWidth] = useState(
         typeof window !== "undefined" ? window.innerWidth : 1200,
     );
@@ -177,14 +178,17 @@ export default function ArticlePage() {
     const isTablet = width < 1100;
     const HEADER_H = isMobile ? 56 : 57;
 
+    const toggleSidebar = () => setSidebarOpen((v) => !v);
+
     const sidebarStyle = {
         borderLeft: "1px solid var(--color-border)",
         position: "sticky",
         top: HEADER_H,
         height: `calc(100vh - ${HEADER_H}px)`,
-        overflowY: "auto",
-        width: 240,
+        overflow: "hidden",
+        width: sidebarOpen ? 240 : 0,
         flexShrink: 0,
+        transition: "width 0.3s ease",
     };
 
     return (
@@ -201,7 +205,7 @@ export default function ArticlePage() {
             {isMobile ? (
                 <MobileHeader hasNotification={false} />
             ) : (
-                <DesktopHeader searchBorder={false} />
+                <DesktopHeader searchBorder={false} onToggleSidebar={toggleSidebar} />
             )}
 
             <div style={{ display: "flex" }}>

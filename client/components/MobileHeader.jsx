@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { IcoBell, IcoSearch } from "@/components/Icons";
 import Avatar from "@/components/Avatar";
+import UserDropdown from "@/components/UserDropdown";
 
-const MobileHeader = ({ onLogin }) => (
+const MobileHeader = ({ onLogin, isAuthenticated }) => {
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    return (
     <header
         style={{
             position: "sticky",
@@ -79,24 +84,6 @@ const MobileHeader = ({ onLogin }) => (
         </button>
 
         <button
-            onClick={onLogin}
-            style={{
-                background: "none",
-                border: "1px solid var(--color-border)",
-                borderRadius: 99,
-                padding: "6px 14px",
-                fontSize: 13,
-                fontFamily: "inherit",
-                color: "var(--color-ink)",
-                cursor: "pointer",
-                fontWeight: 600,
-                flexShrink: 0,
-            }}
-        >
-            تسجيل الدخول
-        </button>
-
-        <button
             style={{
                 background: "none",
                 border: "none",
@@ -122,8 +109,22 @@ const MobileHeader = ({ onLogin }) => (
             />
         </button>
 
-        <Avatar initials="أن" size={32} bg="var(--color-accent)" />
+        <div style={{ position: "relative" }}>
+            <Avatar
+                initials="أن"
+                size={32}
+                bg="var(--color-accent)"
+                onClick={() => setMenuOpen((v) => !v)}
+            />
+            <UserDropdown
+                open={menuOpen}
+                onClose={() => setMenuOpen(false)}
+                isAuthenticated={isAuthenticated}
+                onLogin={onLogin}
+            />
+        </div>
     </header>
-);
+    );
+};
 
 export default MobileHeader;

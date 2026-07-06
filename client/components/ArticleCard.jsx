@@ -72,7 +72,7 @@ const ArticleCard = ({ article, isMobile }) => {
                         >
                             {article.author}
                         </span>
-                        {article.pub && (
+                        {/* {article.pub && (
                             <>
                                 <span
                                     style={{
@@ -92,7 +92,7 @@ const ArticleCard = ({ article, isMobile }) => {
                                     {article.pub.replace("في ", "")}
                                 </span>
                             </>
-                        )}
+                        )} */}
                         <span
                             style={{
                                 color: "var(--color-light)",
@@ -116,7 +116,7 @@ const ArticleCard = ({ article, isMobile }) => {
                             style={{
                                 fontFamily:
                                     "Georgia, 'Noto Serif Arabic', serif",
-                                fontSize: isMobile ? 18 : 22,
+                                fontSize: isMobile ? 20 : 24,
                                 fontWeight: 700,
                                 color: "var(--color-ink)",
                                 lineHeight: 1.3,
@@ -164,7 +164,7 @@ const ArticleCard = ({ article, isMobile }) => {
                             {article.readTime} دقائق
                         </span>
 
-                        <button
+                        {/* <button
                             style={{
                                 display: "flex",
                                 alignItems: "center",
@@ -213,7 +213,7 @@ const ArticleCard = ({ article, isMobile }) => {
                         >
                             <IcoShare size={16} />
                             <span>{article.reposts}</span>
-                        </button>
+                        </button> */}
 
                         <div style={{ flex: 1 }} />
 

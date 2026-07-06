@@ -11,11 +11,11 @@ import ArticleCard from "@/components/ArticleCard";
 import Avatar from "@/components/Avatar";
 import Tabs from "@/components/Tabs";
 import AuthModal from "@/components/AuthModal";
+import { useUser } from "@/context/UserContext";
 
-const isAuthenticated = true; // TODO: Replace with actual auth check
-
-const LeftPanel = ({ onLogin, onSignUp, isAuthenticated }) => {
+const LeftPanel = ({ onLogin, onSignUp }) => {
     const [subs, setSubs] = useState(WRITERS.map((w) => w.sub));
+    const user = useUser();
 
     const cardStyle = {
         background: "var(--color-surface)",
@@ -25,7 +25,7 @@ const LeftPanel = ({ onLogin, onSignUp, isAuthenticated }) => {
         marginBottom: 18,
     };
 
-    if (isAuthenticated) {
+    if (!user) {
         return (
             <div style={{ display: "flex", flexDirection: "column" }}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
@@ -51,15 +51,16 @@ const LeftPanel = ({ onLogin, onSignUp, isAuthenticated }) => {
                                     fontFamily:
                                         "var(--font-wordmark), 'Noto Serif Arabic', serif",
                                     fontWeight: 700,
-                                    fontSize: 24,
-                                    // color: "var(--color-accent-light)",
+                                    fontSize: 28,
+                                    marginBottom: "5px",
+                                    color: "var(--color-accent)",
                                     letterSpacing: -0.5,
                                     flexShrink: 0,
                                     cursor: "pointer",
                                     transform: "scaleX(1.1)",
                                 }}
                             >
-                                مَشْرَقَة
+                                إطناب
                             </span>
                         </div>
                         <h3
@@ -92,7 +93,7 @@ const LeftPanel = ({ onLogin, onSignUp, isAuthenticated }) => {
                                 color: "var(--color-white)",
                                 border: "none",
                                 borderRadius: 6,
-                                padding: "14px",
+                                padding: "12px",
                                 fontSize: 15,
                                 fontWeight: 700,
                                 cursor: "pointer",
@@ -119,7 +120,7 @@ const LeftPanel = ({ onLogin, onSignUp, isAuthenticated }) => {
                                 color: "var(--color-white)",
                                 border: "none",
                                 borderRadius: 6,
-                                padding: "14px",
+                                padding: "12px",
                                 fontSize: 15,
                                 fontWeight: 600,
                                 cursor: "pointer",
@@ -159,6 +160,11 @@ const LeftPanel = ({ onLogin, onSignUp, isAuthenticated }) => {
                     </a>
                 </p> */}
                 </div>
+            </div>
+        );
+    } else {
+        return (
+            <>
                 <div style={cardStyle}>
                     <h4
                         style={{
@@ -295,10 +301,8 @@ const LeftPanel = ({ onLogin, onSignUp, isAuthenticated }) => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </>
         );
-    } else {
-        return;
     }
 };
 
@@ -311,6 +315,7 @@ const GlobalStyle = () => (
 export default function App() {
     const [tab, setTab] = useState("foryou");
     const [modal, setModal] = useState(null); // null | "signin" | "signup"
+    const [sidebarOpen, setSidebarOpen] = useState(true);
 
     const [width, setWidth] = useState(
         typeof window !== "undefined" ? window.innerWidth : 1200,
@@ -326,6 +331,7 @@ export default function App() {
     const openLogin = () => setModal("signin");
     const openSignUp = () => setModal("signup");
     const closeModal = () => setModal(null);
+    const toggleSidebar = () => setSidebarOpen((v) => !v);
 
     const HEADER_H = 57;
 
@@ -345,17 +351,26 @@ export default function App() {
         },
         desktopGrid: {
             display: "grid",
-            gridTemplateColumns: isTablet ? "240px 1fr" : "240px 1fr 350px",
+            gridTemplateColumns: isTablet
+                ? sidebarOpen
+                    ? "240px 1fr"
+                    : "0px 1fr"
+                : sidebarOpen
+                  ? "240px 1fr 350px"
+                  : "0px 1fr 350px",
             width: "100%",
             minHeight: `calc(100vh - ${HEADER_H}px)`,
             alignItems: "start",
+            transition: "grid-template-columns 0.3s ease",
         },
         rightSidebarWrap: {
             borderLeft: "1px solid var(--color-border)",
             position: "sticky",
             top: HEADER_H,
             height: `calc(100vh - ${HEADER_H}px)`,
-            overflowY: "auto",
+            overflow: "hidden",
+            width: sidebarOpen ? 240 : 0,
+            // TODO: Apply sliding transition
         },
         centerWrap: {
             padding: isTablet ? "24px 36px" : "28px 48px",
@@ -401,7 +416,10 @@ export default function App() {
     } else if (isTablet) {
         return (
             <div style={styles.root}>
-                <DesktopHeader />
+                <DesktopHeader
+                    onLogin={openLogin}
+                    onToggleSidebar={toggleSidebar}
+                />
                 <div style={styles.desktopGrid}>
                     <div style={styles.rightSidebarWrap}>
                         <RightSidebar />
@@ -437,7 +455,10 @@ export default function App() {
         return (
             <div style={styles.root}>
                 <GlobalStyle />
-                <DesktopHeader />
+                <DesktopHeader
+                    onLogin={openLogin}
+                    onToggleSidebar={toggleSidebar}
+                />
                 <div style={styles.desktopGrid}>
                     <div style={styles.rightSidebarWrap}>
                         <RightSidebar />
@@ -459,11 +480,7 @@ export default function App() {
                         </div>
                     </main>
                     <div style={styles.leftPanelWrap} className="hide-scroll">
-                        <LeftPanel
-                            onLogin={openLogin}
-                            onSignUp={openSignUp}
-                            isAuthenticated={isAuthenticated}
-                        />
+                        <LeftPanel onLogin={openLogin} onSignUp={openSignUp} />
                     </div>
                 </div>
                 {modal && (

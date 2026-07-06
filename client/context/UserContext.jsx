@@ -10,8 +10,11 @@ export default function UserProvider({ children }) {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/auth/me")
+        fetch("http://localhost:3000/api/auth/me", { credentials: "include" })
             .then((res) => {
+                if (res.status !== 200) {
+                    throw new Error(res.status);
+                }
                 return res.json();
             })
             .then((data) => {

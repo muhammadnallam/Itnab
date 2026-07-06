@@ -144,7 +144,7 @@ const PrimaryButton = ({
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const SignInView = ({ onSwitchToSignUp, onSignIn, onClose }) => {
+const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
@@ -167,7 +167,7 @@ const SignInView = ({ onSwitchToSignUp, onSignIn, onClose }) => {
         setApiError("");
         if (!validate()) return;
         setLoading(true);
-        const result = await onSignIn(email.trim(), password);
+        const result = await onLogIn(email.trim(), password);
         setLoading(false);
         if (!result.success) {
             setApiError(result.error || "فشل تسجيل الدخول");
@@ -200,7 +200,7 @@ const SignInView = ({ onSwitchToSignUp, onSignIn, onClose }) => {
                 أدخل بيانات الدخول أو{" "}
                 <button
                     type="button"
-                    onClick={onSwitchToSignUp}
+                    onClick={onSwitchToRegister}
                     style={{
                         background: "none",
                         border: "none",
@@ -309,7 +309,7 @@ const SignInView = ({ onSwitchToSignUp, onSignIn, onClose }) => {
     );
 };
 
-const SignUpView = ({ onSwitchToSignIn, onSignUp, onClose }) => {
+const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -329,7 +329,8 @@ const SignUpView = ({ onSwitchToSignIn, onSignUp, onClose }) => {
     const validatePassword = () => {
         const e = {};
         if (!password) e.password = "كلمة المرور مطلوبة";
-        else if (password.length < 8) e.password = "على الأقل 8 أحرف";
+        else if (password.length < 8) e.password = "الحد الأدنى 8 أحرف";
+        else if (password.length > 20) e.password = "الحد الأقصى 20 حرفًا";
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -346,7 +347,7 @@ const SignUpView = ({ onSwitchToSignIn, onSignUp, onClose }) => {
         setApiError("");
         if (!validatePassword()) return;
         setLoading(true);
-        const result = await onSignUp(email.trim(), password);
+        const result = await onRegister(email.trim(), password);
         setLoading(false);
         if (!result.success) {
             setApiError(result.error || "فشل إنشاء الحساب");
@@ -381,7 +382,7 @@ const SignUpView = ({ onSwitchToSignIn, onSignUp, onClose }) => {
                         لديك حساب بالفعل؟{" "}
                         <button
                             type="button"
-                            onClick={onSwitchToSignIn}
+                            onClick={onSwitchToLogIn}
                             style={{
                                 background: "none",
                                 border: "none",
@@ -552,9 +553,9 @@ const SignUpView = ({ onSwitchToSignIn, onSignUp, onClose }) => {
 
 
 
-async function defaultSignIn(email, password) {
+async function defaultLogIn(email, password) {
     try {
-        const res = await fetch("http://localhost:3000/api/auth/signin", {
+        const res = await fetch("http://localhost:3000/api/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -569,9 +570,9 @@ async function defaultSignIn(email, password) {
     }
 }
 
-async function defaultSignUp(email, password) {
+async function defaultRegister(email, password) {
     try {
-        const res = await fetch("http://localhost:3000/api/auth/signup", {
+        const res = await fetch("http://localhost:3000/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
@@ -590,8 +591,8 @@ export default function AuthModal({
     open,
     onClose,
     defaultMode = "signin",
-    onSignIn = defaultSignIn,
-    onSignUp = defaultSignUp,
+    onLogIn = defaultLogIn,
+    onRegister = defaultRegister,
 }) {
     const [mode, setMode] = useState(defaultMode);
 
@@ -661,15 +662,15 @@ export default function AuthModal({
                 <BrandBadge />
 
                 {mode === "signin" ? (
-                    <SignInView
-                        onSwitchToSignUp={() => setMode("signup")}
-                        onSignIn={onSignIn}
+                    <LogInView
+                        onSwitchToRegister={() => setMode("signup")}
+                        onLogIn={onLogIn}
                         onClose={onClose}
                     />
                 ) : (
-                    <SignUpView
-                        onSwitchToSignIn={() => setMode("signin")}
-                        onSignUp={onSignUp}
+                    <RegisterView
+                        onSwitchToLogIn={() => setMode("signin")}
+                        onRegister={onRegister}
                         onClose={onClose}
                     />
                 )}

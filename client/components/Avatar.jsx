@@ -3,8 +3,10 @@ const Avatar = ({
     size = 32,
     bg = "var(--color-mid)",
     color = "var(--color-white)",
+    onClick,
 }) => (
     <div
+        onClick={onClick}
         style={{
             width: size,
             height: size,

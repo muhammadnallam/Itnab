@@ -25,10 +25,10 @@ const NAV_ITEMS = [
     },
 ];
 
-const RightSidebar = () => (
+const RightSidebar = (isActive) => (
     <aside
         style={{
-            display: "flex",
+            display: isActive ? "flex" : "hidden",
             flexDirection: "column",
             padding: "24px 18px",
             height: "100%",
