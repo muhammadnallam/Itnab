@@ -34,7 +34,7 @@ const Tabs = ({ active, setActive, tabList }) => (
                             active === tab.id
                                 ? "var(--color-ink)"
                                 : "var(--color-mid)",
-                        fontWeight: active === tab.id ? 700 : 400,
+                        fontWeight: 400,
                         borderBottom:
                             active === tab.id
                                 ? "2px solid var(--color-ink)"

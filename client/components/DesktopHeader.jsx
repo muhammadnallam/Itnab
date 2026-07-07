@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Bell, Search, Menu, SquarePen } from "lucide-react";
 import Avatar from "@/components/Avatar";
@@ -115,7 +116,7 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                             (e.currentTarget.style.color = "var(--color-mid)")
                         }
                     >
-                        <SquarePen size={24}/>
+                        <SquarePen size={24} />
                         اكتب
                     </button>
                 )}
