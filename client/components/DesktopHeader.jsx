@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IcoBell, IcoSearch, IcoMenu } from "@/components/Icons";
+import { Bell, Search, Menu, SquarePen } from "lucide-react";
 import Avatar from "@/components/Avatar";
 import UserDropdown from "@/components/UserDropdown";
 import { useUser } from "@/context/UserContext";
@@ -43,7 +43,7 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                         (e.currentTarget.style.color = "var(--color-mid)")
                     }
                 >
-                    <IcoMenu size={24}></IcoMenu>
+                    <Menu size={24}></Menu>
                 </button>
                 <a href="/">
                     <span
@@ -76,7 +76,7 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                     maxWidth: 540,
                 }}
             >
-                <IcoSearch size={18} />
+                <Search size={18} />
                 <input
                     placeholder="بحث"
                     style={{
@@ -115,19 +115,7 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                             (e.currentTarget.style.color = "var(--color-mid)")
                         }
                     >
-                        <svg
-                            width="22"
-                            height="22"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
+                        <SquarePen size={24}/>
                         اكتب
                     </button>
                 )}
@@ -141,6 +129,7 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                         display: "flex",
                         padding: 4,
                         transition: "color 0.15s",
+                        marginTop: 1,
                     }}
                     onMouseEnter={(e) =>
                         (e.currentTarget.style.color = "var(--color-ink)")
@@ -149,12 +138,12 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                         (e.currentTarget.style.color = "var(--color-mid)")
                     }
                 >
-                    <IcoBell size={24} />
+                    <Bell size={24} />
                 </button>
 
                 <div style={{ position: "relative" }}>
                     <Avatar
-                        initials="أن"
+                        initials="من"
                         size={34}
                         bg="var(--color-accent)"
                         onClick={() => setMenuOpen((v) => !v)}

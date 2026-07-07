@@ -2,12 +2,12 @@ import { useState } from "react";
 
 import Avatar from "@/components/Avatar";
 import {
-    IcoClap,
-    IcoComment,
-    IcoShare,
-    IcoBookmark,
-    IcoMoreH,
-} from "@/components/Icons";
+    Heart,
+    MessageSquare,
+    Share,
+    Bookmark,
+    Ellipsis,
+} from "lucide-react";
 
 const ArticleCard = ({ article, isMobile }) => {
     const [saved, setSaved] = useState(false);
@@ -175,10 +175,16 @@ const ArticleCard = ({ article, isMobile }) => {
                                 padding: 0,
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-mid)")
+                            }
                         >
-                            <IcoClap size={16} />
+                            <Heart size={16}/>
                             <span>{article.claps}</span>
                         </button>
 
@@ -195,10 +201,16 @@ const ArticleCard = ({ article, isMobile }) => {
                                 padding: 0,
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-mid)")
+                            }
                         >
-                            <IcoComment size={16} />
+                            <MessageSquare size={16}/>
                             <span>{article.comments}</span>
                         </button>
 
@@ -215,10 +227,16 @@ const ArticleCard = ({ article, isMobile }) => {
                                 padding: 0,
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-mid)")
+                            }
                         >
-                            <IcoShare size={16} />
+                            <Share size={16} />
                             <span>{article.reposts}</span>
                         </button>
 
@@ -233,10 +251,16 @@ const ArticleCard = ({ article, isMobile }) => {
                                 padding: 4,
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-mid)")
+                            }
                         >
-                            <IcoBookmark
+                            <Bookmark
                                 size={16}
                                 fill={saved ? "var(--color-accent)" : "none"}
                             />
@@ -250,10 +274,16 @@ const ArticleCard = ({ article, isMobile }) => {
                                 padding: 4,
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-mid)")
+                            }
                         >
-                            <IcoMoreH size={16} />
+                            <Ellipsis size={16} />
                         </button>
                     </div>
                 </div>

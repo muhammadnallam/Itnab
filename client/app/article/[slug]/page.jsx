@@ -11,12 +11,11 @@ import Avatar from "@/components/Avatar";
 import ArticleActionBar from "@/components/ArticleActionBar";
 import CommentsSection from "@/components/CommentsSection";
 import {
-    IcoClap,
-    IcoComment,
-    IcoShare,
-    IcoBookmark,
-    IcoMoreH,
-} from "@/components/Icons";
+    Heart,
+    MessageSquare,
+    Share,
+    Ellipsis,
+} from "lucide-react";
 import {
     ARTICLE,
     RESPONSES,
@@ -122,19 +121,19 @@ const RelatedCard = ({ article }) => (
                                 ★
                             </span>
                         )}
-                        <IcoClap size={16} />
+                        <Heart size={16} />
                         <span style={{ fontSize: 13, color: "var(--color-mid)" }}>
                             {article.claps}
                         </span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <IcoComment size={16} />
+                        <MessageSquare size={16} />
                         <span style={{ fontSize: 13, color: "var(--color-mid)" }}>
                             {article.comments}
                         </span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <IcoShare size={16} />
+                        <Share size={16} />
                         <span style={{ fontSize: 13, color: "var(--color-mid)" }}>
                             {article.reposts}
                         </span>
@@ -149,7 +148,7 @@ const RelatedCard = ({ article }) => (
                             padding: 0,
                         }}
                     >
-                        <IcoMoreH size={16} />
+                        <Ellipsis size={16} />
             </button>
         </div>
     </div>

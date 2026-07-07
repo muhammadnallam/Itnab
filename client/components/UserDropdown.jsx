@@ -1,26 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import {
-    IcoProfile,
-    IcoSettings,
-    IcoLogout,
-    IcoSunSmall,
-    IcoSystemSmall,
-    IcoMoonSmall,
-} from "@/components/Icons";
+    UserRound,
+    Settings,
+    LogOut,
+    Sun,
+    Monitor,
+    Moon,
+} from "lucide-react";
 
 const navItems = {
     authed: [
-        { icon: IcoProfile, label: "الملف الشخصي", href: "/profile" },
-        { icon: IcoSettings, label: "الإعدادات", href: "/settings" },
+        { icon: UserRound, label: "الملف الشخصي", href: "/profile" },
+        { icon: Settings, label: "الإعدادات", href: "/settings" },
     ],
     guest: [],
 };
 
 const themeOptions = [
-    { value: "light", label: "فاتح", icon: IcoSunSmall },
-    { value: "dark", label: "داكن", icon: IcoMoonSmall },
-    { value: "system", label: "النظام", icon: IcoSystemSmall },
+    { value: "light", label: "فاتح", icon: Sun },
+    { value: "dark", label: "داكن", icon: Moon },
+    { value: "system", label: "النظام", icon: Monitor },
 ];
 
 const UserDropdown = ({ open, onClose, onLogin }) => {
@@ -177,7 +177,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                         }}
                         style={menuItemStyle()}
                     >
-                        <IcoProfile size={18} stroke="var(--color-mid)" />
+                        <UserRound size={18} stroke="var(--color-mid)" />
                         <span style={{ fontWeight: 500 }}>تسجيل الدخول</span>
                     </button>
                 )}
@@ -290,7 +290,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                                 color: "var(--color-error)",
                             }}
                         >
-                            <IcoLogout size={18} stroke="var(--color-error)" />
+                            <LogOut size={18} stroke="var(--color-error)" />
                             <span style={{ fontWeight: 500 }}>
                                 تسجيل الخروج
                             </span>

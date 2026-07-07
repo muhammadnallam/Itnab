@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IcoClap, IcoComment, IcoMoreH } from "./Icons";
+import { Heart, MessageSquare, Ellipsis } from "lucide-react";
 
 import Avatar from "./Avatar";
 
@@ -95,10 +95,21 @@ const CommentsSection = ({ responses, count }) => {
                                     fontSize: 13,
                                     color: "var(--color-mid)",
                                     cursor: "pointer",
-                                    transition: "border-color 0.15s, color 0.15s",
+                                    transition:
+                                        "border-color 0.15s, color 0.15s",
                                 }}
-                                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--color-accent)"; e.currentTarget.style.color = "var(--color-ink)"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.color = "var(--color-mid)"; }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor =
+                                        "var(--color-accent)";
+                                    e.currentTarget.style.color =
+                                        "var(--color-ink)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor =
+                                        "var(--color-border)";
+                                    e.currentTarget.style.color =
+                                        "var(--color-mid)";
+                                }}
                             >
                                 إلغاء
                             </button>
@@ -114,8 +125,14 @@ const CommentsSection = ({ responses, count }) => {
                                     cursor: "pointer",
                                     transition: "filter 0.15s",
                                 }}
-                                onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(1.15)")}
-                                onMouseLeave={(e) => (e.currentTarget.style.filter = "brightness(1)")}
+                                onMouseEnter={(e) =>
+                                    (e.currentTarget.style.filter =
+                                        "brightness(1.15)")
+                                }
+                                onMouseLeave={(e) =>
+                                    (e.currentTarget.style.filter =
+                                        "brightness(1)")
+                                }
                             >
                                 نشر
                             </button>
@@ -177,10 +194,16 @@ const CommentsSection = ({ responses, count }) => {
                                 color: "var(--color-mid)",
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-ink)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-mid)")
+                            }
                         >
-                            <IcoMoreH size={16} />
+                            <Ellipsis size={16} />
                         </button>
                     </div>
 
@@ -236,10 +259,16 @@ const CommentsSection = ({ responses, count }) => {
                                     display: "flex",
                                     transition: "color 0.15s",
                                 }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                                onMouseEnter={(e) =>
+                                    (e.currentTarget.style.color =
+                                        "var(--color-accent)")
+                                }
+                                onMouseLeave={(e) =>
+                                    (e.currentTarget.style.color =
+                                        "var(--color-mid)")
+                                }
                             >
-                                <IcoClap size={16} />
+                                <Heart size={16} />
                             </button>
                             <span
                                 style={{
@@ -266,10 +295,16 @@ const CommentsSection = ({ responses, count }) => {
                                     display: "flex",
                                     transition: "color 0.15s",
                                 }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                                onMouseEnter={(e) =>
+                                    (e.currentTarget.style.color =
+                                        "var(--color-accent)")
+                                }
+                                onMouseLeave={(e) =>
+                                    (e.currentTarget.style.color =
+                                        "var(--color-mid)")
+                                }
                             >
-                                <IcoComment size={16} />
+                                <MessageSquare size={16} />
                             </button>
                             <span
                                 style={{
@@ -291,8 +326,14 @@ const CommentsSection = ({ responses, count }) => {
                                 transition: "color 0.15s",
                                 padding: 0,
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent-hover)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent-hover)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent)")
+                            }
                         >
                             ردّ
                         </button>

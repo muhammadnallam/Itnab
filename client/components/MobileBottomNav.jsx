@@ -1,17 +1,17 @@
 import {
-    IcoHome,
-    IcoInbox,
-    IcoBookmark,
-    IcoDash,
-    IcoProfile,
-} from "@/components/Icons";
+    House,
+    Inbox,
+    Bookmark,
+    ChartColumn,
+    UserRound,
+} from "lucide-react";
 
 const MobileBottomNav = () => {
     const items = [
-        { icon: IcoHome, label: "الرئيسية", active: true },
-        { icon: IcoInbox, label: "الاشتراكات", active: false },
-        { icon: IcoBookmark, label: "المكتبة", active: false },
-        { icon: IcoProfile, label: "الملف الشخصي", active: false },
+        { icon: House, label: "الرئيسية", active: true },
+        { icon: Inbox, label: "الاشتراكات", active: false },
+        { icon: Bookmark, label: "المكتبة", active: false },
+        { icon: UserRound, label: "الملف الشخصي", active: false },
     ];
     return (
         <nav

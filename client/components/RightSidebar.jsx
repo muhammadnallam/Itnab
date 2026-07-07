@@ -1,25 +1,25 @@
 import {
-    IcoHome,
-    IcoInbox,
-    IcoBookmark,
-    IcoDash,
-    IcoProfile,
-    IcoMoreV,
-} from "@/components/Icons";
+    House,
+    Inbox,
+    Bookmark,
+    ChartColumn,
+    UserRound,
+    Ellipsis,
+} from "lucide-react";
 
 const NAV_ITEMS = [
-    { icon: IcoHome, label: "الرئيسية", active: true, link: "/" },
+    { icon: House, label: "الرئيسية", active: true, link: "/" },
     {
-        icon: IcoInbox,
+        icon: Inbox,
         label: "الاشتراكات",
         active: false,
         link: "/subscriptions",
     },
-    { icon: IcoBookmark, label: "مكتبتي", active: false, link: "/library" },
-    { icon: IcoDash, label: "الإحصائيات", active: false, link: "/analytics" },
+    { icon: Bookmark, label: "مكتبتي", active: false, link: "/library" },
+    { icon: ChartColumn, label: "الإحصائيات", active: false, link: "/analytics" },
     {
-        icon: IcoProfile,
-        label: "الملف الشخصي",
+        icon: UserRound,
+        label: "حسابي",
         active: false,
         link: "/profile",
     },
@@ -86,41 +86,17 @@ const RightSidebar = ({ sidebarOpen, isActive } = {}) => (
                         <Icon
                             size={22}
                             fill={item.active ? "var(--color-accent)" : "none"}
+                            color={
+                                item.active
+                                    ? "var(--color-accent)"
+                                    : "var(--color-mid)"
+                            }
                         />
                         {item.label}
                     </button>
                 );
             })}
         </nav>
-
-        {/* TODO: More menu */}
-        <div style={{ marginTop: 20 }}>
-            <button
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    width: "100%",
-                    padding: "12px 16px",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "var(--color-mid)",
-                    fontSize: 15,
-                    borderRadius: 0,
-                    transition: "color 0.15s",
-                }}
-                onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = "var(--color-ink)")
-                }
-                onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "var(--color-mid)")
-                }
-            >
-                <IcoMoreV size={22} />
-                المزيد
-            </button>
-        </div>
     </aside>
     </div>
 );

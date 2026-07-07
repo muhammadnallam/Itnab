@@ -1,7 +1,28 @@
 import { useState, useEffect } from "react";
-import { IcoClose, IcoEye, IcoEyeOff, IcoBack, BrandBadge } from "@/components/Icons";
+import { X, Eye, EyeOff, ArrowLeft, Bookmark } from "lucide-react";
 
 const OVERLAY = "rgba(15,15,20,0.6)";
+const BrandBadge = () => (
+    <div
+        style={{
+            width: 48,
+            height: 48,
+            borderRadius: 12,
+            background: "var(--color-accent-light)",
+            color: "var(--accent-color)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 18px",
+        }}
+    >
+        <Bookmark
+            size={20}
+            fill="var(--color-accent)"
+            stroke="var(--color-accent)"
+        />
+    </div>
+);
 
 const InputField = ({
     type = "text",
@@ -277,9 +298,9 @@ const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
                             onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
                         >
                             {showPass ? (
-                                <IcoEye size={16} />
+                                <Eye size={16} />
                             ) : (
-                                <IcoEyeOff size={16} />
+                                <EyeOff size={16} />
                             )}
                         </button>
                     }
@@ -494,7 +515,7 @@ const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
                                     onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
                                     onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--color-border)")}
                                 >
-                                    <IcoBack size={15} />
+                                    <ArrowLeft size={15} />
                                 </button>
                                 <span
                                     style={{
@@ -537,9 +558,9 @@ const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
                                         onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
                                     >
                                         {showPass ? (
-                                            <IcoEye size={16} />
+                                            <Eye size={16} />
                                         ) : (
-                                            <IcoEyeOff size={16} />
+                                            <EyeOff size={16} />
                                         )}
                                     </button>
                                 }
@@ -662,7 +683,7 @@ export default function AuthModal({
                     onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
                 >
-                    <IcoClose size={18} />
+                    <X size={18} />
                 </button>
 
                 <BrandBadge />

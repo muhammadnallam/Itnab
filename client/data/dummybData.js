@@ -1,25 +1,6 @@
 // This file contains AI-generated dummy content for simulating real-world scenarios.
 export const ARTICLES = [
     {
-        id: 1,
-        reason: "لأنك تتابع",
-        topic: "علم النفس",
-        author: "ريم الخالدي",
-        authorAvatar: "رخ",
-        pub: "",
-        date: "منذ يومين",
-        title: "هل ستتحسن الأمور فعلاً؟",
-        slug: "هل-ستتحسن-الأمور-فعلاً",
-        excerpt:
-            "الأمل يبدو أحياناً كخدعة حين تجد نفسك عالقاً في مكانك لا تتقدم ولا تتأخر. لكن العلم يقول غير ذلك.",
-        image: "https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=400&h=260&fit=crop",
-        claps: "١.٢ألف",
-        comments: 17,
-        reposts: 31,
-        readTime: 5,
-        boosted: true,
-    },
-    {
         id: 2,
         reason: "لأنك تتابع",
         topic: "العلاقات",
@@ -31,7 +12,7 @@ export const ARTICLES = [
         slug: "ثمة-شيء-مختلف-في-الناس-الآن-وهذا-مرعب",
         excerpt:
             "اضطررت أمس لمرافقة صديق إلى غرفة الطوارئ وأنا أشعر بأن العالم لم يعد كما كان من قبل.",
-        image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/1200x/e0/e4/18/e0e4188649fa442bdaaa58c70531a4c6.jpg",
         claps: "٢٣ألف",
         comments: 495,
         reposts: 126,
@@ -50,7 +31,7 @@ export const ARTICLES = [
         slug: "٧-كتب-يصعب-قراءتها-لكنها-ستجعلك-أذكى-من-أي-كتاب-تطوير-ذاتي",
         excerpt:
             "قرأت أكثر من ٧٠ كتاباً في السنة، وهذه الـ٧ أعادت صياغة تفكيري تماماً.",
-        image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/vwebpf/736x/ab/1f/25/ab1f250de72460416f07f053b41ce9f8.webp",
         claps: "٣٣٢",
         comments: 8,
         reposts: 1,
@@ -69,7 +50,7 @@ export const ARTICLES = [
         slug: "الذكاء-الاصطناعي-لن-يسرق-وظيفتك-لكن-هذا-الشخص-سيفعل",
         excerpt:
             "الحقيقة التي لا يريد أحد قولها عن مستقبل العمل في عصر الأتمتة والنماذج اللغوية الكبيرة.",
-        image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/vwebpf/1200x/5f/fb/81/5ffb816d370a79e3b8524909220d36b2.webp",
         claps: "٤.٧ألف",
         comments: 231,
         reposts: 58,
@@ -88,7 +69,7 @@ export const ARTICLES = [
         slug: "لماذا-نخشى-الموت-ولا-نخشى-أننا-لم-كنن-موجودين-قبل-الولادة",
         excerpt:
             "الفيلسوف إبيقور طرح هذا السؤال منذ ألفي عام، والإجابة لا تزال تزعزع اليقين.",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/1200x/b2/d8/f2/b2d8f21f96c086c5e349175b106d3218.jpg",
         claps: "٨.١ألف",
         comments: 143,
         reposts: 89,
@@ -107,7 +88,7 @@ export const ARTICLES = [
         slug: "هل-ستتحسن-الأمور-فعلاً",
         excerpt:
             "الأمل يبدو أحياناً كخدعة حين تجد نفسك عالقاً في مكانك لا تتقدم ولا تتأخر. لكن العلم يقول غير ذلك.",
-        image: "https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/736x/9a/9b/66/9a9b66f03e1da0a869e70ff9faff186b.jpg",
         claps: "١.٢ألف",
         comments: 17,
         reposts: 31,
@@ -126,7 +107,7 @@ export const ARTICLES = [
         slug: "ثمة-شيء-مختلف-في-الناس-الآن-وهذا-مرعب",
         excerpt:
             "اضطررت أمس لمرافقة صديق إلى غرفة الطوارئ وأنا أشعر بأن العالم لم يعد كما كان من قبل.",
-        image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/1200x/e0/e4/18/e0e4188649fa442bdaaa58c70531a4c6.jpg",
         claps: "٢٣ألف",
         comments: 495,
         reposts: 126,
@@ -145,7 +126,7 @@ export const ARTICLES = [
         slug: "٧-كتب-يصعب-قراءتها-لكنها-ستجعلك-أذكى-من-أي-كتاب-تطوير-ذاتي",
         excerpt:
             "قرأت أكثر من ٧٠ كتاباً في السنة، وهذه الـ٧ أعادت صياغة تفكيري تماماً.",
-        image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/vwebpf/736x/ab/1f/25/ab1f250de72460416f07f053b41ce9f8.webp",
         claps: "٣٣٢",
         comments: 8,
         reposts: 1,
@@ -164,7 +145,7 @@ export const ARTICLES = [
         slug: "الذكاء-الاصطناعي-لن-يسرق-وظيفتك-لكن-هذا-الشخص-سيفعل",
         excerpt:
             "الحقيقة التي لا يريد أحد قولها عن مستقبل العمل في عصر الأتمتة والنماذج اللغوية الكبيرة.",
-        image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/vwebpf/1200x/5f/fb/81/5ffb816d370a79e3b8524909220d36b2.webp",
         claps: "٤.٧ألف",
         comments: 231,
         reposts: 58,
@@ -183,7 +164,7 @@ export const ARTICLES = [
         slug: "لماذا-نخشى-الموت-ولا-نخشى-أننا-لم-كنن-موجودين-قبل-الولادة",
         excerpt:
             "الفيلسوف إبيقور طرح هذا السؤال منذ ألفي عام، والإجابة لا تزال تزعزع اليقين.",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=260&fit=crop",
+        image: "https://i.pinimg.com/1200x/b2/d8/f2/b2d8f21f96c086c5e349175b106d3218.jpg",
         claps: "٨.١ألف",
         comments: 143,
         reposts: 89,

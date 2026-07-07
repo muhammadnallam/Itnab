@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IcoClap, IcoComment, IcoShare, IcoBookmark, IcoMoreH } from "./Icons";
+import { Heart, MessageSquare, Share, Bookmark, Ellipsis } from "lucide-react";
 
 const ArticleActionBar = ({ claps, comments, reposts, saved, onSave }) => {
     const [clapCount, setClapCount] = useState(
@@ -43,7 +43,7 @@ const ArticleActionBar = ({ claps, comments, reposts, saved, onSave }) => {
                     onMouseEnter={(e) => (e.currentTarget.style.color = clapped ? "var(--color-accent)" : "var(--color-ink)")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = clapped ? "var(--color-accent)" : "var(--color-mid)")}
                 >
-                    <IcoClap size={18} />
+                    <Heart size={18} />
                 </button>
                 <span
                     style={{
@@ -63,7 +63,7 @@ const ArticleActionBar = ({ claps, comments, reposts, saved, onSave }) => {
                     onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
                 >
-                    <IcoComment size={18} />
+                    <MessageSquare size={18} />
                 </button>
                 <span style={{ fontSize: 13, color: "var(--color-mid)" }}>
                     {comments}
@@ -76,7 +76,7 @@ const ArticleActionBar = ({ claps, comments, reposts, saved, onSave }) => {
                     onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
                 >
-                    <IcoShare size={18} />
+                    <Share size={18} />
                 </button>
                 <span style={{ fontSize: 13, color: "var(--color-mid)" }}>
                     {reposts}
@@ -91,7 +91,7 @@ const ArticleActionBar = ({ claps, comments, reposts, saved, onSave }) => {
                     onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
                 >
-                <IcoBookmark size={18} />
+                <Bookmark size={18} />
             </button>
 
             <button
@@ -99,7 +99,7 @@ const ArticleActionBar = ({ claps, comments, reposts, saved, onSave }) => {
                     onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
                 >
-                <IcoShare size={18} />
+                <Share size={18} />
             </button>
 
             <button
@@ -107,7 +107,7 @@ const ArticleActionBar = ({ claps, comments, reposts, saved, onSave }) => {
                     onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
                 >
-                <IcoMoreH size={18} />
+                <Ellipsis size={18} />
             </button>
         </div>
     );
