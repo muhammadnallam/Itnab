@@ -18,7 +18,6 @@ const CommentsSection = ({ responses, count }) => {
             >
                 <h3
                     style={{
-                        fontFamily: "Georgia, 'Noto Serif Arabic', serif",
                         fontSize: 19,
                         fontWeight: 700,
                         color: "var(--color-ink)",
@@ -58,7 +57,6 @@ const CommentsSection = ({ responses, count }) => {
                             border: "1px solid var(--color-border)",
                             borderRadius: 0,
                             fontSize: 15,
-                            fontFamily: "inherit",
                             background: "var(--color-bg)",
                             color: "var(--color-ink)",
                             outline: "none",
@@ -95,7 +93,6 @@ const CommentsSection = ({ responses, count }) => {
                                     borderRadius: 99,
                                     padding: "8px 16px",
                                     fontSize: 13,
-                                    fontFamily: "inherit",
                                     color: "var(--color-mid)",
                                     cursor: "pointer",
                                     transition: "border-color 0.15s, color 0.15s",
@@ -113,7 +110,6 @@ const CommentsSection = ({ responses, count }) => {
                                     borderRadius: 99,
                                     padding: "8px 16px",
                                     fontSize: 13,
-                                    fontFamily: "inherit",
                                     fontWeight: 500,
                                     cursor: "pointer",
                                     transition: "filter 0.15s",
@@ -196,8 +192,6 @@ const CommentsSection = ({ responses, count }) => {
                                 borderRadius: 0,
                                 padding: "12px 16px",
                                 marginBottom: 12,
-                                fontFamily:
-                                    "Georgia, 'Noto Serif Arabic', serif",
                                 fontSize: 15,
                                 color: "var(--color-mid)",
                                 lineHeight: 1.65,
@@ -293,7 +287,6 @@ const CommentsSection = ({ responses, count }) => {
                                 cursor: "pointer",
                                 fontSize: 13,
                                 color: "var(--color-accent)",
-                                fontFamily: "inherit",
                                 fontWeight: 500,
                                 transition: "color 0.15s",
                                 padding: 0,

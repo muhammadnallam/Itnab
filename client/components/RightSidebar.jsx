@@ -64,7 +64,6 @@ const RightSidebar = ({ sidebarOpen, isActive } = {}) => (
                                 ? "var(--color-accent)"
                                 : "var(--color-mid)",
                             fontSize: 15,
-                            fontFamily: "inherit",
                             fontWeight: item.active ? 700 : 400,
                             borderRadius: 0,
                             marginBottom: 4,
@@ -108,7 +107,6 @@ const RightSidebar = ({ sidebarOpen, isActive } = {}) => (
                     cursor: "pointer",
                     color: "var(--color-mid)",
                     fontSize: 15,
-                    fontFamily: "inherit",
                     borderRadius: 0,
                     transition: "color 0.15s",
                 }}

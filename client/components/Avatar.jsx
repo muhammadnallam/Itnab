@@ -19,7 +19,6 @@ const Avatar = ({
             fontSize: size * 0.34,
             fontWeight: 700,
             flexShrink: 0,
-            fontFamily: "inherit",
             userSelect: "none",
             cursor: "pointer",
         }}

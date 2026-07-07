@@ -24,8 +24,6 @@ const MobileHeader = ({ onLogin, isAuthenticated }) => {
         <a href="/">
             <span
                 style={{
-                    fontFamily:
-                        "var(--font-wordmark), 'Noto Serif Arabic', serif",
                     fontWeight: 700,
                     fontSize: 19,
                     transform: "scaleX(1.1)",
@@ -66,7 +64,6 @@ const MobileHeader = ({ onLogin, isAuthenticated }) => {
                 cursor: "pointer",
                 color: "var(--color-mid)",
                 fontSize: 13,
-                fontFamily: "inherit",
                 padding: "4px",
                 transition: "color 0.15s",
             }}

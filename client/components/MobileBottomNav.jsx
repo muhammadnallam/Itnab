@@ -45,7 +45,6 @@ const MobileBottomNav = () => {
                                 ? "var(--color-accent)"
                                 : "var(--color-mid)",
                             fontSize: 13,
-                            fontFamily: "inherit",
                             gap: 4,
                             transition: "color 0.15s",
                         }}

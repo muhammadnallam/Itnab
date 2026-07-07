@@ -48,16 +48,14 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                         >
                             <span
                                 style={{
-                                    fontFamily:
-                                        "var(--font-wordmark), 'Noto Serif Arabic', serif",
-                                    fontWeight: 700,
-                                    fontSize: 24,
+                                    fontFamily: "var(--font-wordmark)",
+                                    fontWeight: 400,
+                                    fontSize: 28,
                                     marginBottom: "4px",
                                     color: "var(--color-accent)",
                                     letterSpacing: -0.5,
                                     flexShrink: 0,
                                     cursor: "pointer",
-                                    transform: "scaleX(1.1)",
                                 }}
                             >
                                 إطناب
@@ -97,7 +95,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                 fontSize: 15,
                                 fontWeight: 700,
                                 cursor: "pointer",
-                                fontFamily: "inherit",
                                 marginBottom: 12,
                                 transition: "filter 0.15s",
                             }}
@@ -124,7 +121,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                 fontSize: 15,
                                 fontWeight: 700,
                                 cursor: "pointer",
-                                fontFamily: "inherit",
                                 transition: "background 0.15s",
                             }}
                             onMouseEnter={(e) =>
@@ -188,7 +184,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                     fontSize: 13,
                                     color: "var(--color-ink)",
                                     cursor: "pointer",
-                                    fontFamily: "inherit",
                                     transition:
                                         "background 0.15s, border-color 0.15s, color 0.15s",
                                 }}
@@ -240,7 +235,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                 cursor: "pointer",
                                 fontSize: 13,
                                 color: "var(--color-accent)",
-                                fontFamily: "inherit",
                                 transition: "color 0.15s",
                             }}
                             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent-hover)")}
@@ -293,7 +287,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                     padding: "6px 16px",
                                     fontSize: 13,
                                     cursor: "pointer",
-                                    fontFamily: "inherit",
                                     fontWeight: 500,
                                     flexShrink: 0,
                                     transition: "background 0.15s",
@@ -348,7 +341,6 @@ export default function App() {
 
     const styles = {
         root: {
-            fontFamily: "'Noto Sans Arabic', 'Cairo', 'Segoe UI', sans-serif",
             direction: "rtl",
             background: "var(--color-bg)",
             minHeight: "100vh",

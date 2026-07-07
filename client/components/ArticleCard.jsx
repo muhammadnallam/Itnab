@@ -114,10 +114,8 @@ const ArticleCard = ({ article, isMobile }) => {
                     <a href={`/article/${article.slug}`}>
                         <h2
                             style={{
-                                fontFamily:
-                                    "Georgia, 'Noto Serif Arabic', serif",
                                 fontSize: isMobile ? 19 : 24,
-                                fontWeight: 700,
+                                fontWeight: 600,
                                 color: "var(--color-ink)",
                                 lineHeight: 1.3,
                                 marginBottom: 8,
@@ -130,7 +128,7 @@ const ArticleCard = ({ article, isMobile }) => {
 
                     <p
                         style={{
-                            fontSize: 15,
+                            fontSize: 16,
                             color: "var(--color-mid)",
                             lineHeight: 1.8,
                             marginBottom: 16,

@@ -44,7 +44,6 @@ const InputField = ({
                         border: `1px solid ${error ? "var(--color-error)" : "var(--color-border)"}`,
                         borderRadius: 8,
                         fontSize: 15,
-                        fontFamily: "inherit",
                         color: "var(--color-ink)",
                         background: "var(--color-white)",
                         outline: "none",
@@ -109,7 +108,6 @@ const PrimaryButton = ({
             border: "none",
             fontSize: 15,
             fontWeight: 700,
-            fontFamily: "inherit",
             background:
                 enabled && !loading
                     ? "var(--color-accent)"
@@ -211,7 +209,6 @@ const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
                         fontSize: 13,
                         fontWeight: 700,
                         color: "var(--color-ink)",
-                        fontFamily: "inherit",
                     }}
                 >
                     أنشئ حسابًا
@@ -304,7 +301,6 @@ const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
                         cursor: "pointer",
                         fontSize: 13,
                         color: "var(--color-light-txt)",
-                        fontFamily: "inherit",
                     }}
                 >
                     نسيت كلمة المرور؟
@@ -396,7 +392,6 @@ const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
                                 fontSize: 13,
                                 fontWeight: 700,
                                 color: "var(--color-ink)",
-                                fontFamily: "inherit",
                             }}
                         >
                             تسجيل الدخول
@@ -646,8 +641,6 @@ export default function AuthModal({
                     borderRadius: 0,
                     padding: "24px",
                     direction: "rtl",
-                    fontFamily:
-                        "'Noto Sans Arabic', 'Cairo', 'Segoe UI', sans-serif",
                     animation: "authModalIn 0.18s ease",
                 }}
             >

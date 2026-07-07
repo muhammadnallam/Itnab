@@ -255,7 +255,6 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                                         borderRadius: 999,
                                         padding: "8px 0",
                                         cursor: "pointer",
-                                        fontFamily: "inherit",
                                         fontSize: 13,
                                         fontWeight: 500,
                                         background: active
@@ -313,7 +312,6 @@ function menuItemStyle() {
         border: "none",
         background: "none",
         cursor: "pointer",
-        fontFamily: "inherit",
         fontSize: 13,
         color: "var(--color-ink)",
         textAlign: "right",

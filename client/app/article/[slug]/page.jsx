@@ -32,7 +32,6 @@ const ArticleContent = ({ blocks }) => (
                     <p
                         key={i}
                         style={{
-                            fontFamily: "Georgia, 'Noto Serif Arabic', serif",
                             fontSize: 19,
                             lineHeight: 1.8,
                             color: "var(--color-ink)",
@@ -48,7 +47,6 @@ const ArticleContent = ({ blocks }) => (
                     <h2
                         key={i}
                         style={{
-                            fontFamily: "Georgia, 'Noto Serif Arabic', serif",
                             fontSize: 24,
                             fontWeight: 700,
                             color: "var(--color-ink)",
@@ -68,7 +66,6 @@ const ArticleContent = ({ blocks }) => (
                             borderRight: "3px solid var(--color-accent)",
                             paddingRight: 20,
                             margin: "32px 0",
-                            fontFamily: "Georgia, 'Noto Serif Arabic', serif",
                             fontSize: 19,
                             fontStyle: "italic",
                             color: "var(--color-mid)",
@@ -109,7 +106,6 @@ const RelatedCard = ({ article }) => (
         </div>
         <h4
             style={{
-                fontFamily: "Georgia, 'Noto Serif Arabic', serif",
                 fontSize: 17,
                 fontWeight: 700,
                 color: "var(--color-ink)",
@@ -194,8 +190,6 @@ export default function ArticlePage() {
     return (
         <div
             style={{
-                fontFamily:
-                    "'Noto Sans Arabic', 'Cairo', 'Segoe UI', sans-serif",
                 direction: "rtl",
                 background: "var(--color-white)",
                 minHeight: "100vh",
@@ -254,8 +248,6 @@ export default function ArticlePage() {
 
                             <h1
                                 style={{
-                                    fontFamily:
-                                        "Georgia, 'Noto Serif Arabic', serif",
                                     fontSize: isMobile ? 24 : 32,
                                     fontWeight: 700,
                                     lineHeight: 1.2,
@@ -269,8 +261,6 @@ export default function ArticlePage() {
 
                             <p
                                 style={{
-                                    fontFamily:
-                                        "Georgia, 'Noto Serif Arabic', serif",
                                     fontSize: isMobile ? 17 : 19,
                                     color: "var(--color-mid)",
                                     lineHeight: 1.8,
@@ -325,7 +315,6 @@ export default function ArticlePage() {
                                                 borderRadius: 99,
                                                 padding: "3px 12px",
                                                 fontSize: 13,
-                                                fontFamily: "inherit",
                                                 color: followed
                                                     ? "var(--color-mid)"
                                                     : "var(--color-ink)",
@@ -439,7 +428,6 @@ export default function ArticlePage() {
                                                 borderRadius: 99,
                                                 padding: "5px 16px",
                                                 fontSize: 13,
-                                                fontFamily: "inherit",
                                                 cursor: "pointer",
                                                 fontWeight: 500,
                                                 transition: "all 0.15s",
@@ -478,8 +466,6 @@ export default function ArticlePage() {
                         <section style={{ marginTop: 64 }}>
                             <h3
                                 style={{
-                                    fontFamily:
-                                        "Georgia, 'Noto Serif Arabic', serif",
                                     fontSize: 19,
                                     fontWeight: 700,
                                     color: "var(--color-ink)",
@@ -516,7 +502,6 @@ export default function ArticlePage() {
                                         borderRadius: 99,
                                         padding: "8px 24px",
                                         fontSize: 13,
-                                        fontFamily: "inherit",
                                         color: "var(--color-ink)",
                                         cursor: "pointer",
                                         transition: "border-color 0.15s",
@@ -544,8 +529,6 @@ export default function ArticlePage() {
                         >
                             <h3
                                 style={{
-                                    fontFamily:
-                                        "Georgia, 'Noto Serif Arabic', serif",
                                     fontSize: 19,
                                     fontWeight: 700,
                                     color: "var(--color-ink)",

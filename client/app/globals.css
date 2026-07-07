@@ -1,8 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
     --font-family-sans: "Noto Sans Arabic", Cairo, "Segoe UI", sans-serif;
-    --font-family-serif: Georgia, "Noto Serif Arabic", serif;
+    --font-family-serif: "Noto Serif Arabic", Georgia, serif;
 
     /* Spacing scale (4px base) */
     --sp-xs: 4px;
@@ -86,8 +87,10 @@
     html {
         direction: rtl;
     }
-    body {
+    * {
         font-family: var(--font-family-sans);
+    }
+    body {
         background-color: var(--color-bg);
         color: var(--color-ink);
         min-height: 100vh;

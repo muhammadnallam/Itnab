@@ -28,7 +28,6 @@ const Tabs = ({ active, setActive, tabList }) => (
                         cursor: "pointer",
                         padding: "12px 20px",
                         fontSize: 15,
-                        fontFamily: "inherit",
                         whiteSpace: "nowrap",
                         flexShrink: 0,
                         color:

@@ -48,10 +48,9 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                 <a href="/">
                     <span
                         style={{
-                            fontFamily:
-                                "var(--font-wordmark), 'Noto Serif Arabic', serif",
-                            fontWeight: 700,
-                            fontSize: 24,
+                            fontFamily: "var(--font-wordmark)",
+                            fontWeight: 400,
+                            fontSize: 28,
                             color: "var(--color-accent)",
                             letterSpacing: -0.5,
                             flexShrink: 0,
@@ -85,7 +84,6 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                         border: "none",
                         outline: "none",
                         fontSize: 14,
-                        fontFamily: "inherit",
                         color: "var(--color-ink)",
                         width: "100%",
                         direction: "rtl",
@@ -107,7 +105,6 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                             color: "var(--color-mid)",
                             fontSize: 15,
                             cursor: "pointer",
-                            fontFamily: "inherit",
                             flexShrink: 0,
                             transition: "color 0.15s",
                         }}

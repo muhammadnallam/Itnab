@@ -16,7 +16,6 @@ const ArticleActionBar = ({ claps, comments, reposts, saved, onSave }) => {
         cursor: "pointer",
         color: active ? "var(--color-accent)" : "var(--color-mid)",
         fontSize: 13,
-        fontFamily: "inherit",
         padding: "4px 0",
         transition: "color 0.15s",
     });

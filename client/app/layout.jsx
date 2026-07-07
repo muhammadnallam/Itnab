@@ -29,6 +29,17 @@ const nastaliqUrdu = localFont({
     variable: "--font-wordmark",
 });
 
+const wordmarkFont = localFont({
+    src: [
+        {
+            path: "../public/fonts/ae_cortoba_regular.ttf",
+            weight: "400",
+            style: "normal",
+        },
+    ],
+    variable: "--font-wordmark",
+});
+
 export const metadata = {
     title: "إطناب",
     description: "نافذة على الفكر والقلم العربي",
@@ -38,7 +49,7 @@ export default function RootLayout({ children, user }) {
     return (
         <StrictMode>
             {/* TODO: Remove in Production */}
-            <html dir="rtl" lang="ar" className={nastaliqUrdu.variable}>
+            <html dir="rtl" lang="ar" className={wordmarkFont.variable}>
                 <head>
                     <meta
                         name="viewport"
