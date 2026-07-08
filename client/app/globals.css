@@ -22,34 +22,36 @@
     --radius-btn: 8px;
     --radius-pill: 99px;
     --radius-input: 8px;
+    --border-radius: 8px; /* TODO: Replace the rest */
 }
 
 @theme {
-    --color-accent: #3c2415; /* #301C15 */
-    --color-accent-hover: #5a3820;
+    --color-accent: #004741; /* #004741 */
+    --color-accent-hover: #153d2e;
     --color-accent-light: #f5ede8;
     --color-accent-med: #7a4a32;
     --color-accent-ring: rgba(60, 36, 22, 0.25);
     --color-gold: #c9a84c;
     --color-navy: #1b2d4f;
-    --color-surface: #ffffff;
-    --color-white: #ffffff;
+    --color-surface: #fdfcfa;
+    --color-white: #fdfcfa;
     /* --color-bg: #f9f9f9; */
-    --color-bg: white;
-    --color-page-bg: #e0e0e0;
+    --color-bg: #F0EDE4;
+    --color-page-bg: #F0EDE4;
     --color-parchment: #f7f4ee;
     /* --color-ink: #1a1a1a; */
-    --color-ink: #37352f;
+    --color-ink: #1a1714;
     --color-light-txt: #b7b8c2;
     --color-mid: #6b6b6b;
-    --color-light: #9e9e9e;
+    --color-light: #4a4540;
     --color-tag-bg: #f2ede9;
     --color-dark-card: #1a1a1a;
     --color-dark-surface: #2a2a2a;
-    --color-border: #e8e8e8;
+    --color-border: #c8c0b4;
     --color-error: #d32f2f;
     --color-disabled-bg: #f0f0f4;
     --color-disabled-txt: #b9bac4;
+    --color-surface-card: #fdfcfa;
 
     /* New Emerald Theme */
     /* --color-primary: #1a4d3a;
@@ -58,7 +60,6 @@
     --color-primary-light: #2d6b52;
     
     --color-background: #f5f0e8;
-    --color-surface-card: #fdfcfa;
     --color-surface-subtle: #ede8df;
     
     --color-ink: #1a1714;
