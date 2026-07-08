@@ -29,21 +29,27 @@ export function useCursorVisibility({
       const { state, view } = editor
       if (!view.hasFocus()) return
 
-      // Get current cursor position coordinates
+      const scrollContainer = view.dom.closest(".simple-editor-content")
+      if (!scrollContainer) return
+
       const { from } = state.selection
       const cursorCoords = view.coordsAtPos(from)
 
       if (windowHeight < rect.height && cursorCoords) {
-        const availableSpace = windowHeight - cursorCoords.top
+        const containerRect = scrollContainer.getBoundingClientRect()
+        const cursorTopRelative = cursorCoords.top - containerRect.top
+        const availableSpace = containerRect.height - cursorTopRelative
 
-        // If the cursor is hidden behind the overlay or offscreen, scroll it into view
         if (availableSpace < overlayHeight) {
-          const targetCursorY = Math.max(windowHeight / 2, overlayHeight)
-          const currentScrollY = window.scrollY
-          const cursorAbsoluteY = cursorCoords.top + currentScrollY
+          const targetCursorY = Math.max(
+            containerRect.height / 2,
+            overlayHeight
+          )
+          const currentScrollY = scrollContainer.scrollTop
+          const cursorAbsoluteY = cursorTopRelative + currentScrollY
           const newScrollY = cursorAbsoluteY - targetCursorY
 
-          window.scrollTo({
+          scrollContainer.scrollTo({
             top: Math.max(0, newScrollY),
             behavior: "smooth",
           })

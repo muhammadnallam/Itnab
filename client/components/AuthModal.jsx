@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { X, Eye, EyeOff, ArrowLeft, Bookmark } from "lucide-react";
+import { UserContext } from "@/context/UserContext";
 
 const OVERLAY = "rgba(15,15,20,0.6)";
 const BrandBadge = () => (
@@ -120,8 +121,14 @@ const PrimaryButton = ({
     <button
         onClick={enabled && !loading ? onClick : undefined}
         disabled={loading || !enabled}
-        onMouseEnter={(e) => { if (enabled && !loading) e.currentTarget.style.background = "var(--color-accent-hover)"; }}
-        onMouseLeave={(e) => { if (enabled && !loading) e.currentTarget.style.background = "var(--color-accent)"; }}
+        onMouseEnter={(e) => {
+            if (enabled && !loading)
+                e.currentTarget.style.background = "var(--color-accent-hover)";
+        }}
+        onMouseLeave={(e) => {
+            if (enabled && !loading)
+                e.currentTarget.style.background = "var(--color-accent)";
+        }}
         style={{
             width: "100%",
             padding: "12px 16px",
@@ -172,6 +179,7 @@ const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [apiError, setApiError] = useState("");
+    const { setUser } = useContext(UserContext);
 
     const validate = () => {
         const e = {};
@@ -188,7 +196,7 @@ const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
         setApiError("");
         if (!validate()) return;
         setLoading(true);
-        const result = await onLogIn(email.trim(), password);
+        const result = await onLogIn(email.trim(), password, setUser);
         setLoading(false);
         if (!result.success) {
             setApiError(result.error || "فشل تسجيل الدخول");
@@ -218,7 +226,7 @@ const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
                     marginBottom: 24,
                 }}
             >
-                أدخل بيانات الدخول أو {" "}
+                أدخل بيانات الدخول أو{" "}
                 <button
                     type="button"
                     onClick={onSwitchToRegister}
@@ -247,6 +255,7 @@ const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
                         background: "var(--color-error)",
                         borderRadius: 0,
                         textAlign: "center",
+                        borderRadius: "var(--border-radius)",
                     }}
                 >
                     {apiError}
@@ -294,8 +303,14 @@ const LogInView = ({ onSwitchToRegister, onLogIn, onClose }) => {
                                 color: "var(--color-mid)",
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-ink)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-mid)")
+                            }
                         >
                             {showPass ? (
                                 <Eye size={16} />
@@ -339,6 +354,7 @@ const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [apiError, setApiError] = useState("");
+    const { setUser } = useContext(UserContext);
 
     const validateEmail = () => {
         const e = {};
@@ -369,7 +385,7 @@ const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
         setApiError("");
         if (!validatePassword()) return;
         setLoading(true);
-        const result = await onRegister(email.trim(), password);
+        const result = await onRegister(email.trim(), password, setUser);
         setLoading(false);
         if (!result.success) {
             setApiError(result.error || "فشل إنشاء الحساب");
@@ -512,8 +528,14 @@ const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
                                         flexShrink: 0,
                                         transition: "border-color 0.15s",
                                     }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--color-border)")}
+                                    onMouseEnter={(e) =>
+                                        (e.currentTarget.style.borderColor =
+                                            "var(--color-accent)")
+                                    }
+                                    onMouseLeave={(e) =>
+                                        (e.currentTarget.style.borderColor =
+                                            "var(--color-border)")
+                                    }
                                 >
                                     <ArrowLeft size={15} />
                                 </button>
@@ -554,8 +576,14 @@ const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
                                             color: "var(--color-mid)",
                                             transition: "color 0.15s",
                                         }}
-                                        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
-                                        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                                        onMouseEnter={(e) =>
+                                            (e.currentTarget.style.color =
+                                                "var(--color-ink)")
+                                        }
+                                        onMouseLeave={(e) =>
+                                            (e.currentTarget.style.color =
+                                                "var(--color-mid)")
+                                        }
                                     >
                                         {showPass ? (
                                             <Eye size={16} />
@@ -578,9 +606,7 @@ const RegisterView = ({ onSwitchToLogIn, onRegister, onClose }) => {
     );
 };
 
-
-
-async function defaultLogIn(email, password) {
+async function defaultLogIn(email, password, setUser) {
     try {
         const res = await fetch("http://localhost:3000/api/auth/login", {
             method: "POST",
@@ -591,13 +617,14 @@ async function defaultLogIn(email, password) {
         const data = await res.json();
         if (!res.ok || !data.success)
             return { success: false, error: data.error || "فشل تسجيل الدخول" };
+        setUser(data);
         return { success: true, user: data.user };
     } catch {
         return { success: false, error: "تعذر الاتصال بالخادم" };
     }
 }
 
-async function defaultRegister(email, password) {
+async function defaultRegister(email, password, setUser) {
     try {
         const res = await fetch("http://localhost:3000/api/auth/register", {
             method: "POST",
@@ -608,6 +635,7 @@ async function defaultRegister(email, password) {
         const data = await res.json();
         if (!res.ok || !data.success)
             return { success: false, error: data.error || "فشل إنشاء الحساب" };
+        setUser(data);
         return { success: true, user: data.user };
     } catch {
         return { success: false, error: "تعذر الاتصال بالخادم" };
@@ -663,6 +691,7 @@ export default function AuthModal({
                     padding: "24px",
                     direction: "rtl",
                     animation: "authModalIn 0.18s ease",
+                    borderRadius: "var(--border-radius)",
                 }}
             >
                 <button
@@ -680,8 +709,12 @@ export default function AuthModal({
                         padding: 4,
                         transition: "color 0.15s",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                    onMouseEnter={(e) =>
+                        (e.currentTarget.style.color = "var(--color-ink)")
+                    }
+                    onMouseLeave={(e) =>
+                        (e.currentTarget.style.color = "var(--color-mid)")
+                    }
                 >
                     <X size={18} />
                 </button>
@@ -703,14 +736,14 @@ export default function AuthModal({
                 )}
             </div>
             <style>{`
-        @keyframes authModalIn {
-          from { opacity: 0; transform: translateY(8px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+                @keyframes authModalIn {
+                    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+                    to { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+        `}</style>
         </div>
     );
 }

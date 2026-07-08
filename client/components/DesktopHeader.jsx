@@ -1,13 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Bell, Search, Menu, SquarePen } from "lucide-react";
 import Avatar from "@/components/Avatar";
 import UserDropdown from "@/components/UserDropdown";
-import { useUser } from "@/context/UserContext";
+import { UserContext } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
 
-const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
+const DesktopHeader = ({ onLogin, onToggleSidebar }) => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const user = useUser();
+    const { user, setUser } = useContext(UserContext);
+    const router = useRouter();
 
     return (
         <header
@@ -96,7 +98,7 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
 
             <div style={{ display: "flex", gap: 16 }}>
                 {user && (
-                    <button
+                    <button onClick={() => {router.push("/editor")}}
                         style={{
                             display: "flex",
                             alignItems: "center",
@@ -152,7 +154,6 @@ const DesktopHeader = ({ isAuthenticated, onLogin, onToggleSidebar }) => {
                     <UserDropdown
                         open={menuOpen}
                         onClose={() => setMenuOpen(false)}
-                        isAuthenticated={isAuthenticated}
                         onLogin={onLogin}
                     />
                 </div>

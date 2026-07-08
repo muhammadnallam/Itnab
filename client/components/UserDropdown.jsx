@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useUser } from "@/context/UserContext";
+import { useEffect, useRef, useState, useContext } from "react";
+import { UserContext } from "@/context/UserContext";
 import {
     UserRound,
     Settings,
@@ -25,7 +25,7 @@ const themeOptions = [
 
 const UserDropdown = ({ open, onClose, onLogin }) => {
     const menuRef = useRef(null);
-    const user = useUser();
+    const { user, setUser } = useContext(UserContext);
     const [theme, setTheme] = useState("light");
 
     useEffect(() => {
@@ -62,7 +62,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
             method: "POST",
             credentials: "include",
         }).finally(() => {
-            window.location.href = "/";
+            setUser(null);
         });
         onClose();
     };
@@ -90,7 +90,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                     width: 260,
                     background: "var(--color-white)",
                     border: "1px solid var(--color-border)",
-                    borderRadius: 0,
+                    borderRadius: "var(--border-radius)",
                     zIndex: 80,
                     boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                     padding: 8,
@@ -169,11 +169,11 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                         onClick={handleLogin}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.color =
-                                "var(--color-accent)";
+                                "var(--color-ink)";
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.color =
-                                "var(--color-ink)";
+                                "var(--color-mid)";
                         }}
                         style={menuItemStyle()}
                     >
@@ -313,7 +313,7 @@ function menuItemStyle() {
         background: "none",
         cursor: "pointer",
         fontSize: 13,
-        color: "var(--color-ink)",
+        color: "var(--color-mid)",
         textAlign: "right",
         borderRadius: 0,
         transition: "color 0.12s",

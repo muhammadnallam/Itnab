@@ -30,6 +30,10 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRouter);
 
+app.post("/api/content", (req, res) => {
+    console.log(req.body);
+})
+
 app.listen(PORT, (e) => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

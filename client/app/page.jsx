@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { TAGS } from "@/components/constants";
 import { ARTICLES, WRITERS } from "@/data/dummybData";
 import MobileHeader from "@/components/MobileHeader";
@@ -11,16 +11,16 @@ import ArticleCard from "@/components/ArticleCard";
 import Avatar from "@/components/Avatar";
 import Tabs from "@/components/Tabs";
 import AuthModal from "@/components/AuthModal";
-import { useUser } from "@/context/UserContext";
+import { UserContext } from "@/context/UserContext";
 
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const [subs, setSubs] = useState(WRITERS.map((w) => w.sub));
-    const user = useUser();
+    const { user, setUser } = useContext(UserContext);
 
     const cardStyle = {
         background: "var(--color-surface)",
         border: "1px solid var(--color-border)",
-        borderRadius: 0,
+        borderRadius: "var(--border-radius)",
         padding: "24px 20px",
         marginBottom: 16,
     };
@@ -28,114 +28,113 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
     if (!user) {
         return (
             <div style={{ display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+                <div
+                    style={{
+                        background: "var(color-surface-card)",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: 0,
+                        padding: "24px 20px",
+                        textAlign: "center",
+                        marginBottom: 16,
+                        borderRadius: "var(--border-radius)",
+                    }}
+                >
                     <div
                         style={{
-                            background: "var(--color-bg)",
-                            border: "1px solid var(--color-border)",
-                            borderRadius: 0,
-                            padding: "24px 20px",
-                            textAlign: "center",
-                            marginBottom: 16,
+                            display: "flex",
+                            justifyContent: "center",
+                            marginBottom: 12,
                         }}
                     >
-                        <div
+                        <span
                             style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                marginBottom: 12,
-                            }}
-                        >
-                            <span
-                                style={{
-                                    fontFamily: "var(--font-wordmark)",
-                                    fontWeight: 400,
-                                    fontSize: 28,
-                                    marginBottom: "4px",
-                                    color: "var(--color-accent)",
-                                    letterSpacing: -0.5,
-                                    flexShrink: 0,
-                                    cursor: "pointer",
-                                }}
-                            >
-                                إطناب
-                            </span>
-                        </div>
-                        <h3
-                            style={{
-                                fontSize: 17,
-                                fontWeight: 700,
-                                // color: "var(--color-white)",
-                                marginBottom: 8,
-                                lineHeight: 1.3,
-                            }}
-                        >
-                            سجّل دخولك أو انضم إلينا
-                        </h3>
-                        <p
-                            style={{
-                                fontSize: 15,
-                                color: "var(--color-light)",
-                                marginBottom: 24,
-                                lineHeight: 1.8,
-                            }}
-                        >
-                            انضم إلى أكثر النقاشات إثارةً وعمقاً.
-                        </p>
-                        <button
-                            onClick={onLogin}
-                            style={{
-                                display: "block",
-                                width: "100%",
-                                background: "var(--color-accent)",
-                                color: "var(--color-white)",
-                                border: "none",
-                                borderRadius: 6,
-                                padding: "12px 16px",
-                                fontSize: 15,
-                                fontWeight: 700,
+                                fontFamily: "var(--font-wordmark)",
+                                fontWeight: 400,
+                                fontSize: 28,
+                                marginBottom: "4px",
+                                color: "var(--color-accent)",
+                                letterSpacing: -0.5,
+                                flexShrink: 0,
                                 cursor: "pointer",
-                                marginBottom: 12,
-                                transition: "filter 0.15s",
                             }}
-                            onMouseEnter={(e) =>
-                                (e.currentTarget.style.filter =
-                                    "brightness(1.15)")
-                            }
-                            onMouseLeave={(e) =>
-                                (e.currentTarget.style.filter = "brightness(1)")
-                            }
                         >
-                            تسجيل الدخول
-                        </button>
-                        <button
-                            onClick={onSignUp}
-                            style={{
-                                display: "block",
-                                width: "100%",
-                                background: "var(--color-dark-surface)",
-                                color: "var(--color-white)",
-                                border: "none",
-                                borderRadius: 6,
-                                padding: "12px 16px",
-                                fontSize: 15,
-                                fontWeight: 700,
-                                cursor: "pointer",
-                                transition: "background 0.15s",
-                            }}
-                            onMouseEnter={(e) =>
-                                (e.currentTarget.style.background = "#3a3a3a")
-                            }
-                            onMouseLeave={(e) =>
-                                (e.currentTarget.style.background =
-                                    "var(--color-dark-surface)")
-                            }
-                        >
-                            انضم إلينا
-                        </button>
+                            إطناب
+                        </span>
                     </div>
+                    <h3
+                        style={{
+                            fontSize: 17,
+                            fontWeight: 700,
+                            // color: "var(--color-white)",
+                            marginBottom: 8,
+                            lineHeight: 1.3,
+                        }}
+                    >
+                        سجّل دخولك أو انضم إلينا
+                    </h3>
+                    <p
+                        style={{
+                            fontSize: 15,
+                            color: "var(--color-light)",
+                            marginBottom: 24,
+                            lineHeight: 1.8,
+                        }}
+                    >
+                        انضم إلى أكثر النقاشات إثارةً وعمقاً.
+                    </p>
+                    <button
+                        onClick={onLogin}
+                        style={{
+                            display: "block",
+                            width: "100%",
+                            background: "var(--color-accent)",
+                            color: "var(--color-white)",
+                            border: "none",
+                            borderRadius: 6,
+                            padding: "12px 16px",
+                            fontSize: 15,
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            marginBottom: 12,
+                            transition: "filter 0.15s",
+                        }}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.filter = "brightness(1.15)")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.filter = "brightness(1)")
+                        }
+                    >
+                        تسجيل الدخول
+                    </button>
+                    <button
+                        onClick={onSignUp}
+                        style={{
+                            display: "block",
+                            width: "100%",
+                            background: "var(--color-dark-surface)",
+                            color: "var(--color-white)",
+                            border: "none",
+                            borderRadius: 6,
+                            padding: "12px 16px",
+                            fontSize: 15,
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            transition: "background 0.15s",
+                        }}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.background = "#3a3a3a")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.background =
+                                "var(--color-dark-surface)")
+                        }
+                    >
+                        انضم إلينا
+                    </button>
+                </div>
 
-                    {/* <p
+                {/* <p
                     style={{
                         fontSize: 11,
                         color: "var(--color-light)",
@@ -155,12 +154,11 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                         سياسة المحتوى
                     </a>
                 </p> */}
-                </div>
             </div>
         );
     } else {
         return (
-            <>
+            <div style={{ display: "flex", flexDirection: "column" }}>
                 <div style={cardStyle}>
                     <h4
                         style={{
@@ -237,8 +235,14 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                 color: "var(--color-accent)",
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent-hover)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent-hover)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-accent)")
+                            }
                         >
                             عرض الكل
                         </button>
@@ -277,7 +281,7 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                 }
                                 style={{
                                     background: subs[i]
-                                        ? "var(--color-border)"
+                                        ? "var(--color-accent-light)"
                                         : "var(--color-accent)",
                                     color: subs[i]
                                         ? "var(--color-ink)"
@@ -291,15 +295,27 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                     flexShrink: 0,
                                     transition: "background 0.15s",
                                 }}
-                                onMouseEnter={(e) => { if (subs[i]) { e.currentTarget.style.background = "#d0d0d0"; } else { e.currentTarget.style.background = "var(--color-accent-hover)"; } }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = subs[i] ? "var(--color-border)" : "var(--color-accent)"; }}
+                                onMouseEnter={(e) => {
+                                    if (subs[i]) {
+                                        e.currentTarget.style.background =
+                                            "#d0d0d0";
+                                    } else {
+                                        e.currentTarget.style.background =
+                                            "var(--color-accent-hover)";
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = subs[i]
+                                        ? "var(--color-border)"
+                                        : "var(--color-accent)";
+                                }}
                             >
                                 {subs[i] ? "متابَع" : "اشترك"}
                             </button>
                         </div>
                     ))}
                 </div>
-            </>
+            </div>
         );
     }
 };
@@ -314,15 +330,16 @@ export default function App() {
     const [tab, setTab] = useState("foryou");
     const [modal, setModal] = useState(null); // null | "signin" | "signup"
     const [sidebarOpen, setSidebarOpen] = useState(true);
-
     const [width, setWidth] = useState(
         typeof window !== "undefined" ? window.innerWidth : 1200,
     );
-    if (typeof window !== "undefined") {
-        window.addEventListener("resize", () => setWidth(window.innerWidth), {
-            passive: true,
-        });
-    }
+
+    useEffect(() => {
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener("resize", handleResize, { passive: true });
+        return () => window.removeEventListener("resize", handleResize);
+    }, []); // empty deps = runs once on mount, cleans up on unmount
+
     const isMobile = width < 768;
     const isTablet = width >= 768 && width < 1100;
 

@@ -61,7 +61,7 @@ export const Button = forwardRef((
   }
 
   return (
-    <Tooltip delay={200}>
+    <Tooltip delay={200} placement="bottom"> 
       <TooltipTrigger
         data-slot="tiptap-button"
         className={cn("tiptap-button", className)}

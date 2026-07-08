@@ -69,7 +69,7 @@
   --tt-brand-color-200: rgba(195, 189, 255, 1);
   --tt-brand-color-300: rgba(157, 138, 255, 1);
   --tt-brand-color-400: rgba(122, 82, 255, 1);
-  --tt-brand-color-500: rgba(98, 41, 255, 1);
+  --tt-brand-color-500: var(--color-accent);
   --tt-brand-color-600: rgba(84, 0, 229, 1);
   --tt-brand-color-700: rgba(75, 0, 204, 1);
   --tt-brand-color-800: rgba(56, 0, 153, 1);
@@ -116,7 +116,7 @@
   --tt-color-red-dec-5: hsla(1, 100%, 9%, 1);
 
   /* Basic colors */
-  --white: rgba(255, 255, 255, 1);
+  --white: var(--color-bg);
   --black: rgba(14, 14, 17, 1);
   --transparent: rgba(255, 255, 255, 0);
 

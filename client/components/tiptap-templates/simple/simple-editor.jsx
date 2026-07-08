@@ -1,4 +1,5 @@
 "use client";
+import { EditorHeader } from "@/components/Editor";
 
 import { useEffect, useRef, useState } from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
@@ -10,7 +11,7 @@ import { TaskItem, TaskList } from "@tiptap/extension-list";
 import { TextAlign } from "@tiptap/extension-text-align";
 import { Typography } from "@tiptap/extension-typography";
 import { Highlight } from "@tiptap/extension-highlight";
-import { Selection } from "@tiptap/extensions";
+import { Placeholder, Selection } from "@tiptap/extensions";
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button";
@@ -24,6 +25,11 @@ import {
 // --- Tiptap Node ---
 import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
 import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension";
+import {
+    ArticleTitle,
+    ArticleDescription,
+} from "@/components/tiptap-node/article-node/article-node-extension";
+import { ProtectedNodes } from "@/components/tiptap-extension/protected-nodes-extension";
 import "@/components/tiptap-node/blockquote-node/blockquote-node.scss";
 import "@/components/tiptap-node/code-block-node/code-block-node.scss";
 import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss";
@@ -67,8 +73,6 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
-
-import content from "@/components/tiptap-templates/simple/data/content.json";
 
 const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
     return (
@@ -159,7 +163,8 @@ export function SimpleEditor() {
                 autocomplete: "off",
                 autocorrect: "off",
                 autocapitalize: "off",
-                "aria-label": "منطقة المحتوى الرئيسية، ابدأ الكتابة لإدخال النص.",
+                "aria-label":
+                    "منطقة المحتوى الرئيسية، ابدأ الكتابة لإدخال النص.",
                 class: "simple-editor",
             },
         },
@@ -167,10 +172,23 @@ export function SimpleEditor() {
             StarterKit.configure({
                 horizontalRule: false,
                 link: {
-                    // openOnClick: false,
+                    openOnClick: false,
                     enableClickSelection: true,
                 },
             }),
+            Placeholder.configure({
+                showOnlyCurrent: false,
+                placeholder: ({ node }) => {
+                    if (node.type.name === "articleTitle")
+                        return "عنوان المقال"
+                    if (node.type.name === "articleDescription")
+                        return "وصف المقال"
+                    return ""
+                },
+            }),
+            ProtectedNodes,
+            ArticleTitle,
+            ArticleDescription,
             HorizontalRule,
             TextAlign.configure({
                 types: ["heading", "paragraph"],
@@ -192,7 +210,39 @@ export function SimpleEditor() {
                 onError: (error) => console.error("Upload failed:", error),
             }),
         ],
-        content,
+        content: (() => {
+            if (typeof window !== "undefined") {
+                const saved = window.localStorage.getItem("editor-content");
+                if (saved && saved !== "{}" && saved !== "") {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        if (
+                            parsed?.content?.length > 0 &&
+                            parsed.content[0]?.type !== "articleTitle"
+                        ) {
+                            parsed.content.unshift(
+                                { type: "articleTitle", content: [] },
+                                { type: "articleDescription", content: [] },
+                            );
+                        }
+                        return parsed;
+                    } catch {}
+                }
+            }
+            return {
+                type: "doc",
+                content: [
+                    { type: "articleTitle", content: [] },
+                    { type: "articleDescription", content: [] },
+                ],
+            };
+        })(),
+        onUpdate: ({ editor }) => {
+            window.localStorage.setItem(
+                "editor-content",
+                JSON.stringify(editor.getJSON()),
+            );
+        },
     });
 
     const rect = useCursorVisibility({
@@ -209,15 +259,16 @@ export function SimpleEditor() {
     return (
         <div className="simple-editor-wrapper">
             <EditorContext.Provider value={{ editor }}>
+                <EditorHeader />
                 <Toolbar
                     ref={toolbarRef}
-                    style={{
-                        ...(isMobile
-                            ? {
-                                  bottom: `calc(100% - ${height - rect.y}px)`,
-                              }
-                            : {}),
-                    }}
+                    // style={{
+                    //     ...(isMobile
+                    //         ? {
+                    //               bottom: `calc(100% - ${height - rect.y}px)`,
+                    //           }
+                    //         : {}),
+                    // }}
                 >
                     {mobileView === "main" ? (
                         <MainToolbarContent

@@ -28,7 +28,7 @@ const MobileHeader = ({ onLogin, isAuthenticated }) => {
                         fontWeight: 400,
                         fontSize: 28,
                         transform: "scaleX(1.1)",
-                        color: "var(--color-ink)",
+                        color: "var(--color-accent)",
                         letterSpacing: -0.5,
                         flexShrink: 0,
                     }}

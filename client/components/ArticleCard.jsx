@@ -61,7 +61,7 @@ const ArticleCard = ({ article, isMobile }) => {
                         <Avatar
                             initials={article.authorAvatar}
                             size={28}
-                            bg="var(--color-accent-med)"
+                            bg="var(--color-accent)"
                         />
                         <span
                             style={{
@@ -129,7 +129,7 @@ const ArticleCard = ({ article, isMobile }) => {
                     <p
                         style={{
                             fontSize: 16,
-                            color: "var(--color-mid)",
+                            color: "var(--color-light)",
                             lineHeight: 1.8,
                             marginBottom: 16,
                             display: "-webkit-box",
@@ -263,6 +263,7 @@ const ArticleCard = ({ article, isMobile }) => {
                             <Bookmark
                                 size={16}
                                 fill={saved ? "var(--color-accent)" : "none"}
+                                color={saved ? "var(--color-accent)" : "var(--color-mid)"}
                             />
                         </button>
                         <button
