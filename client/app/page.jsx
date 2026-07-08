@@ -15,7 +15,7 @@ import { UserContext } from "@/context/UserContext";
 
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const [subs, setSubs] = useState(WRITERS.map((w) => w.sub));
-    const { user, setUser } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     const cardStyle = {
         background: "var(--color-surface)",
@@ -27,16 +27,22 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
 
     if (!user) {
         return (
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    
+                }}
+            >
                 <div
                     style={{
-                        background: "var(color-surface-card)",
                         border: "1px solid var(--color-border)",
                         borderRadius: 0,
                         padding: "24px 20px",
                         textAlign: "center",
                         marginBottom: 16,
                         borderRadius: "var(--border-radius)",
+                        background: "var(--color-surface)",
                     }}
                 >
                     <div
@@ -322,21 +328,21 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
 
 const GlobalStyle = () => (
     <style>{`
-    .hide-scroll::-webkit-scrollbar { display: none; }
-  `}</style>
+        .hide-scroll::-webkit-scrollbar { display: none; }
+    `}</style>
 );
 
 export default function App() {
     const [tab, setTab] = useState("foryou");
     const [modal, setModal] = useState(null); // null | "signin" | "signup"
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [width, setWidth] = useState(
-        typeof window !== "undefined" ? window.innerWidth : 1200,
-    );
+    
+    const [width, setWidth] = useState(1200);
 
     useEffect(() => {
         const handleResize = () => setWidth(window.innerWidth);
         window.addEventListener("resize", handleResize, { passive: true });
+        handleResize();
         return () => window.removeEventListener("resize", handleResize);
     }, []); // empty deps = runs once on mount, cleans up on unmount
 
@@ -383,7 +389,7 @@ export default function App() {
             top: HEADER_H,
             height: `calc(100vh - ${HEADER_H}px)`,
             overflow: "hidden",
-            width: sidebarOpen ? 240 : 0,
+            width: sidebarOpen ? 232 : 0,
             // TODO: Apply sliding transition
         },
         centerWrap: {
@@ -393,7 +399,7 @@ export default function App() {
         },
         // Inner wrapper used inside <main> to cap content width and center it
         centerInner: {
-            maxWidth: 700,
+            maxWidth: 640,
             margin: "0 auto",
         },
         leftPanelWrap: {

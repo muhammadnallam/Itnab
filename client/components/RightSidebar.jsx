@@ -28,7 +28,7 @@ const NAV_ITEMS = [
 const RightSidebar = ({ sidebarOpen, isActive } = {}) => (
     <div
         style={{
-            width: 240,
+            width: 232,
             transform: sidebarOpen
                 ? "translateX(0)"
                 : "translateX(240px)",
@@ -84,7 +84,7 @@ const RightSidebar = ({ sidebarOpen, isActive } = {}) => (
                         }}
                     >
                         <Icon
-                            size={22}
+                            size={24}
                             fill={item.active ? "var(--color-accent)" : "none"}
                             color={
                                 item.active
