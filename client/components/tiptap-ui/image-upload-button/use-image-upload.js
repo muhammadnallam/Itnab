@@ -1,76 +1,76 @@
 "use client";
-import { useCallback, useEffect, useState } from "react"
-import { useHotkeys } from "react-hotkeys-hook"
+import { useCallback, useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 // --- Hooks ---
-import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
-import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
+import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
+import { useIsBreakpoint } from "@/hooks/use-is-breakpoint";
 
 // --- Lib ---
-import { isExtensionAvailable } from "@/lib/tiptap-utils"
+import { isExtensionAvailable } from "@/lib/tiptap-utils";
 
 // --- Icons ---
-import { ImagePlusIcon } from "@/components/tiptap-icons/image-plus-icon"
+import { ImagePlusIcon } from "@/components/tiptap-icons/image-plus-icon";
 
-export const IMAGE_UPLOAD_SHORTCUT_KEY = "mod+shift+i"
+export const IMAGE_UPLOAD_SHORTCUT_KEY = "mod+shift+i";
 
 /**
  * Checks if image can be inserted in the current editor state
  */
 export function canInsertImage(editor) {
-  if (!editor || !editor.isEditable) return false
-  if (!isExtensionAvailable(editor, "imageUpload")) return false
+    if (!editor || !editor.isEditable) return false;
+    if (!isExtensionAvailable(editor, "imageUpload")) return false;
 
-  return editor.can().insertContent({ type: "imageUpload" });
+    return editor.can().insertContent({ type: "imageUpload" });
 }
 
 /**
  * Checks if image is currently active
  */
 export function isImageActive(editor) {
-  if (!editor || !editor.isEditable) return false
-  return editor.isActive("imageUpload");
+    if (!editor || !editor.isEditable) return false;
+    return editor.isActive("imageUpload");
 }
 
 /**
  * Inserts an image in the editor
  */
 export function insertImage(editor) {
-  if (!editor || !editor.isEditable) return false
-  if (!canInsertImage(editor)) return false
+    if (!editor || !editor.isEditable) return false;
+    if (!canInsertImage(editor)) return false;
 
-  try {
-    return editor
-      .chain()
-      .focus()
-      .insertContent({
-        type: "imageUpload",
-      })
-      .run();
-  } catch {
-    return false
-  }
+    try {
+        return editor
+            .chain()
+            .focus()
+            .insertContent({
+                type: "imageUpload",
+            })
+            .run();
+    } catch {
+        return false;
+    }
 }
 
 /**
  * Determines if the image button should be shown
  */
 export function shouldShowButton(props) {
-  const { editor, hideWhenUnavailable } = props
+    const { editor, hideWhenUnavailable } = props;
 
-  if (!editor || !editor.isEditable) return false
+    if (!editor || !editor.isEditable) return false;
 
-  if (!hideWhenUnavailable) {
-    return true
-  }
+    if (!hideWhenUnavailable) {
+        return true;
+    }
 
-  if (!isExtensionAvailable(editor, "imageUpload")) return false
+    if (!isExtensionAvailable(editor, "imageUpload")) return false;
 
-  if (!editor.isActive("code")) {
-    return canInsertImage(editor);
-  }
+    if (!editor.isActive("code")) {
+        return canInsertImage(editor);
+    }
 
-  return true
+    return true;
 }
 
 /**
@@ -110,60 +110,64 @@ export function shouldShowButton(props) {
  * ```
  */
 export function useImageUpload(config) {
-  const {
-    editor: providedEditor,
-    hideWhenUnavailable = false,
-    onInserted,
-  } = config || {}
+    const {
+        editor: providedEditor,
+        hideWhenUnavailable = false,
+        onInserted,
+    } = config || {};
 
-  const { editor } = useTiptapEditor(providedEditor)
-  const isMobile = useIsBreakpoint()
-  const [isVisible, setIsVisible] = useState(true)
-  const canInsert = canInsertImage(editor)
-  const isActive = isImageActive(editor)
+    const { editor } = useTiptapEditor(providedEditor);
+    const isMobile = useIsBreakpoint();
+    const [isVisible, setIsVisible] = useState(true);
+    const canInsert = canInsertImage(editor);
+    const isActive = isImageActive(editor);
 
-  useEffect(() => {
-    if (!editor) return
+    useEffect(() => {
+        if (!editor) return;
 
-    const handleSelectionUpdate = () => {
-      setIsVisible(shouldShowButton({ editor, hideWhenUnavailable }))
-    }
+        const handleSelectionUpdate = () => {
+            setIsVisible(shouldShowButton({ editor, hideWhenUnavailable }));
+        };
 
-    handleSelectionUpdate()
+        handleSelectionUpdate();
 
-    editor.on("selectionUpdate", handleSelectionUpdate)
+        editor.on("selectionUpdate", handleSelectionUpdate);
 
-    return () => {
-      editor.off("selectionUpdate", handleSelectionUpdate)
+        return () => {
+            editor.off("selectionUpdate", handleSelectionUpdate);
+        };
+    }, [editor, hideWhenUnavailable]);
+
+    const handleImage = useCallback(() => {
+        if (!editor) return false;
+
+        const success = insertImage(editor);
+        if (success) {
+            onInserted?.();
+        }
+        return success;
+    }, [editor, onInserted]);
+
+    useHotkeys(
+        IMAGE_UPLOAD_SHORTCUT_KEY,
+        (event) => {
+            event.preventDefault();
+            handleImage();
+        },
+        {
+            enabled: isVisible && canInsert,
+            enableOnContentEditable: !isMobile,
+            enableOnFormTags: true,
+        },
+    );
+
+    return {
+        isVisible,
+        isActive,
+        handleImage,
+        canInsert,
+        label: "إضافة صورة",
+        shortcutKeys: IMAGE_UPLOAD_SHORTCUT_KEY,
+        Icon: ImagePlusIcon,
     };
-  }, [editor, hideWhenUnavailable])
-
-  const handleImage = useCallback(() => {
-    if (!editor) return false
-
-    const success = insertImage(editor)
-    if (success) {
-      onInserted?.()
-    }
-    return success
-  }, [editor, onInserted])
-
-  useHotkeys(IMAGE_UPLOAD_SHORTCUT_KEY, (event) => {
-    event.preventDefault()
-    handleImage()
-  }, {
-    enabled: isVisible && canInsert,
-    enableOnContentEditable: !isMobile,
-    enableOnFormTags: true,
-  })
-
-  return {
-    isVisible,
-    isActive,
-    handleImage,
-    canInsert,
-    label: "إضافة صورة",
-    shortcutKeys: IMAGE_UPLOAD_SHORTCUT_KEY,
-    Icon: ImagePlusIcon,
-  }
 }

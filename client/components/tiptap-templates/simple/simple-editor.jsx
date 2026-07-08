@@ -1,5 +1,8 @@
 "use client";
-import { EditorHeader } from "@/components/Editor";
+
+// --- My Components
+import EditorHeader from "@/components/Editor/EditorHeader";
+import { PublishModal, SettingsModal } from "@/components/Editor/EditorModals";
 
 import { useEffect, useRef, useState } from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
@@ -154,6 +157,10 @@ export function SimpleEditor() {
     const { height } = useWindowSize();
     const [mobileView, setMobileView] = useState("main");
     const toolbarRef = useRef(null);
+    const [ publishModal, setPublishModal ] = useState(false);
+    const [ settingsModal, setSettingsModal ] = useState(false);
+    const [coverImage, setCoverImage] = useState(null);
+    const [coverError, setCoverError] = useState("");
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -180,10 +187,10 @@ export function SimpleEditor() {
                 showOnlyCurrent: false,
                 placeholder: ({ node }) => {
                     if (node.type.name === "articleTitle")
-                        return "عنوان المقال"
+                        return "عنوان المقال";
                     if (node.type.name === "articleDescription")
-                        return "وصف المقال"
-                    return ""
+                        return "وصف المقال";
+                    return "";
                 },
             }),
             ProtectedNodes,
@@ -259,7 +266,12 @@ export function SimpleEditor() {
     return (
         <div className="simple-editor-wrapper">
             <EditorContext.Provider value={{ editor }}>
-                <EditorHeader />
+                <EditorHeader setPublishModal={setPublishModal} setSettingsModal={setSettingsModal}/>
+                <PublishModal isOpen={publishModal} onClose={() => {setPublishModal(false)}}
+                    coverImage={coverImage} setCoverImage={setCoverImage}
+                    coverError={coverError} setCoverError={setCoverError}
+                />
+                <SettingsModal isOpen={settingsModal} onClose={() => {setSettingsModal(false)}}/>
                 <Toolbar
                     ref={toolbarRef}
                     // style={{
@@ -290,11 +302,79 @@ export function SimpleEditor() {
                     )}
                 </Toolbar>
 
-                <EditorContent
-                    editor={editor}
-                    role="presentation"
-                    className="simple-editor-content"
-                />
+                <div className="simple-editor-content">
+                    {coverImage && (
+                        <div
+                            style={{
+                                padding: "3rem 3rem 24px",
+                                maxWidth: "100%",
+                                boxSizing: "border-box",
+                            }}
+                        >
+                            <img
+                                src={URL.createObjectURL(coverImage)}
+                                alt=""
+                                style={{
+                                    width: "100%",
+                                    aspectRatio: "191/100",
+                                    objectFit: "cover",
+                                    borderRadius: 8,
+                                }}
+                            />
+                        </div>
+                    )}
+                    <label
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 8,
+                            padding: "12px 3rem",
+                            cursor: "pointer",
+                            fontSize: 13,
+                            color: "var(--color-mid)",
+                            borderBottom: "1px solid var(--color-border)",
+                            margin: "0 3rem 0",
+                            transition: "color 0.15s, border-color 0.15s",
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.color =
+                                "var(--color-accent)";
+                            e.currentTarget.style.borderColor =
+                                "var(--color-accent)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.color = "var(--color-mid)";
+                            e.currentTarget.style.borderColor =
+                                "var(--color-border)";
+                        }}
+                    >
+                        <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                if (file.size > 3 * 1024 * 1024) {
+                                    setCoverError(
+                                        "الحد الأقصى 3 ميغابايت",
+                                    );
+                                    return;
+                                }
+                                setCoverError("");
+                                setCoverImage(file);
+                            }}
+                        />
+                        {coverImage
+                            ? "تغيير صورة الغلاف"
+                            : "إضافة صورة غلاف"}
+                    </label>
+                    <EditorContent
+                        editor={editor}
+                        role="presentation"
+                    />
+                </div>
             </EditorContext.Provider>
         </div>
     );

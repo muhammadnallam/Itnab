@@ -1,104 +1,101 @@
 "use client";
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react";
 
 // --- Hooks ---
-import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
 
 // --- Lib ---
-import {
-  isExtensionAvailable,
-  isNodeTypeSelected,
-} from "@/lib/tiptap-utils"
+import { isExtensionAvailable, isNodeTypeSelected } from "@/lib/tiptap-utils";
 
 // --- Icons ---
-import { AlignCenterIcon } from "@/components/tiptap-icons/align-center-icon"
-import { AlignJustifyIcon } from "@/components/tiptap-icons/align-justify-icon"
-import { AlignLeftIcon } from "@/components/tiptap-icons/align-left-icon"
+import { AlignCenterIcon } from "@/components/tiptap-icons/align-center-icon";
+import { AlignJustifyIcon } from "@/components/tiptap-icons/align-justify-icon";
+import { AlignLeftIcon } from "@/components/tiptap-icons/align-left-icon";
 import { AlignRightIcon } from "@/components/tiptap-icons/align-right-icon";
 
 export const TEXT_ALIGN_SHORTCUT_KEYS = {
-  left: "mod+shift+l",
-  center: "mod+shift+e",
-  right: "mod+shift+r",
-  justify: "mod+shift+j",
-}
+    left: "mod+shift+l",
+    center: "mod+shift+e",
+    right: "mod+shift+r",
+    justify: "mod+shift+j",
+};
 
 export const textAlignIcons = {
-  left: AlignLeftIcon,
-  center: AlignCenterIcon,
-  right: AlignRightIcon,
-  justify: AlignJustifyIcon,
-}
+    left: AlignLeftIcon,
+    center: AlignCenterIcon,
+    right: AlignRightIcon,
+    justify: AlignJustifyIcon,
+};
 
 export const textAlignLabels = {
-  left: "محاذاة لليسار",
-  center: "توسيط",
-  right: "محاذاة لليمين",
-  justify: "ضبط",
-}
+    left: "محاذاة لليسار",
+    center: "توسيط",
+    right: "محاذاة لليمين",
+    justify: "ضبط",
+};
 
 /**
  * Checks if text alignment can be performed in the current editor state
  */
 export function canSetTextAlign(editor, align) {
-  if (!editor || !editor.isEditable) return false
-  if (
-    !isExtensionAvailable(editor, "textAlign") ||
-    isNodeTypeSelected(editor, ["image", "horizontalRule"])
-  )
-    return false
+    if (!editor || !editor.isEditable) return false;
+    if (
+        !isExtensionAvailable(editor, "textAlign") ||
+        isNodeTypeSelected(editor, ["image", "horizontalRule"])
+    )
+        return false;
 
-  return editor.can().setTextAlign(align);
+    return editor.can().setTextAlign(align);
 }
 
 export function hasSetTextAlign(commands) {
-  return "setTextAlign" in commands
+    return "setTextAlign" in commands;
 }
 
 /**
  * Checks if the text alignment is currently active
  */
 export function isTextAlignActive(editor, align) {
-  if (!editor || !editor.isEditable) return false
-  return editor.isActive({ textAlign: align });
+    if (!editor || !editor.isEditable) return false;
+    return editor.isActive({ textAlign: align });
 }
 
 /**
  * Sets text alignment in the editor
  */
 export function setTextAlign(editor, align) {
-  if (!editor || !editor.isEditable) return false
-  if (!canSetTextAlign(editor, align)) return false
+    if (!editor || !editor.isEditable) return false;
+    if (!canSetTextAlign(editor, align)) return false;
 
-  const chain = editor.chain().focus()
-  if (hasSetTextAlign(chain)) {
-    return chain.setTextAlign(align).run();
-  }
+    const chain = editor.chain().focus();
+    if (hasSetTextAlign(chain)) {
+        return chain.setTextAlign(align).run();
+    }
 
-  return false
+    return false;
 }
 
 /**
  * Determines if the text align button should be shown
  */
 export function shouldShowButton(props) {
-  const { editor, hideWhenUnavailable, align } = props
+    const { editor, hideWhenUnavailable, align } = props;
 
-  if (!editor) return false
+    if (!editor) return false;
 
-  if (!hideWhenUnavailable) {
-    return true
-  }
+    if (!hideWhenUnavailable) {
+        return true;
+    }
 
-  if (!editor.isEditable) return false
+    if (!editor.isEditable) return false;
 
-  if (!isExtensionAvailable(editor, "textAlign")) return false
+    if (!isExtensionAvailable(editor, "textAlign")) return false;
 
-  if (!editor.isActive("code")) {
-    return canSetTextAlign(editor, align);
-  }
+    if (!editor.isActive("code")) {
+        return canSetTextAlign(editor, align);
+    }
 
-  return true
+    return true;
 }
 
 /**
@@ -139,51 +136,53 @@ export function shouldShowButton(props) {
  * ```
  */
 export function useTextAlign(config) {
-  const {
-    editor: providedEditor,
-    align,
-    hideWhenUnavailable = false,
-    onAligned,
-  } = config
+    const {
+        editor: providedEditor,
+        align,
+        hideWhenUnavailable = false,
+        onAligned,
+    } = config;
 
-  const { editor } = useTiptapEditor(providedEditor)
-  const [isVisible, setIsVisible] = useState(true)
-  const canAlign = canSetTextAlign(editor, align)
-  const isActive = isTextAlignActive(editor, align)
+    const { editor } = useTiptapEditor(providedEditor);
+    const [isVisible, setIsVisible] = useState(true);
+    const canAlign = canSetTextAlign(editor, align);
+    const isActive = isTextAlignActive(editor, align);
 
-  useEffect(() => {
-    if (!editor) return
+    useEffect(() => {
+        if (!editor) return;
 
-    const handleSelectionUpdate = () => {
-      setIsVisible(shouldShowButton({ editor, align, hideWhenUnavailable }))
-    }
+        const handleSelectionUpdate = () => {
+            setIsVisible(
+                shouldShowButton({ editor, align, hideWhenUnavailable }),
+            );
+        };
 
-    handleSelectionUpdate()
+        handleSelectionUpdate();
 
-    editor.on("selectionUpdate", handleSelectionUpdate)
+        editor.on("selectionUpdate", handleSelectionUpdate);
 
-    return () => {
-      editor.off("selectionUpdate", handleSelectionUpdate)
+        return () => {
+            editor.off("selectionUpdate", handleSelectionUpdate);
+        };
+    }, [editor, hideWhenUnavailable, align]);
+
+    const handleTextAlign = useCallback(() => {
+        if (!editor) return false;
+
+        const success = setTextAlign(editor, align);
+        if (success) {
+            onAligned?.();
+        }
+        return success;
+    }, [editor, align, onAligned]);
+
+    return {
+        isVisible,
+        isActive,
+        handleTextAlign,
+        canAlign,
+        label: textAlignLabels[align],
+        shortcutKeys: TEXT_ALIGN_SHORTCUT_KEYS[align],
+        Icon: textAlignIcons[align],
     };
-  }, [editor, hideWhenUnavailable, align])
-
-  const handleTextAlign = useCallback(() => {
-    if (!editor) return false
-
-    const success = setTextAlign(editor, align)
-    if (success) {
-      onAligned?.()
-    }
-    return success
-  }, [editor, align, onAligned])
-
-  return {
-    isVisible,
-    isActive,
-    handleTextAlign,
-    canAlign,
-    label: textAlignLabels[align],
-    shortcutKeys: TEXT_ALIGN_SHORTCUT_KEYS[align],
-    Icon: textAlignIcons[align],
-  }
 }

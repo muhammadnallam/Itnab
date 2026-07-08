@@ -2,93 +2,102 @@
 import { forwardRef, useCallback, useState } from "react";
 
 // --- Hooks ---
-import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
 
 // --- Icons ---
-import { ChevronDownIcon } from "@/components/tiptap-icons/chevron-down-icon"
+import { ChevronDownIcon } from "@/components/tiptap-icons/chevron-down-icon";
 
 // --- Tiptap UI ---
 import { ListButton } from "@/components/tiptap-ui/list-button";
 
-import { useListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu/use-list-dropdown-menu"
+import { useListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu/use-list-dropdown-menu";
 
-import { Button } from "@/components/tiptap-ui-primitive/button"
+import { Button } from "@/components/tiptap-ui-primitive/button";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuGroup,
-} from "@/components/tiptap-ui-primitive/dropdown-menu"
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuGroup,
+} from "@/components/tiptap-ui-primitive/dropdown-menu";
 
 function ListDropdownMenuImpl(
-  {
-    editor: providedEditor,
-    types = ["bulletList", "orderedList"],
-    hideWhenUnavailable = false,
-    onOpenChange,
-    modal = true,
-    ...props
-  },
-  ref
+    {
+        editor: providedEditor,
+        types = ["bulletList", "orderedList"],
+        hideWhenUnavailable = false,
+        onOpenChange,
+        modal = true,
+        ...props
+    },
+    ref,
 ) {
-  const { editor } = useTiptapEditor(providedEditor)
-  const [isOpen, setIsOpen] = useState(false)
+    const { editor } = useTiptapEditor(providedEditor);
+    const [isOpen, setIsOpen] = useState(false);
 
-  const { filteredLists, canToggle, isActive, isVisible, Icon } =
-    useListDropdownMenu({
-      editor,
-      types,
-      hideWhenUnavailable,
-    })
+    const { filteredLists, canToggle, isActive, isVisible, Icon } =
+        useListDropdownMenu({
+            editor,
+            types,
+            hideWhenUnavailable,
+        });
 
-  const handleOnOpenChange = useCallback((open) => {
-    setIsOpen(open)
-    onOpenChange?.(open)
-  }, [onOpenChange])
+    const handleOnOpenChange = useCallback(
+        (open) => {
+            setIsOpen(open);
+            onOpenChange?.(open);
+        },
+        [onOpenChange],
+    );
 
-  if (!isVisible) {
-    return null
-  }
+    if (!isVisible) {
+        return null;
+    }
 
-  return (
-    <DropdownMenu modal={modal} open={isOpen} onOpenChange={handleOnOpenChange}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          data-active-state={isActive ? "on" : "off"}
-          role="button"
-          tabIndex={-1}
-          disabled={!canToggle}
-          data-disabled={!canToggle}
-          aria-label="خيارات القائمة"
-          tooltip="قائمة"
-          {...props}
-          ref={ref}>
-          <Icon className="tiptap-button-icon" />
-          <ChevronDownIcon className="tiptap-button-dropdown-small" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        <DropdownMenuGroup>
-          {filteredLists.map((option) => (
-            <DropdownMenuItem key={option.type} asChild>
-              <ListButton
-                editor={editor}
-                type={option.type}
-                text={option.label}
-                showTooltip={false} />
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+    return (
+        <DropdownMenu
+            modal={modal}
+            open={isOpen}
+            onOpenChange={handleOnOpenChange}
+        >
+            <DropdownMenuTrigger asChild>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    data-active-state={isActive ? "on" : "off"}
+                    role="button"
+                    tabIndex={-1}
+                    disabled={!canToggle}
+                    data-disabled={!canToggle}
+                    aria-label="خيارات القائمة"
+                    tooltip="قائمة"
+                    {...props}
+                    ref={ref}
+                >
+                    <Icon className="tiptap-button-icon" />
+                    <ChevronDownIcon className="tiptap-button-dropdown-small" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+                <DropdownMenuGroup>
+                    {filteredLists.map((option) => (
+                        <DropdownMenuItem key={option.type} asChild>
+                            <ListButton
+                                editor={editor}
+                                type={option.type}
+                                text={option.label}
+                                showTooltip={false}
+                            />
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenuGroup>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 }
 
-export const ListDropdownMenu = forwardRef(ListDropdownMenuImpl)
+export const ListDropdownMenu = forwardRef(ListDropdownMenuImpl);
 
-ListDropdownMenu.displayName = "ListDropdownMenu"
+ListDropdownMenu.displayName = "ListDropdownMenu";
 
-export default ListDropdownMenu
+export default ListDropdownMenu;

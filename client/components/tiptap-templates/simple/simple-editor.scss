@@ -1,53 +1,57 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
 body {
-  --tt-toolbar-height: 44px;
-  --tt-theme-text: var(--tt-gray-light-900);
+    --tt-toolbar-height: 44px;
+    --tt-theme-text: var(--tt-gray-light-900);
 
-  .dark & {
-    --tt-theme-text: var(--tt-gray-dark-900);
-  }
+    .dark & {
+        --tt-theme-text: var(--tt-gray-dark-900);
+    }
 }
 
 body {
-  font-family: "Inter", sans-serif;
-  color: var(--tt-theme-text);
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  padding: 0;
-  overscroll-behavior-y: none;
+    font-family: "Inter", sans-serif;
+    color: var(--tt-theme-text);
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    padding: 0;
+    overscroll-behavior-y: none;
 }
 
 html,
 body {
-  overscroll-behavior-x: none;
+    overscroll-behavior-x: none;
 }
 
 html,
 body,
 #root,
 #app {
-  height: 100%;
-  background-color: var(--tt-bg-color);
+    height: 100%;
+    /* Was --tt-bg-color while the wrapper below used --color-bg. If the
+       two variables ever resolve differently (or one is undefined), the
+       sliver of html/body revealed by the mobile 100vh bug shows up as a
+       mismatched (often white) strip instead of the editor background. */
+    background-color: var(--color-bg);
 }
 
 ::-webkit-scrollbar {
-  width: 0.25rem;
+    width: 0.25rem;
 }
 
 * {
-  scrollbar-width: thin;
-  scrollbar-color: var(--tt-scrollbar-color) transparent;
+    scrollbar-width: thin;
+    scrollbar-color: var(--tt-scrollbar-color) transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--tt-scrollbar-color);
-  border-radius: 9999px;
+    background-color: var(--tt-scrollbar-color);
+    border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+    background: transparent;
 }
 
 // .tiptap.ProseMirror {
@@ -55,36 +59,42 @@ body,
 // }
 
 .simple-editor-wrapper {
-  display: grid;
-  grid-template-rows: 57px 50px 1fr;
-  height: 100dvh;
-  overflow-y: auto;
-  background-color: var(--color-bg);
+    display: grid;
+    grid-template-rows: 57px 50px 1fr;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background-color: var(--color-bg);
 }
 
 .simple-editor-content {
-  max-width: 740px;
-  width: 100%;
-  margin: 0 auto;
+    height: 100%;
+    max-width: 740px;
+    width: 100%;
+    margin: 0 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
 }
 
 .simple-editor-content .tiptap.ProseMirror.simple-editor {
-  padding: 3rem 3rem 30vh;
-  // border: 3px solid black;
+    padding: 3rem 3rem 30vh;
+    // border: 3px solid black;
 }
 
 @media screen and (max-width: 480px) {
-  .simple-editor-content .tiptap.ProseMirror.simple-editor {
-    padding: 1rem 1.5rem 30vh;
-  }
+    .simple-editor-content .tiptap.ProseMirror.simple-editor {
+        padding: 1rem 1.5rem 30vh;
+    }
 }
 
 .article-title.is-editor-empty::before,
 .article-description.is-editor-empty::before {
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-  color: oklch(0.55 0 0);
-  opacity: 0.6;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    color: oklch(0.55 0 0);
+    opacity: 0.6;
 }
