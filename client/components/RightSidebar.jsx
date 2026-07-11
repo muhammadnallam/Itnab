@@ -25,11 +25,11 @@ const NAV_ITEMS = [
     },
 ];
 
-const RightSidebar = ({ sidebarOpen, isActive } = {}) => (
+const RightSidebar = ({ isOpen, isActive } = {}) => (
     <div
         style={{
             width: 232,
-            transform: sidebarOpen
+            transform: isOpen
                 ? "translateX(0)"
                 : "translateX(240px)",
             transition: "transform 0.3s ease",

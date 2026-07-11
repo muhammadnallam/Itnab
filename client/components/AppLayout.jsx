@@ -1,8 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import MobileHeader from "@/components/MobileHeader";
-import DesktopHeader from "@/components/DesktopHeader";
+import Header from "@/components/Header";
 import RightSidebar from "@/components/RightSidebar";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import { WidthContext } from "@/context/ScreenContext";
@@ -26,8 +25,8 @@ export default function AppLayout({
                 ? "240px 1fr"
                 : "0px 1fr"
             : sidebarOpen
-                ? "240px 1fr"
-                : "0px 1fr";
+              ? "240px 1fr"
+              : "0px 1fr";
         if (leftPanel && !isTablet) {
             return sidebarOpen ? "240px 1fr 350px" : "0px 1fr 350px";
         }
@@ -77,39 +76,38 @@ export default function AppLayout({
         },
     };
 
-    if (isMobile) {
-        return (
-            <div style={styles.root}>
-                <MobileHeader onLogin={onLogin} />
-                <main style={{ padding: "16px 16px 80px" }}>
-                    {children}
-                </main>
-                <MobileBottomNav />
-            </div>
-        );
-    }
-
     return (
         <div style={styles.root}>
-            <DesktopHeader
+            <Header
                 onLogin={onLogin}
                 onToggleSidebar={onToggleSidebar}
+                isMobile={isMobile}
             />
-            <div style={styles.desktopGrid}>
-                <div style={styles.rightSidebarWrap}>
-                    <RightSidebar isOpen={sidebarOpen} />
-                </div>
-                <main style={styles.centerWrap}>
-                    <div style={styles.centerInner}>
+            {isMobile ? (
+                <>
+                    <main style={{ padding: "16px 16px 80px" }}>
                         {children}
+                    </main>
+                    <MobileBottomNav />
+                </>
+            ) : (
+                <div style={styles.desktopGrid}>
+                    <div style={styles.rightSidebarWrap}>
+                        <RightSidebar isOpen={sidebarOpen} />
                     </div>
-                </main>
-                {leftPanel && (
-                    <div style={styles.leftPanelWrap} className="hide-scroll">
-                        {leftPanel}
-                    </div>
-                )}
-            </div>
+                    <main style={styles.centerWrap}>
+                        <div style={styles.centerInner}>{children}</div>
+                    </main>
+                    {leftPanel && (
+                        <div
+                            style={styles.leftPanelWrap}
+                            className="hide-scroll"
+                        >
+                            {leftPanel}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

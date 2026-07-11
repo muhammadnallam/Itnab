@@ -6,9 +6,9 @@ import UserDropdown from "@/components/UserDropdown";
 import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 
-const DesktopHeader = ({ onLogin, onToggleSidebar }) => {
+export default function Header({ onLogin, onToggleSidebar, isMobile }) {
     const [menuOpen, setMenuOpen] = useState(false);
-    const { user, setUser } = useContext(UserContext);
+    const { user } = useContext(UserContext);
     const router = useRouter();
 
     return (
@@ -28,26 +28,28 @@ const DesktopHeader = ({ onLogin, onToggleSidebar }) => {
             }}
         >
             <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-                <button
-                    onClick={onToggleSidebar}
-                    style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "var(--color-mid)",
-                        display: "flex",
-                        padding: 4,
-                        transition: "color 0.15s",
-                    }}
-                    onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "var(--color-ink)")
-                    }
-                    onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "var(--color-mid)")
-                    }
-                >
-                    <Menu size={24}></Menu>
-                </button>
+                {!isMobile && (
+                    <button
+                        onClick={onToggleSidebar}
+                        style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: "var(--color-mid)",
+                            display: "flex",
+                            padding: 4,
+                            transition: "color 0.15s",
+                        }}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.color = "var(--color-ink)")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.color = "var(--color-mid)")
+                        }
+                    >
+                        <Menu size={24}></Menu>
+                    </button>
+                )}
                 <a href="/">
                     <span
                         style={{
@@ -64,9 +66,30 @@ const DesktopHeader = ({ onLogin, onToggleSidebar }) => {
                         إطناب
                     </span>
                 </a>
+                {isMobile && (
+                    <button
+                        style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: "var(--color-mid)",
+                            display: "flex",
+                            padding: 4,
+                            transition: "color 0.15s",
+                        }}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.color = "var(--color-ink)")
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.color = "var(--color-mid)")
+                        }
+                    >
+                        <Search size={22} />
+                    </button>
+                )}
             </div>
 
-            <div
+            {!isMobile && <div
                 style={{
                     display: "flex",
                     alignItems: "center",
@@ -92,7 +115,7 @@ const DesktopHeader = ({ onLogin, onToggleSidebar }) => {
                         direction: "rtl",
                     }}
                 />
-            </div>
+            </div>}
 
             {/* <div style={{ flex: 1 }} /> */}
 
@@ -125,6 +148,7 @@ const DesktopHeader = ({ onLogin, onToggleSidebar }) => {
                         اكتب
                     </button>
                 )}
+                
 
                 <button
                     style={{
@@ -159,5 +183,3 @@ const DesktopHeader = ({ onLogin, onToggleSidebar }) => {
         </header>
     );
 };
-
-export default DesktopHeader;
