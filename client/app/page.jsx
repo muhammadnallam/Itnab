@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { TAGS } from "@/components/constants";
 import { ARTICLES, WRITERS } from "@/data/dummybData";
-import MobileHeader from "@/components/MobileHeader";
-import DesktopHeader from "@/components/DesktopHeader";
-import RightSidebar from "@/components/RightSidebar";
-import MobileBottomNav from "@/components/MobileBottomNav";
+import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import Avatar from "@/components/Avatar";
 import Tabs from "@/components/Tabs";
@@ -140,27 +137,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                         انضم إلينا
                     </button>
                 </div>
-
-                {/* <p
-                    style={{
-                        fontSize: 11,
-                        color: "var(--color-light)",
-                        lineHeight: 1.6,
-                        padding: "0 4px",
-                    }}
-                >
-                    <a href="#" style={{ color: "var(--color-light)" }}>
-                        شروط الخدمة
-                    </a>{" "}
-                    ·{" "}
-                    <a href="#" style={{ color: "var(--color-light)" }}>
-                        الخصوصية
-                    </a>{" "}
-                    ·{" "}
-                    <a href="#" style={{ color: "var(--color-light)" }}>
-                        سياسة المحتوى
-                    </a>
-                </p> */}
             </div>
         );
     } else {
@@ -334,14 +310,11 @@ export default function App() {
     const width = useContext(WidthContext);
 
     const isMobile = width < 768;
-    const isTablet = width >= 768 && width < 1100;
 
     const openLogin = () => setModal("signin");
     const openSignUp = () => setModal("signup");
     const closeModal = () => setModal(null);
     const toggleSidebar = () => setSidebarOpen((v) => !v);
-
-    const HEADER_H = 57;
 
     const tabList = [
         { id: "foryou", label: "لك" },
@@ -349,154 +322,26 @@ export default function App() {
         { id: "trending", label: "الأحدث" },
     ];
 
-    const styles = {
-        root: {
-            direction: "rtl",
-            background: "var(--color-bg)",
-            minHeight: "100vh",
-            color: "var(--color-ink)",
-        },
-        desktopGrid: {
-            display: "grid",
-            gridTemplateColumns: isTablet
-                ? sidebarOpen
-                    ? "240px 1fr"
-                    : "0px 1fr"
-                : sidebarOpen
-                    ? "240px 1fr 350px"
-                    : "0px 1fr 350px",
-            width: "100%",
-            minHeight: `calc(100vh - ${HEADER_H}px)`,
-            alignItems: "start",
-            transition: "grid-template-columns 0.3s ease",
-        },
-        rightSidebarWrap: {
-            borderLeft: "1px solid var(--color-border)",
-            position: "sticky",
-            top: HEADER_H,
-            height: `calc(100vh - ${HEADER_H}px)`,
-            overflow: "hidden",
-            width: sidebarOpen ? 232 : 0,
-            // TODO: Apply sliding transition
-        },
-        centerWrap: {
-            padding: isTablet ? "24px 32px" : "24px 48px",
-            minWidth: 0,
-            borderLeft: isTablet ? "none" : "1px solid var(--color-border)",
-        },
-        // Inner wrapper used inside <main> to cap content width and center it
-        centerInner: {
-            maxWidth: 640,
-            margin: "0 auto",
-        },
-        leftPanelWrap: {
-            padding: "24px",
-            position: "sticky",
-            top: HEADER_H,
-            height: `calc(100vh - ${HEADER_H}px)`,
-            overflowY: "scroll",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-        },
-    };
-
-    if (isMobile) {
-        return (
-            <div style={styles.root}>
-                <MobileHeader onLogin={openLogin} />
-                <main style={{ padding: "16px 16px 80px" }}>
-                    <Tabs active={tab} setActive={setTab} tabList={tabList} />
-                    {ARTICLES.map((a) => (
-                        <ArticleCard key={a.id} article={a} isMobile />
-                    ))}
-                </main>
-                <MobileBottomNav />
-                {modal && (
-                    <AuthModal
-                        open={Boolean(modal)}
-                        defaultMode={modal}
-                        onClose={closeModal}
-                    />
-                )}
-            </div>
-        );
-    } else if (isTablet) {
-        return (
-            <div style={styles.root}>
-                <DesktopHeader
-                    onLogin={openLogin}
-                    onToggleSidebar={toggleSidebar}
+    return (
+        <>
+            <AppLayout
+                leftPanel={<LeftPanel onLogin={openLogin} onSignUp={openSignUp} />}
+                sidebarOpen={sidebarOpen}
+                onToggleSidebar={toggleSidebar}
+                onLogin={openLogin}
+            >
+                <Tabs active={tab} setActive={setTab} tabList={tabList} />
+                {ARTICLES.map((a) => (
+                    <ArticleCard key={a.id} article={a} isMobile={isMobile} />
+                ))}
+            </AppLayout>
+            {modal && (
+                <AuthModal
+                    open={Boolean(modal)}
+                    defaultMode={modal}
+                    onClose={closeModal}
                 />
-                <div style={styles.desktopGrid}>
-                    <div style={styles.rightSidebarWrap}>
-                        <RightSidebar isOpen={sidebarOpen} />
-                    </div>
-                    <main style={styles.centerWrap}>
-                        <div style={styles.centerInner}>
-                            <Tabs
-                                active={tab}
-                                setActive={setTab}
-                                tabList={tabList}
-                            />
-                            {ARTICLES.map((a) => (
-                                <ArticleCard
-                                    key={a.id}
-                                    article={a}
-                                    isMobile={false}
-                                />
-                            ))}
-                        </div>
-                    </main>
-                </div>
-                {modal && (
-                    <AuthModal
-                        open={Boolean(modal)}
-                        defaultMode={modal}
-                        onClose={closeModal}
-                    />
-                )}
-            </div>
-        );
-    } else {
-        // Desktop
-        return (
-            <div style={styles.root}>
-                <DesktopHeader
-                    onLogin={openLogin}
-                    onToggleSidebar={toggleSidebar}
-                />
-                <div style={styles.desktopGrid}>
-                    <div style={styles.rightSidebarWrap}>
-                        <RightSidebar isOpen={sidebarOpen} />
-                    </div>
-                    <main style={styles.centerWrap}>
-                        <div style={styles.centerInner}>
-                            <Tabs
-                                active={tab}
-                                setActive={setTab}
-                                tabList={tabList}
-                            />
-                            {ARTICLES.map((a) => (
-                                <ArticleCard
-                                    key={a.id}
-                                    article={a}
-                                    isMobile={false}
-                                />
-                            ))}
-                        </div>
-                    </main>
-                    <div style={styles.leftPanelWrap} className="hide-scroll">
-                        <LeftPanel onLogin={openLogin} onSignUp={openSignUp} />
-                    </div>
-                </div>
-                {modal && (
-                    <AuthModal
-                        open={Boolean(modal)}
-                        defaultMode={modal}
-                        onClose={closeModal}
-                    />
-                )}
-            </div>
-        );
-    }
+            )}
+        </>
+    );
 }
