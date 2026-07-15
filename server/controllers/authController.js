@@ -1,10 +1,9 @@
-require("dotenv").config();
-const { z } = require("zod");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const cookieParser = require("cookie-parser");
-const { generateFromEmail } = require("unique-username-generator");
-const User = require("../models/user");
+import "dotenv/config";
+import { z } from "zod";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { generateFromEmail } from "unique-username-generator";
+import User from "../models/user.js";
 
 const NODE_ENV = process.env.NODE_ENV;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -12,7 +11,23 @@ const JWT_EXPIRES_IN = "1h";
 
 const user = new User();
 
-const validateData = (email, password) => {
+const setJwtCookie = (data, res) => {
+    const token = jwt.sign(
+        { userId: data.id, username: data.username },
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN },
+    );
+
+    res.cookie("jwt", token, {
+        httpOnly: true,
+        protected: NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 3600000,
+        path: "/",
+    });
+};
+
+const validateUser = (email, password) => {
     const userSchema = z.object({
         email: z.string().email("البريد الإلكتروني غير صالح"),
         password: z
@@ -33,24 +48,8 @@ const validateData = (email, password) => {
     return { success: result.success, error: errorMessage };
 };
 
-const setJwtCookie = (data, res) => {
-    const token = jwt.sign(
-        { userId: data.id, username: data.username },
-        JWT_SECRET,
-        { expiresIn: JWT_EXPIRES_IN },
-    );
-
-    res.cookie("jwt", token, {
-        httpOnly: true,
-        protected: NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 3600000,
-        path: "/",
-    });
-};
-
 const logIn = async (email, password, res) => {
-    const result = validateData(email, password);
+    const result = validateUser(email, password);
     if (!result.success) {
         return result;
     }
@@ -71,7 +70,7 @@ const logIn = async (email, password, res) => {
 };
 
 const register = async (email, password) => {
-    const result = validateData(email, password);
+    const result = validateUser(email, password);
     if (!result.success) {
         return result;
     }
@@ -104,4 +103,4 @@ const remove = async (userId) => {
     }
 };
 
-module.exports = { logIn, register, remove };
+export { logIn, register, remove };

@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const { logIn, register, remove } = require("../controllers/authController");
-const verifyCookie = require("../middleware/requireAuth");
+import { Router } from "express";
+import { logIn, register, remove } from "../controllers/authController.js";
+import verifyCookie from "../middleware/requireAuth.js";
+
+const router = Router();
 
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
@@ -34,7 +36,6 @@ router.post("/logout", (req, res) => {
 
 router.delete("/delete", verifyCookie, async (req, res) => {
     await remove(req.userId);
-    // TODO: Remove cookies
     res.json({ success: true });
 });
 
@@ -42,4 +43,4 @@ router.get("/me", verifyCookie, (req, res) => {
     res.json(req.user);
 });
 
-module.exports = router;
+export default router;

@@ -43,4 +43,4 @@ function sanitizeDoc(json, options = {}) {
     return walk(JSON.parse(JSON.stringify(json)), 0);
 }
 
-module.exports = { sanitizeDoc };
+export { sanitizeDoc };

@@ -1,4 +1,4 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
 class User {
     async findByEmail(email) {
@@ -28,4 +28,4 @@ class User {
     }
 }
 
-module.exports = User;
+export default User;

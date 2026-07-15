@@ -1,9 +1,9 @@
-const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const authRouter = require("./routes/auth");
-const articleRouter = require("./routes/article");
-require("dotenv").config();
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth.js";
+import articleRouter from "./routes/article.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -18,10 +18,8 @@ app.use(
     }),
 );
 
-// Event Logger
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
-
     next();
 });
 
@@ -30,13 +28,12 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
-
 app.use("/api/article", articleRouter);
 
 app.post("/api/content", (req, res) => {
     console.log(req.body);
 });
 
-app.listen(PORT, (e) => {
+app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -1,6 +1,6 @@
-const normalize = require("./normalize");
-const Article = require("../models/article");
-const { nanoid } = require("nanoid");
+import normalize from "./normalize.js";
+import Article from "../models/article.js";
+import { nanoid } from "nanoid";
 
 const stopWords = [
     "في",
@@ -31,10 +31,9 @@ async function slugify(title, tag) {
     let slug;
     const article = new Article();
 
-    // Normalize
     slug = normalize(title);
 
-    slug = slug.replace(/\s+/g, "-").replace(/[،؛!.,"']/g, ""); // Kept ?
+    slug = slug.replace(/\s+/g, "-").replace(/[،؛!.,"']/g, "");
 
     slug = `/${tag}/` + slug;
 
@@ -42,10 +41,8 @@ async function slugify(title, tag) {
     if (exists) {
         slug += nanoid(4);
     }
-    // Check uniqueness
 
     console.log(slug);
-    // Check unique; Not -> Add tag
 }
 
 const arabicTitles = [
@@ -65,4 +62,4 @@ for (let t of arabicTitles) {
     slugify(t, "مجتمع");
 }
 
-module.exports = slugify;
+export default slugify;

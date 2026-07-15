@@ -1,4 +1,4 @@
-const prisma = require("../lib/prisma");
+import prisma from "../lib/prisma.js";
 
 class Article {
     async slugExists(slug) {
@@ -10,4 +10,4 @@ class Article {
     }
 }
 
-module.exports = Article;
+export default Article;

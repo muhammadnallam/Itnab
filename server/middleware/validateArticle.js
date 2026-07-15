@@ -1,6 +1,6 @@
-const { z } = require("zod");
-const { validateDoc } = require("../lib/editor-schema");
-const { sanitizeDoc } = require("../lib/sanitize-doc");
+import { z } from "zod";
+import { validateDoc } from "../lib/editor-schema.js";
+import { sanitizeDoc } from "../lib/sanitize-doc.js";
 
 const VALID_TAGS = [
     "تقنية",
@@ -59,4 +59,4 @@ function validateArticle(req, res, next) {
     next();
 }
 
-module.exports = validateArticle;
+export default validateArticle;

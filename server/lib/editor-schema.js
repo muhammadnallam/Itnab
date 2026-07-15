@@ -1,10 +1,10 @@
-const { getSchema, Node } = require("@tiptap/core");
-const { StarterKit } = require("@tiptap/starter-kit");
-const { TaskList, TaskItem } = require("@tiptap/extension-list");
-const { TextAlign } = require("@tiptap/extension-text-align");
-const { Highlight } = require("@tiptap/extension-highlight");
-const { Image } = require("@tiptap/extension-image");
-const { Node: PMNode } = require("prosemirror-model");
+import { getSchema, Node } from "@tiptap/core";
+import { StarterKit } from "@tiptap/starter-kit";
+import { TaskList, TaskItem } from "@tiptap/extension-list";
+import { TextAlign } from "@tiptap/extension-text-align";
+import { Highlight } from "@tiptap/extension-highlight";
+import { Image } from "@tiptap/extension-image";
+import { Node as PMNode } from "prosemirror-model";
 
 const ArticleTitle = Node.create({
     name: "articleTitle",
@@ -78,4 +78,4 @@ function validateDoc(json) {
     return doc;
 }
 
-module.exports = { validateDoc, schema, extensions };
+export { validateDoc, schema, extensions };
