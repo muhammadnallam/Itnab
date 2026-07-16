@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { UserContext } from "@/context/UserContext";
+import { authClient } from "@/lib/auth-client";
 import {
     UserRound,
     Settings,
@@ -57,13 +58,9 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
         onClose();
     };
 
-    const handleLogout = () => {
-        fetch("http://localhost:3000/api/auth/logout", {
-            method: "POST",
-            credentials: "include",
-        }).finally(() => {
-            setUser(null);
-        });
+    const handleLogout = async () => {
+        await authClient.signOut();
+        setUser(null);
         onClose();
     };
 

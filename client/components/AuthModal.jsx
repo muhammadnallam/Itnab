@@ -4,6 +4,28 @@ import { UserContext } from "@/context/UserContext";
 import InputField from "./InputField";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
+import { authClient } from "@/lib/auth-client";
+
+const GoogleIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+            fill="#4285F4"
+        />
+        <path
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            fill="#34A853"
+        />
+        <path
+            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+            fill="#FBBC05"
+        />
+        <path
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+            fill="#EA4335"
+        />
+    </svg>
+);
 
 const BrandBadge = () => (
     <div
@@ -19,7 +41,11 @@ const BrandBadge = () => (
             margin: "0 auto 18px",
         }}
     >
-        <Bookmark size={20} fill="var(--color-accent)" stroke="var(--color-accent)" />
+        <Bookmark
+            size={20}
+            fill="var(--color-accent)"
+            stroke="var(--color-accent)"
+        />
     </div>
 );
 
@@ -82,9 +108,13 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
         else if (!EMAIL_RE.test(email)) e.email = "البريد الإلكتروني غير صالح";
 
         if (!password) e.password = "كلمة المرور مطلوبة";
-        else if (mode === "signup" && password.length > 20) e.password = "الحد الأقصى 20 حرفًا";
+        else if (mode === "signup" && password.length > 20)
+            e.password = "الحد الأقصى 20 حرفًا";
         else if (password.length < 8)
-            e.password = mode === "signup" ? "الحد الأدنى 8 أحرف" : "كلمة المرور قصيرة جداً";
+            e.password =
+                mode === "signup"
+                    ? "الحد الأدنى 8 أحرف"
+                    : "كلمة المرور قصيرة جداً";
 
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -104,6 +134,17 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
         onClose?.();
     };
 
+    const handleGoogleSignIn = async () => {
+        setLoading(true);
+        const { error } = await authClient.signIn.social({
+            provider: "google",
+        });
+        setLoading(false);
+        if (error) {
+            setApiError(error.message || "فشل تسجيل الدخول عبر Google");
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit} noValidate>
             <h2
@@ -117,9 +158,20 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
             >
                 {copy.title}
             </h2>
-            <p style={{ fontSize: 13, color: "var(--color-ink)", textAlign: "center", marginBottom: 24 }}>
+            <p
+                style={{
+                    fontSize: 13,
+                    color: "var(--color-ink)",
+                    textAlign: "center",
+                    marginBottom: 24,
+                }}
+            >
                 {copy.switchText}{" "}
-                <button type="button" onClick={onSwitchMode} style={linkBtnStyle}>
+                <button
+                    type="button"
+                    onClick={onSwitchMode}
+                    style={linkBtnStyle}
+                >
                     {copy.switchLink}
                 </button>
             </p>
@@ -140,6 +192,75 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                     {apiError}
                 </p>
             )}
+
+            <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    width: "100%",
+                    padding: "10px 16px",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--border-radius)",
+                    background: loading
+                        ? "var(--color-disabled-bg)"
+                        : "var(--color-white)",
+                    color: "var(--color-ink)",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: loading ? "wait" : "pointer",
+                    transition: "background 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                    if (!loading)
+                        e.currentTarget.style.background = "var(--color-bg)";
+                }}
+                onMouseLeave={(e) => {
+                    if (!loading)
+                        e.currentTarget.style.background =
+                            "var(--color-white)";
+                }}
+            >
+                <GoogleIcon />
+                متابعة عبر Google
+            </button>
+
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    margin: "16px 0",
+                }}
+            >
+                <div
+                    style={{
+                        flex: 1,
+                        height: 1,
+                        background: "var(--color-border)",
+                    }}
+                />
+                <span
+                    style={{
+                        fontSize: 13,
+                        color: "var(--color-mid)",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    أو
+                </span>
+                <div
+                    style={{
+                        flex: 1,
+                        height: 1,
+                        background: "var(--color-border)",
+                    }}
+                />
+            </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 <InputField
@@ -174,10 +295,20 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                             type="button"
                             onClick={() => setShowPass((s) => !s)}
                             style={iconBtnStyle}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-ink)")}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-mid)")}
+                            onMouseEnter={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-ink)")
+                            }
+                            onMouseLeave={(e) =>
+                                (e.currentTarget.style.color =
+                                    "var(--color-mid)")
+                            }
                         >
-                            {showPass ? <Eye size={16} /> : <EyeOff size={16} />}
+                            {showPass ? (
+                                <Eye size={16} />
+                            ) : (
+                                <EyeOff size={16} />
+                            )}
                         </button>
                     }
                 />
@@ -210,24 +341,38 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
 };
 
 async function handleUser(mode, email, password, setUser) {
-    try {
-        const endpoint = mode === "login" ? "login" : "register";
-        const res = await fetch(`http://localhost:3000/api/auth/${endpoint}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ email, password }),
+    if (mode === "login") {
+        const { data, error } = await authClient.signIn.email({
+            email,
+            password,
         });
-        const data = await res.json();
-        if (!res.ok || !data.success) return { success: false, error: data.error };
-        setUser(data);
-        return { success: true, user: data.user };
-    } catch {
-        return { success: false, error: "تعذر الاتصال بالخادم" };
+        if (error) {
+            return { success: false, error: error.message || "فشل تسجيل الدخول" };
+        }
+        const { data: session } = await authClient.getSession();
+        if (session?.user) setUser(session.user);
+        return { success: true };
     }
+
+    const name = email.split("@")[0];
+    const { data, error } = await authClient.signUp.email({
+        email,
+        password,
+        name,
+    });
+    if (error) {
+        return { success: false, error: error.message || "فشل إنشاء الحساب" };
+    }
+    if (data?.user) setUser(data.user);
+    return { success: true };
 }
 
-export default function AuthModal({ open, onClose, defaultMode = "login", onSubmit = handleUser }) {
+export default function AuthModal({
+    open,
+    onClose,
+    defaultMode = "login",
+    onSubmit = handleUser,
+}) {
     const [mode, setMode] = useState(defaultMode);
 
     useEffect(() => {
@@ -239,7 +384,9 @@ export default function AuthModal({ open, onClose, defaultMode = "login", onSubm
             <BrandBadge />
             <AuthForm
                 mode={mode}
-                onSwitchMode={() => setMode(mode === "login" ? "signup" : "login")}
+                onSwitchMode={() =>
+                    setMode(mode === "login" ? "signup" : "login")
+                }
                 onSubmit={onSubmit}
                 onClose={onClose}
             />

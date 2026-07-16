@@ -2,8 +2,9 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRouter from "./routes/auth.js";
 import articleRouter from "./routes/article.js";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -27,7 +28,8 @@ app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
 });
 
-app.use("/api/auth", authRouter);
+app.all("/api/auth/{*any}", toNodeHandler(auth));
+
 app.use("/api/article", articleRouter);
 
 app.post("/api/content", (req, res) => {

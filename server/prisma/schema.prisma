@@ -1,5 +1,6 @@
+
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../lib/generated/prisma"
 }
 
@@ -7,28 +8,36 @@ datasource db {
   provider = "postgresql"
 }
 
-
 // UUID is chosen over CUID2 to leverage the native support and database optimization.
 // Additionally, the platform manages articles URLs with slugs not with IDs (CUID2's main benefit).
+
 model User {
   id          String   @id @default(uuid()) @db.Uuid
   email       String   @unique
   username    String   @unique
-  firstName   String?  @default("مجهول")
+  firstName   String   @default("مجهول")
   lastName    String?
   bio         String?
   avatarUrl   String?
-  password    String
   preferences Json?
   createdAt   DateTime @default(now())
 
-  articles  Article[]
-  following Follow[]   @relation("follower")
-  followers Follow[]   @relation("following")
-  likes     Like[]
-  bookmarks Bookmark[]
-  shares    Share[]
-  views     View[]     @relation("userViews")
+  articles      Article[]
+  following     Follow[]   @relation("follower")
+  followers     Follow[]   @relation("following")
+  likes         Like[]
+  bookmarks     Bookmark[]
+  shares        Share[]
+  views         View[]     @relation("userViews")
+  
+  name          String
+  emailVerified Boolean    @default(false)
+  image         String?
+  updatedAt     DateTime   @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
 }
 
 model Article {
@@ -70,6 +79,7 @@ model ArticleTag {
 
 // Interactions were separated to simplify queries and make indexing more efficient.
 // createdAt are recorded for a planned writer statistics feature.
+
 model Follow {
   followerId  String   @db.Uuid
   followingId String   @db.Uuid
@@ -111,6 +121,7 @@ model Share {
 }
 
 // Logged in views are counted once per user (@@unique), unlike unlimited guest views.
+
 model View {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String?  @db.Uuid // Optional for counting guests views
@@ -125,3 +136,51 @@ model View {
 }
 
 // TODO: model Comment (Manage threaded comments, nesting replies).
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(uuid()) @db.Uuid
+  accountId             String
+  providerId            String
+  userId                String    @db.Uuid
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(uuid()) @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
