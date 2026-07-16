@@ -26,6 +26,7 @@
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
         "better-auth": "^1.6.23",
+        "better-auth-localization": "^3.0.0",
         "clsx": "^2.1.1",
         "lodash.throttle": "^4.1.1",
         "lucide-react": "^1.23.0",

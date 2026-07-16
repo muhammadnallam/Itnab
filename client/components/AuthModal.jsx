@@ -5,6 +5,7 @@ import InputField from "./InputField";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import { authClient } from "@/lib/auth-client";
+import { textAlignIcons } from "./tiptap-ui/text-align-button";
 
 const GoogleIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -105,16 +106,15 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
     const validate = () => {
         const e = {};
         if (!email.trim()) e.email = "البريد الإلكتروني مطلوب";
-        else if (!EMAIL_RE.test(email)) e.email = "البريد الإلكتروني غير صالح";
+        else if (!EMAIL_RE.test(email))
+            e.email =
+                "صيغة البريد الإلكتروني غير صحيحة. تأكد من كتابته بشكل صحيح";
 
         if (!password) e.password = "كلمة المرور مطلوبة";
-        else if (mode === "signup" && password.length > 20)
-            e.password = "الحد الأقصى 20 حرفًا";
+        else if (password.length > 20)
+            e.password = "كلمة المرور طويلة جدًا. يجب ألا تتجاوز 20 حرفًا";
         else if (password.length < 8)
-            e.password =
-                mode === "signup"
-                    ? "الحد الأدنى 8 أحرف"
-                    : "كلمة المرور قصيرة جداً";
+            e.password = "كلمة المرور ضعيفة. استخدم 8 أحرف على الأقل";
 
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -183,8 +183,8 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                         margin: "0 0 16px",
                         padding: "8px 12px",
                         fontSize: 13,
-                        color: "var(--color-white)",
-                        background: "var(--color-error)",
+                        color: "var(--color-error)",
+                        background: "var(--color-error-light)",
                         borderRadius: "var(--border-radius)",
                         textAlign: "center",
                     }}
@@ -221,8 +221,7 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                 }}
                 onMouseLeave={(e) => {
                     if (!loading)
-                        e.currentTarget.style.background =
-                            "var(--color-white)";
+                        e.currentTarget.style.background = "var(--color-white)";
                 }}
             >
                 <GoogleIcon />
@@ -311,6 +310,7 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                             )}
                         </button>
                     }
+                    style={{direction: "ltr", textAlign: "right"}}
                 />
             </div>
 
@@ -341,30 +341,43 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
 };
 
 async function handleUser(mode, email, password, setUser) {
-    if (mode === "login") {
-        const { data, error } = await authClient.signIn.email({
+    try {
+        if (mode === "login") {
+            const { data, error } = await authClient.signIn.email({
+                email,
+                password,
+            });
+            if (error) {
+                return {
+                    success: false,
+                    error: error.message || "فشل تسجيل الدخول",
+                };
+            }
+            const { data: session } = await authClient.getSession();
+            if (session?.user) setUser(session.user);
+            return { success: true };
+        }
+
+        const name = email.split("@")[0];
+        const { data, error } = await authClient.signUp.email({
             email,
             password,
+            name,
         });
         if (error) {
-            return { success: false, error: error.message || "فشل تسجيل الدخول" };
+            return {
+                success: false,
+                error: error.message || "فشل إنشاء الحساب",
+            };
         }
-        const { data: session } = await authClient.getSession();
-        if (session?.user) setUser(session.user);
+        if (data?.user) setUser(data.user);
         return { success: true };
+    } catch {
+        return {
+            success: false,
+            error: "حدث خطأ ما من جانبنا. يرجى المحاولة لاحقًا",
+        };
     }
-
-    const name = email.split("@")[0];
-    const { data, error } = await authClient.signUp.email({
-        email,
-        password,
-        name,
-    });
-    if (error) {
-        return { success: false, error: error.message || "فشل إنشاء الحساب" };
-    }
-    if (data?.user) setUser(data.user);
-    return { success: true };
 }
 
 export default function AuthModal({

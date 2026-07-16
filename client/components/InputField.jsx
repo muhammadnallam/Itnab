@@ -12,6 +12,7 @@ export default function InputField({
     minLength,
     autoComplete,
     error,
+    style,
 }){
     const inputId = id || name;
     const errId = inputId ? `${inputId}-error` : undefined;
@@ -45,6 +46,7 @@ export default function InputField({
                         outline: "none",
                         direction: "rtl",
                         transition: "border-color 0.2s",
+                        ...style,
                     }}
                     onFocus={(e) => {
                         if (!error)
