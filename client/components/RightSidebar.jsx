@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
     House,
     Inbox,
@@ -8,24 +10,17 @@ import {
 } from "lucide-react";
 
 const NAV_ITEMS = [
-    { icon: House, label: "الرئيسية", active: true, link: "/" },
-    {
-        icon: Inbox,
-        label: "الاشتراكات",
-        active: false,
-        link: "/subscriptions",
-    },
-    { icon: Bookmark, label: "مكتبتي", active: false, link: "/library" },
-    { icon: ChartColumn, label: "الإحصائيات", active: false, link: "/analytics" },
-    {
-        icon: UserRound,
-        label: "حسابي",
-        active: false,
-        link: "/profile",
-    },
+    { icon: House, label: "الرئيسية", link: "/" },
+    { icon: Inbox, label: "الاشتراكات", link: "/subscriptions" },
+    { icon: Bookmark, label: "مكتبتي", link: "/library" },
+    { icon: ChartColumn, label: "الإحصائيات", link: "/analytics" },
+    { icon: UserRound, label: "حسابي", link: "/profile" },
 ];
 
-const RightSidebar = ({ isOpen, isActive } = {}) => (
+const RightSidebar = ({ isOpen, isActive } = {}) => {
+    const pathname = usePathname();
+
+    return (
     <div
         style={{
             width: 232,
@@ -38,7 +33,7 @@ const RightSidebar = ({ isOpen, isActive } = {}) => (
     >
     <aside
         style={{
-            display: isActive ? "flex" : "hidden",
+            display: isActive !== false ? "flex" : "none",
             flexDirection: "column",
             padding: "24px 16px",
             height: "100%",
@@ -47,10 +42,11 @@ const RightSidebar = ({ isOpen, isActive } = {}) => (
         <nav style={{ flex: 1 }}>
             {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
+                const active = pathname === item.link;
                 return (
-                    <button
+                    <Link
                         key={item.label}
-                        onClick={() => (window.location.href = item.link)}
+                        href={item.link}
                         style={{
                             display: "flex",
                             alignItems: "center",
@@ -60,24 +56,25 @@ const RightSidebar = ({ isOpen, isActive } = {}) => (
                             background: "none",
                             border: "none",
                             cursor: "pointer",
-                            color: item.active
+                            color: active
                                 ? "var(--color-accent)"
                                 : "var(--color-mid)",
                             fontSize: 15,
-                            fontWeight: item.active ? 700 : 400,
+                            fontWeight: active ? 700 : 400,
                             borderRadius: 0,
                             marginBottom: 4,
+                            textDecoration: "none",
                             textAlign: "right",
                             transition: "color 0.15s",
                         }}
                         onMouseEnter={(e) => {
-                            if (!item.active) {
+                            if (!active) {
                                 e.currentTarget.style.color =
                                     "var(--color-ink)";
                             }
                         }}
                         onMouseLeave={(e) => {
-                            if (!item.active) {
+                            if (!active) {
                                 e.currentTarget.style.color =
                                     "var(--color-mid)";
                             }
@@ -85,20 +82,21 @@ const RightSidebar = ({ isOpen, isActive } = {}) => (
                     >
                         <Icon
                             size={24}
-                            fill={item.active ? "var(--color-accent)" : "none"}
+                            fill={active ? "var(--color-accent)" : "none"}
                             color={
-                                item.active
+                                active
                                     ? "var(--color-accent)"
                                     : "var(--color-mid)"
                             }
                         />
                         {item.label}
-                    </button>
+                    </Link>
                 );
             })}
         </nav>
     </aside>
     </div>
 );
+};
 
 export default RightSidebar;
