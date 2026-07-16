@@ -59,6 +59,7 @@ export default function AppLayout({
         centerWrap: {
             padding: isTablet ? "24px 32px" : "24px 48px",
             minWidth: 0,
+            minHeight: `calc(100vh - ${HEADER_H}px)`,
             borderLeft: isTablet ? "none" : "1px solid var(--color-border)",
         },
         centerInner: {

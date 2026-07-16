@@ -5,7 +5,8 @@ import InputField from "./InputField";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import { authClient } from "@/lib/auth-client";
-import { textAlignIcons } from "./tiptap-ui/text-align-button";
+import Image from "next/image";
+import logo from "../public/logo.png"
 
 const GoogleIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -34,19 +35,18 @@ const BrandBadge = () => (
             width: 48,
             height: 48,
             borderRadius: 12,
-            background: "var(--color-accent-light)",
-            color: "var(--accent-color)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             margin: "0 auto 18px",
         }}
     >
-        <Bookmark
+        {/* <Bookmark
             size={20}
             fill="var(--color-accent)"
             stroke="var(--color-accent)"
-        />
+        /> */}
+        <Image src={logo} alt="itnab logo"></Image>
     </div>
 );
 
@@ -169,7 +169,10 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                 {copy.switchText}{" "}
                 <button
                     type="button"
-                    onClick={onSwitchMode}
+                    onClick={() => {
+                        onSwitchMode();
+                        setApiError("");
+                    }}
                     style={linkBtnStyle}
                 >
                     {copy.switchLink}
@@ -310,7 +313,7 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                             )}
                         </button>
                     }
-                    style={{direction: "ltr", textAlign: "right"}}
+                    style={{ direction: "ltr", textAlign: "right" }}
                 />
             </div>
 
