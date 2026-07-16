@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import articleRouter from "./routes/article.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
+import logger from "./middleware/logger.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -19,10 +20,7 @@ app.use(
     }),
 );
 
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-});
+app.use(logger);
 
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
