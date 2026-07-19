@@ -54,7 +54,12 @@ export default function AppLayout({
             top: HEADER_H,
             height: `calc(100vh - ${HEADER_H}px)`,
             overflow: "hidden",
-            width: sidebarOpen ? 232 : 0,
+            width: 232,
+            transform: sidebarOpen
+                ? "translateX(0)"
+                : "translateX(240px)",
+            transition: "transform 0.4s ease",
+            willChange: "transform",
         },
         centerWrap: {
             padding: isTablet ? "24px 32px" : "24px 48px",
