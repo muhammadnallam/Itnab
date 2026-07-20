@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { UserContext } from "@/context/UserContext";
-import { authClient } from "@/lib/auth-client";
+import { signOut } from "@/lib/api";
 import {
     UserRound,
     Settings,
@@ -59,7 +59,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
     };
 
     const handleLogout = async () => {
-        await authClient.signOut();
+        await signOut();
         setUser(null);
         onClose();
     };

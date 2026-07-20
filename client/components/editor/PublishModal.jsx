@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import { TAGS } from "@/components/constants";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
-import { publish, upload } from "@/lib/api";
+import { handleArticle } from "@/lib/handlers";
 
 function InputField({ label, error, children }) {
     return (
@@ -153,68 +153,7 @@ function ModalFrame({ isOpen, onClose, title, footer, children, onSubmit }) {
     );
 }
 
-const handlePublishSubmit = async (data) => {
-    const errors = {};
-
-    if (!data.coverImage) errors.coverImage = "صورة الغلاف مطلوبة";
-
-    const content = data.content;
-    const firstNode = content?.content?.[0];
-    const secondNode = content?.content?.[1];
-
-    const getText = (node) =>
-        node?.content
-            ?.map((c) => (c.type === "text" ? c.text : ""))
-            .join("")
-            .trim() || "";
-
-    if (
-        !firstNode ||
-        firstNode.type !== "articleTitle" ||
-        !getText(firstNode)
-    ) {
-        errors.articleTitle = "عنوان المقال مطلوب";
-        alert(errors.articleTitle);
-    }
-
-    if (
-        !secondNode ||
-        secondNode.type !== "articleDescription" ||
-        !getText(secondNode)
-    ) {
-        errors.articleDescription = "وصف المقال مطلوب";
-        alert(errors.articleDescription);
-    }
-
-    if (!data.seoTitle) errors.seoTitle = "عنوان محركات البحث مطلوب";
-    else if (data.seoTitle.length > 60 || data.seoTitle.length < 30)
-        errors.seoTitle = "العنوان يجب أن يكون بين 30 إلى 60 حرفًا";
-
-    if (!data.seoDescription) errors.seoDescription = "وصف SEO مطلوب";
-    else if (
-        data.seoDescription.length > 160 ||
-        data.seoDescription.length < 100
-    )
-        errors.seoDescription = "الوصف يجب أن يكون بين 100 إلى 160 حرفًا";
-
-    if (!data.tag) errors.tag = "الموضوع مطلوب";
-
-    if (data.wordCount < 500) {
-        errors.wordCount = "يجب أن يحتوي المقال على 500 كلمة على الأقل";
-        alert(errors.wordCount);
-    }
-
-    if (Object.keys(errors).length > 0) return { success: false, errors };
-
-    try {
-        const coverImageUrl = await upload(data.coverImage);
-        const result = await publish(data, coverImageUrl);
-        return result;
-    } catch {
-        return { success: false, errors: { apiError: "Upload failed" } };
-    }
-
-};
+const handlePublishSubmit = (data) => handleArticle(data);
 
 export default function PublishModal({
     isOpen,

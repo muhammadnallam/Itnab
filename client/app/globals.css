@@ -48,7 +48,10 @@
     --color-dark-card: #1a1a1a;
     --color-dark-surface: #2a2a2a;
     --color-border: #c8c0b4;
+
     --color-error: #d32f2f;
+    --color-success: #2e7d5e;
+    
     --color-error-light: #FCE8E6;
     --color-disabled-bg: #f0f0f4;
     --color-disabled-txt: #b9bac4;

@@ -4,7 +4,8 @@ import { UserContext } from "@/context/UserContext";
 import InputField from "./InputField";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
-import { authClient } from "@/lib/auth-client";
+import { signInGoogle } from "@/lib/api";
+import { handleUser } from "@/lib/handlers";
 import Image from "next/image";
 import logo from "../public/logo.png"
 
@@ -136,13 +137,12 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
 
     const handleGoogleSignIn = async () => {
         setLoading(true);
-        const { error } = await authClient.signIn.social({
-            provider: "google",
-        });
-        setLoading(false);
-        if (error) {
-            setApiError(error.message || "فشل تسجيل الدخول عبر Google");
+        try {
+            await signInGoogle();
+        } catch (err) {
+            setApiError(err.message);
         }
+        setLoading(false);
     };
 
     return (
@@ -342,46 +342,6 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
         </form>
     );
 };
-
-async function handleUser(mode, email, password, setUser) {
-    try {
-        if (mode === "login") {
-            const { data, error } = await authClient.signIn.email({
-                email,
-                password,
-            });
-            if (error) {
-                return {
-                    success: false,
-                    error: error.message || "فشل تسجيل الدخول",
-                };
-            }
-            const { data: session } = await authClient.getSession();
-            if (session?.user) setUser(session.user);
-            return { success: true };
-        }
-
-        const name = email.split("@")[0];
-        const { data, error } = await authClient.signUp.email({
-            email,
-            password,
-            name,
-        });
-        if (error) {
-            return {
-                success: false,
-                error: error.message || "فشل إنشاء الحساب",
-            };
-        }
-        if (data?.user) setUser(data.user);
-        return { success: true };
-    } catch {
-        return {
-            success: false,
-            error: "حدث خطأ ما من جانبنا. يرجى المحاولة لاحقًا",
-        };
-    }
-}
 
 export default function AuthModal({
     open,

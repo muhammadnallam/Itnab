@@ -15,7 +15,7 @@ export function proxy(request) {
 
 export const config = {
   matcher: [
-    // "/new/:path*",
+    "/new/:path*",
     "/edit/:path*",
     "/settings/:path*",
     "/library/:path*",
