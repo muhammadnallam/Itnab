@@ -1,11 +1,11 @@
 import { authClient } from "./auth-client";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function upload(file) {
+export async function upload(file, folder) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch(`${API_URL}/api/upload`, {
+    const res = await fetch(`${API_URL}/api/upload/${folder}`, {
         credentials: "include",
         method: "POST",
         body: formData,

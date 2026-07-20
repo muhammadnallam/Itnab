@@ -18,7 +18,8 @@ const upload = multer({
 
 const router = Router();
 
-router.post("/", requireAuth, upload.single("file"), async (req, res) => {
+router.post("/:folder", requireAuth, upload.single("file"), async (req, res) => {
+    const folder = req.params.folder || "";
     try {
         if (!req.file) {
             return res
@@ -28,7 +29,7 @@ router.post("/", requireAuth, upload.single("file"), async (req, res) => {
 
         const result = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: "itnab" },
+                { folder: `itnab/${folder}` },
                 (error, result) => {
                     if (error) reject(error);
                     else resolve(result);

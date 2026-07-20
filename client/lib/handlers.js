@@ -1,4 +1,5 @@
 import { upload, publishArticle, getSession, signInEmail, signUpEmail} from "./api";
+import { processContentImages } from "./processImages";
 
 export async function handleArticle({ coverImage, content, seoTitle, seoDescription, tag, sendEmail, wordCount }) {
     const errors = {};
@@ -53,9 +54,10 @@ export async function handleArticle({ coverImage, content, seoTitle, seoDescript
     if (Object.keys(errors).length > 0) return { success: false, errors };
 
     try {
-        const coverImageUrl = await upload(coverImage);
+        const coverImageUrl = await upload(coverImage, "article-covers");
+        const processedContent = await processContentImages(content);
         const json = await publishArticle({
-            content,
+            content: processedContent,
             data: { seoTitle, seoDescription, tag, sendEmail, coverImage: coverImageUrl },
         });
         return { success: true, slug: json.slug };

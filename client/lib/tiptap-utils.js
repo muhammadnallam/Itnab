@@ -316,15 +316,25 @@ export function selectionWithinConvertibleTypes(editor, types = []) {
   return false
 }
 
+const pendingImageFiles = new Map();
+
+export function getPendingImageFiles() {
+    return pendingImageFiles;
+}
+
+export function clearPendingImageFiles() {
+    for (const blobUrl of pendingImageFiles.keys()) {
+        URL.revokeObjectURL(blobUrl);
+    }
+    pendingImageFiles.clear();
+}
+
 /**
  * Handles image upload with progress tracking and abort capability
  * @param file The file to upload
- * @param onProgress Optional callback for tracking upload progress
- * @param abortSignal Optional AbortSignal for cancelling the upload
- * @returns Promise resolving to the URL of the uploaded image
+ * @returns Promise resolving to a local blob URL for preview
  */
-export const handleImageUpload = async (file, onProgress, abortSignal) => {
-  // Validate file
+export const handleImageUpload = async (file) => {
   if (!file) {
     throw new Error("No file provided")
   }
@@ -333,17 +343,10 @@ export const handleImageUpload = async (file, onProgress, abortSignal) => {
     throw new Error(`File size exceeds maximum allowed (${MAX_FILE_SIZE / (1024 * 1024)}MB)`)
   }
 
-  // For demo/testing: Simulate upload progress. In production, replace the following code
-  // with your own upload implementation.
-  for (let progress = 0; progress <= 100; progress += 10) {
-    if (abortSignal?.aborted) {
-      throw new Error("Upload cancelled")
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    onProgress?.({ progress })
-  }
+  const previewUrl = URL.createObjectURL(file);
+  pendingImageFiles.set(previewUrl, file);
 
-  return "/images/tiptap-ui-placeholder-image.jpg"
+  return previewUrl;
 }
 
 const ATTR_WHITESPACE =
