@@ -4,7 +4,7 @@ import extractText from "../lib/extractText";
 import prisma from "../lib/prisma";
 
 export async function createArticle(validatedContent, articleData, userId) {
-    const { seoTitle, seoDescription, tag, sendEmail, coverImage, characterCount, readTime } =
+    const { seoTitle, seoDescription, tag, sendEmail, coverImage, wordCount } =
         articleData;
     const title =
         validatedContent.content?.[0]?.content?.[0]?.text?.trim() || "";
@@ -12,6 +12,7 @@ export async function createArticle(validatedContent, articleData, userId) {
         validatedContent.content?.[1]?.content?.[0]?.text?.trim() || "";
     const slug = await slugify(title);
     const searchVector = normalizeArabic(extractText(validatedContent));
+    const readTime = Math.max(1, Math.ceil(data.wordCount / 120));
 
     const contentClone = JSON.parse(JSON.stringify(validatedContent));
     contentClone.content.splice(0, 2);

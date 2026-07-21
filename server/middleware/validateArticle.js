@@ -66,10 +66,7 @@ function validateArticle(req, res, next) {
     }
 
     req.validatedContent = sanitized;
-    req.articleData = {
-        ...data,
-        readTime: Math.max(1, Math.ceil(data.wordCount / 120)),
-    };
+    req.articleData = data;
     next();
 }
 
