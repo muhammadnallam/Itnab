@@ -164,12 +164,23 @@ export default function PublishModal({
     setCoverError,
     content,
     wordCount,
+    mode,
+    articleData,
 }) {
-    const [seoTitle, setSeoTitle] = useState("");
+    const isUpdate = mode === "update";
+    const [seoTitle, setSeoTitle] = useState(
+        isUpdate && articleData?.seoTitle ? articleData.seoTitle : "",
+    );
     const [seoTitleError, setSeoTitleError] = useState("");
-    const [seoDescription, setSeoDescription] = useState("");
+    const [seoDescription, setSeoDescription] = useState(
+        isUpdate && articleData?.seoDescription
+            ? articleData.seoDescription
+            : "",
+    );
     const [seoDescriptionError, setSeoDescriptionError] = useState("");
-    const [tag, setTag] = useState("");
+    const [tag, setTag] = useState(
+        isUpdate && articleData?.tag ? articleData.tag : "",
+    );
     const [tagError, setTagError] = useState("");
     const [sendEmail, setSendEmail] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -210,11 +221,11 @@ export default function PublishModal({
         <ModalFrame
             isOpen={isOpen}
             onClose={onClose}
-            title="نشر"
+            title={isUpdate ? "تعديل" : "نشر"}
             footer={
                 <>
                     <Button loading={loading} type="submit">
-                        نشر المقال
+                        {isUpdate ? "تعديل المقال" : "نشر المقال"}
                     </Button>
                     <Button onClick={onClose} variant="secondary">
                         إلغاء
@@ -228,7 +239,7 @@ export default function PublishModal({
                 setSeoDescriptionError("");
                 setTagError("");
                 setLoading(true);
-                const result = await handlePublishSubmit({
+                const payload = {
                     coverImage,
                     seoTitle,
                     seoDescription,
@@ -236,7 +247,12 @@ export default function PublishModal({
                     sendEmail,
                     content,
                     wordCount,
-                });
+                };
+                if (isUpdate) {
+                    payload.mode = "update";
+                    payload.articleId = articleData?.id;
+                }
+                const result = await handlePublishSubmit(payload);
                 setLoading(false);
                 if (!result.success) {
                     if (result.errors.coverImage)
@@ -249,7 +265,11 @@ export default function PublishModal({
                     if (result.errors.apiError) alert(result.errors.apiError);
                     return;
                 }
-                router.push(`/article/${result.slug}`);
+                if (isUpdate) {
+                    router.push(`/article/${articleData?.slug}`);
+                } else {
+                    router.push(`/article/${result.slug}`);
+                }
                 onClose();
             }}
         >
@@ -273,7 +293,7 @@ export default function PublishModal({
                     />
                     {coverImage ? (
                         <img
-                            src={URL.createObjectURL(coverImage)}
+                            src={typeof coverImage === "string" ? coverImage : URL.createObjectURL(coverImage)}
                             alt=""
                             style={FILE_PREVIEW}
                         />

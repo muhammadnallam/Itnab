@@ -1,6 +1,9 @@
+import { notFound } from "next/navigation";
 import {
     upload,
     publishArticle,
+    updateArticle,
+    getArticle,
     getSession,
     signInEmail,
     signUpEmail,
@@ -15,6 +18,8 @@ export async function handleArticle({
     tag,
     sendEmail,
     wordCount,
+    mode,
+    articleId,
 }) {
     const errors = {};
 
@@ -65,10 +70,34 @@ export async function handleArticle({
     if (Object.keys(errors).length > 0) return { success: false, errors };
 
     try {
-        // const coverImageUrl = await upload(coverImage, "article-covers");
-        const coverImageUrl =
-            "https://substackcdn.com/image/fetch/$s_!SfSF!,w_1456,c_limit,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F028f3639-bac3-4e5e-9426-12357f00808a_736x558.jpeg";
+        const isUpdate = mode === "update";
+        let coverImageUrl = coverImage;
+
+        if (isUpdate && typeof coverImage === "string") {
+            // Existing URL -> skip upload
+        } else {
+            const uploaded = await upload(coverImage, "article-covers");
+            coverImageUrl = uploaded;
+        }
+
         const processedContent = await processContentImages(content);
+
+        if (isUpdate) {
+            await updateArticle({
+                content: processedContent,
+                data: {
+                    seoTitle,
+                    seoDescription,
+                    tag,
+                    sendEmail,
+                    coverImage: coverImageUrl,
+                    wordCount,
+                },
+                articleId,
+            });
+            return { success: true };
+        }
+
         const json = await publishArticle({
             content: processedContent,
             data: {
@@ -84,8 +113,22 @@ export async function handleArticle({
     } catch (err) {
         return {
             success: false,
-            errors: { apiError: err.message || "حديث خطأ أثناء نشر المقال" },
+            errors: {
+                apiError:
+                    err.message || isUpdate
+                        ? "حدث خطأ أثناء حفظ المقال"
+                        : "حدث خطأ أثناء نشر المقال",
+            },
         };
+    }
+}
+
+export async function handleArticleRead(slug) {
+    try {
+        const article = await getArticle(slug);
+        return article;
+    } catch (e) {
+        throw notFound();
     }
 }
 

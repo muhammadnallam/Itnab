@@ -3,6 +3,7 @@ import { renderTipTap } from "@/lib/render-tiptap-html";
 import Avatar from "@/components/Avatar";
 import ArticleHeader from "@/components/ArticleHeader";
 import "./styles.css";
+import { handleArticleRead } from "@/lib/handlers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -12,14 +13,6 @@ const Ltr = ({ children }) => (
     </span>
 );
 
-async function getArticle(slug) {
-    const res = await fetch(`${API_URL}/api/article/${slug}`, {
-        next: { revalidate: 60 },
-    });
-    if (!res.ok) return null;
-    return res.json();
-}
-
 function formatDate(dateStr) {
     const d = new Date(dateStr);
     return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
@@ -27,7 +20,7 @@ function formatDate(dateStr) {
 
 export async function generateMetadata({ params }) {
     const { slug } = await params;
-    const article = await getArticle(slug);
+    const article = await handleArticleRead(slug);
     if (!article) return {};
     return {
         title: article.seoTitle,
@@ -43,7 +36,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ArticlePage({ params }) {
     const { slug } = await params;
-    const article = await getArticle(slug);
+    const article = await handleArticleRead(slug);
     if (!article) notFound();
 
     const title = article.title;
@@ -71,7 +64,7 @@ export default async function ArticlePage({ params }) {
                         padding: "20px 0",
                         borderTop: "1px solid var(--color-border)",
                         borderBottom: "1px solid var(--color-border)",
-                    }} 
+                    }}
                     className="metadata"
                 >
                     <Avatar
@@ -132,7 +125,9 @@ export default async function ArticlePage({ params }) {
                                 {readTime} دقائق قراءة
                             </span>
                             <span>·</span>
-                            <span className="date">{formatDate(article.createdAt)}</span>
+                            <span className="date">
+                                {formatDate(article.createdAt)}
+                            </span>
                         </div>
                     </div>
                 </div>

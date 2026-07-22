@@ -3,15 +3,10 @@ import { TextSelection } from "@tiptap/pm/state";
 
 export const ArticleTitle = Node.create({
     name: "articleTitle",
-
     group: "block",
-
     content: "text*",
-
     marks: "",
-
     defining: true,
-
     selectable: false,
 
     parseHTML() {
@@ -60,15 +55,10 @@ export const ArticleTitle = Node.create({
 
 export const ArticleDescription = Node.create({
     name: "articleDescription",
-
     group: "block",
-
     content: "text*",
-
     marks: "",
-
     defining: true,
-
     selectable: false,
 
     parseHTML() {

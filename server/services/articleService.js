@@ -12,7 +12,7 @@ export async function createArticle(validatedContent, articleData, userId) {
         validatedContent.content?.[1]?.content?.[0]?.text?.trim() || "";
     const slug = await slugify(title);
     const searchVector = normalizeArabic(extractText(validatedContent));
-    const readTime = Math.max(1, Math.ceil(data.wordCount / 120));
+    const readTime = Math.max(1, Math.ceil(wordCount / 120));
 
     const contentClone = JSON.parse(JSON.stringify(validatedContent));
     contentClone.content.splice(0, 2);
@@ -45,4 +45,54 @@ export async function getArticleBySlug(slug) {
             },
         },
     });
+}
+
+export async function getArticleById(articleId) {
+    return prisma.article.findUnique({
+        where: { id: articleId },
+        include: {
+            author: {
+                select: { name: true, image: true },
+            },
+        },
+    });
+}
+
+export async function updateArticle(
+    articleId,
+    validatedContent,
+    articleData,
+    userId,
+) {
+    const { seoTitle, seoDescription, tag, sendEmail, coverImage, wordCount } =
+        articleData;
+    const title =
+        validatedContent.content?.[0]?.content?.[0]?.text?.trim() || "";
+    const subtitle =
+        validatedContent.content?.[1]?.content?.[0]?.text?.trim() || "";
+    const searchVector = normalizeArabic(extractText(validatedContent));
+    const readTime = Math.max(1, Math.ceil(wordCount / 120));
+
+    const contentClone = JSON.parse(JSON.stringify(validatedContent));
+    contentClone.content.splice(0, 2);
+
+    console.log(title);
+    console.log(subtitle);
+
+    const res = await prisma.article.update({
+        where: { id: articleId },
+        data: {
+            title,
+            subtitle,
+            seoTitle,
+            seoSubtitle: seoDescription,
+            topic: tag,
+            coverImage,
+            content: contentClone,
+            searchVector,
+            readTime,
+        },
+    });
+
+    console.log(res);
 }

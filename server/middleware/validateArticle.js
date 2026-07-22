@@ -18,7 +18,8 @@ const VALID_TAGS = [
 ];
 
 const articleSchema = z.object({
-    content: z.record(z.unknown()),
+    content: z.record(z.any()),
+    articleId: z.string().optional(),
     data: z.object({
         seoTitle: z.string().min(30).max(60),
         seoDescription: z.string().min(100).max(160),
@@ -39,8 +40,6 @@ function validateArticle(req, res, next) {
     }
 
     const { content, data } = parsed.data;
-
-    console.log(content);
 
     try {
         validateDoc(content);

@@ -1,12 +1,12 @@
 "use client";
 
-// --- My Components
 import EditorHeader from "@/components/editor/EditorHeader";
 import PublishModal from "@/components/editor/PublishModal";
 import ConfirmModal from "@/components/ConfirmModal";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
+import { useDebouncedCallback } from "use-debounce";
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit";
@@ -78,6 +78,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 // --- Styles ---
 import "./styles.scss";
 import { Trash } from "lucide-react";
+import CoverImage from "./CoverImageNode";
 
 const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
     return (
@@ -154,15 +155,64 @@ const MobileToolbarContent = ({ type, onBack }) => (
     </>
 );
 
-export function SimpleEditor() {
+export function Editor({ articleContent, articleData, mode } = {}) {
+    const isUpdate = mode === "update";
     const isMobile = useIsBreakpoint();
     const [mobileView, setMobileView] = useState("main");
     const toolbarRef = useRef(null);
     const [publishModal, setPublishModal] = useState(false);
     const [confirmModal, setConfirmModal] = useState(false);
-    const [coverImage, setCoverImage] = useState(null);
+    const [coverImage, setCoverImage] = useState(
+        isUpdate && articleData?.coverImage ? articleData.coverImage : null,
+    );
     const [coverError, setCoverError] = useState("");
     const [stats, setStats] = useState({ words: 0, characters: 0 });
+
+    const saveContent = useDebouncedCallback((content) => {
+        if (!isUpdate) {
+            window.localStorage.setItem(
+                "editor-content",
+                JSON.stringify(content),
+            );
+        }
+    }, 2000);
+
+    useEffect(() => {
+        return () => {
+            saveContent.flush();
+        };
+    }, [saveContent]);
+
+    const initialContent = useMemo(() => {
+        if (isUpdate && articleContent) {
+            return articleContent;
+        }
+        if (typeof window !== "undefined") {
+            const saved = window.localStorage.getItem("editor-content");
+            if (saved && saved !== "{}" && saved !== "") {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (
+                        parsed?.content?.length > 0 &&
+                        parsed.content[0]?.type !== "articleTitle"
+                    ) {
+                        parsed.content.unshift(
+                            { type: "articleTitle", content: [] },
+                            { type: "articleDescription", content: [] },
+                        );
+                    }
+                    return parsed;
+                } catch {}
+            }
+        }
+        return {
+            type: "doc",
+            content: [
+                { type: "articleTitle", content: [] },
+                { type: "articleDescription", content: [] },
+            ],
+        };
+    }, []);
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -209,8 +259,6 @@ export function SimpleEditor() {
             Image,
             Typography,
             Selection,
-            /* TODO: use tiptap-extension-upload-image to upload to cloudinary, replace with a link, 
-                     and show live preview upon success */
             ImageUploadNode.configure({
                 accept: "image/*",
                 maxSize: MAX_FILE_SIZE,
@@ -220,47 +268,13 @@ export function SimpleEditor() {
             }),
             CharacterCount,
         ],
-        content: (() => {
-            if (typeof window !== "undefined") {
-                const saved = window.localStorage.getItem("editor-content");
-                if (saved && saved !== "{}" && saved !== "") {
-                    try {
-                        const parsed = JSON.parse(saved);
-                        if (
-                            parsed?.content?.length > 0 &&
-                            parsed.content[0]?.type !== "articleTitle"
-                        ) {
-                            parsed.content.unshift(
-                                { type: "articleTitle", content: [] },
-                                { type: "articleDescription", content: [] },
-                            );
-                        }
-                        return parsed;
-                    } catch {}
-                }
-            }
-            return {
-                type: "doc",
-                content: [
-                    { type: "articleTitle", content: [] },
-                    { type: "articleDescription", content: [] },
-                ],
-            };
-        })(),
+        content: initialContent,
         onUpdate: ({ editor }) => {
             setStats({
                 words: editor.storage.characterCount.words(),
             });
-            window.localStorage.setItem(
-                "editor-content",
-                JSON.stringify(editor.getJSON()),
-            );
+            saveContent(editor.getJSON());
         },
-    });
-
-    const rect = useCursorVisibility({
-        editor,
-        overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
     });
 
     useEffect(() => {
@@ -296,6 +310,8 @@ export function SimpleEditor() {
                     setCoverError={setCoverError}
                     content={editor && editor.getJSON()}
                     wordCount={stats.words}
+                    mode={mode}
+                    articleData={articleData}
                 />
                 <ConfirmModal
                     isOpen={confirmModal}
@@ -307,16 +323,7 @@ export function SimpleEditor() {
                     buttonText={"حذف"}
                     onCancel={() => setConfirmModal(false)}
                 />
-                <Toolbar
-                    ref={toolbarRef}
-                    // style={{
-                    //     ...(isMobile
-                    //         ? {
-                    //               bottom: `calc(100% - ${height - rect.y}px)`,
-                    //           }
-                    //         : {}),
-                    // }}
-                >
+                <Toolbar ref={toolbarRef}>
                     {mobileView === "main" ? (
                         <MainToolbarContent
                             onHighlighterClick={() =>
@@ -339,72 +346,11 @@ export function SimpleEditor() {
 
                 <div className="simple-editor-scroll">
                     <div className="simple-editor-content">
-                        {coverImage && (
-                            <div
-                                style={{
-                                    padding: "3rem 3rem 24px",
-                                    maxWidth: "100%",
-                                    boxSizing: "border-box",
-                                }}
-                            >
-                                <img
-                                    src={URL.createObjectURL(coverImage)}
-                                    alt=""
-                                    style={{
-                                        width: "100%",
-                                        aspectRatio: "191/100",
-                                        objectFit: "cover",
-                                        borderRadius: 8,
-                                    }}
-                                />
-                            </div>
-                        )}
-                        <label
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: 8,
-                                padding: "12px 3rem",
-                                cursor: "pointer",
-                                fontSize: 13,
-                                color: "var(--color-mid)",
-                                borderBottom: "1px solid var(--color-border)",
-                                margin: "0 3rem 0",
-                                transition: "color 0.15s, border-color 0.15s",
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.color =
-                                    "var(--color-accent)";
-                                e.currentTarget.style.borderColor =
-                                    "var(--color-accent)";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.color =
-                                    "var(--color-mid)";
-                                e.currentTarget.style.borderColor =
-                                    "var(--color-border)";
-                            }}
-                        >
-                            <input
-                                type="file"
-                                accept="image/*"
-                                hidden
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (!file) return;
-                                    if (file.size > 3 * 1024 * 1024) {
-                                        setCoverError("الحد الأقصى 3 ميغابايت");
-                                        return;
-                                    }
-                                    setCoverError("");
-                                    setCoverImage(file);
-                                }}
-                            />
-                            {coverImage
-                                ? "تغيير صورة الغلاف"
-                                : "إضافة صورة غلاف"}
-                        </label>
+                        <CoverImage
+                            coverImage={coverImage}
+                            setCoverError={setCoverError}
+                            setCoverImage={setCoverImage}
+                        />
                         <EditorContent editor={editor} role="presentation" />
                     </div>
                 </div>

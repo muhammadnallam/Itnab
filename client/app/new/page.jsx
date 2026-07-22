@@ -1,4 +1,4 @@
-import { SimpleEditor } from "@/components/editor/Editor";
+import { Editor } from "@/components/editor/Editor";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -13,5 +13,5 @@ export default async function Page() {
         redirect("/auth");
     }
 
-    return <SimpleEditor />;
+    return <Editor />;
 }
