@@ -4,8 +4,7 @@ import validateArticle from "../middleware/validateArticle.js";
 import requireAuth from "../middleware/requireAuth.js";
 import {
     createArticle,
-    getArticleBySlug,
-    getArticleById,
+    getArticle,
     updateArticle,
     deleteArticle,
 } from "../services/articleService.js";
@@ -32,7 +31,7 @@ router.get(
     "/read/:slug",
     asyncErrorHandler(async (req, res) => {
         const slug = req.params.slug;
-        const article = await getArticleBySlug(slug);
+        const article = await getArticle({ slug });
         if (!article) {
             return res.status(404).json({ error: "المقال غير موجود" });
         }
@@ -53,7 +52,7 @@ router.put(
             return res.status(400).json({ error: "معرف المقال مطلوب" });
         }
 
-        const article = await getArticleById(articleId);
+        const article = await getArticle({ id: articleId });
         if (!article) {
             return res.status(404).json({ error: "المقال غير موجود" });
         }
@@ -79,7 +78,7 @@ router.delete(
             return res.status(400).json({ error: "معرف المقال مطلوب" });
         }
 
-        const article = await getArticleBySlug(slug);
+        const article = await getArticle({ slug });
         if (!article) {
             return res.status(404).json({ error: "المقال غير موجود" });
         }

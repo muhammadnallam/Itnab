@@ -41,10 +41,10 @@ export async function createArticle(validatedContent, articleData, userId) {
     }
 }
 
-export async function getArticleBySlug(slug) {
+export async function getArticle({ slug, id }) {
     try {
         const article = await prisma.article.findUnique({
-            where: { slug },
+            where: slug ? { slug } : { id },
             include: {
                 author: {
                     select: { name: true, image: true },
@@ -53,24 +53,7 @@ export async function getArticleBySlug(slug) {
         });
         return article;
     } catch (err) {
-        console.error("Error fetching article by slug:", err);
-        throw new Error("حدث خطأ أثناء جلب المقال");
-    }
-}
-
-export async function getArticleById(articleId) {
-    try {
-        const article = await prisma.article.findUnique({
-            where: { id: articleId },
-            include: {
-                author: {
-                    select: { name: true, image: true },
-                },
-            },
-        });
-        return article;
-    } catch (err) {
-        console.error("Error fetching article by id:", err);
+        console.error("Error fetching article:", err);
         throw new Error("حدث خطأ أثناء جلب المقال");
     }
 }
