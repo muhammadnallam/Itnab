@@ -1,0 +1,19 @@
+{
+    "name": "@itnab/tiptap",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "index.js",
+    "exports": {
+        ".": "./index.js"
+    },
+    "dependencies": {
+        "@tiptap/core": "^3.27.0",
+        "@tiptap/extension-highlight": "^3.27.0",
+        "@tiptap/extension-image": "^3.27.0",
+        "@tiptap/extension-list": "^3.27.0",
+        "@tiptap/extension-text-align": "^3.27.0",
+        "@tiptap/pm": "^3.27.0",
+        "@tiptap/starter-kit": "^3.27.0",
+        "prosemirror-model": "^1.25.0"
+    }
+}

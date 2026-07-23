@@ -212,6 +212,12 @@ importers:
       '@floating-ui/react':
         specifier: ^0.27.19
         version: 0.27.20(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@itnab/constants':
+        specifier: workspace:*
+        version: link:../shared/constants
+      '@itnab/tiptap':
+        specifier: workspace:*
+        version: link:../shared/tiptap
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.20
         version: 2.1.20(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -318,6 +324,12 @@ importers:
       '@better-auth/i18n':
         specifier: ^1.6.23
         version: 1.6.23(@better-auth/core@1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0))(better-auth@1.6.23(@prisma/client@7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))(typescript@6.0.3))(mysql2@3.15.3)(next@16.2.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.101.0))(pg@8.22.0)(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      '@itnab/constants':
+        specifier: workspace:*
+        version: link:../shared/constants
+      '@itnab/tiptap':
+        specifier: workspace:*
+        version: link:../shared/tiptap
       '@prisma/adapter-pg':
         specifier: ^7.8.0
         version: 7.8.0
@@ -330,21 +342,6 @@ importers:
       '@tiptap/core':
         specifier: ^3.27.3
         version: 3.27.4(@tiptap/pm@3.27.4)
-      '@tiptap/extension-highlight':
-        specifier: ^3.27.3
-        version: 3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))
-      '@tiptap/extension-image':
-        specifier: ^3.27.3
-        version: 3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))
-      '@tiptap/extension-list':
-        specifier: ^3.27.3
-        version: 3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))(@tiptap/pm@3.27.4)
-      '@tiptap/extension-text-align':
-        specifier: ^3.27.3
-        version: 3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))
-      '@tiptap/starter-kit':
-        specifier: ^3.27.3
-        version: 3.27.4
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -403,6 +400,35 @@ importers:
       prisma:
         specifier: ^7.8.0
         version: 7.8.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3)
+
+  shared/constants: {}
+
+  shared/tiptap:
+    dependencies:
+      '@tiptap/core':
+        specifier: ^3.27.0
+        version: 3.27.4(@tiptap/pm@3.27.4)
+      '@tiptap/extension-highlight':
+        specifier: ^3.27.0
+        version: 3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))
+      '@tiptap/extension-image':
+        specifier: ^3.27.0
+        version: 3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))
+      '@tiptap/extension-list':
+        specifier: ^3.27.0
+        version: 3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))(@tiptap/pm@3.27.4)
+      '@tiptap/extension-text-align':
+        specifier: ^3.27.0
+        version: 3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))
+      '@tiptap/pm':
+        specifier: ^3.27.0
+        version: 3.27.4
+      '@tiptap/starter-kit':
+        specifier: ^3.27.0
+        version: 3.27.4
+      prosemirror-model:
+        specifier: ^1.25.0
+        version: 1.25.11
 
 packages:
 

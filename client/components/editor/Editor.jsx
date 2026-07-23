@@ -34,7 +34,7 @@ import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/ho
 import {
     ArticleTitle,
     ArticleDescription,
-} from "@/components/tiptap-node/article-node/article-node-extension";
+} from "@itnab/tiptap";
 import { ProtectedNodes } from "@/components/tiptap-extension/protected-nodes-extension";
 import "@/components/tiptap-node/blockquote-node/blockquote-node.scss";
 import "@/components/tiptap-node/code-block-node/code-block-node.scss";

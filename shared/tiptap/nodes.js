@@ -76,3 +76,18 @@ export const ArticleDescription = Node.create({
         ];
     },
 });
+
+export const ImageUpload = Node.create({
+    name: "imageUpload",
+    group: "block",
+    atom: true,
+    draggable: true,
+    selectable: true,
+    addAttributes() {
+        return {
+            accept: { default: "image/*" },
+            limit: { default: 1 },
+            maxSize: { default: 0 },
+        };
+    },
+});

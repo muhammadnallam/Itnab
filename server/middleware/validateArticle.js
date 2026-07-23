@@ -1,21 +1,9 @@
 import { z } from "zod";
 import { validateDoc } from "../lib/editor-schema.js";
 import { sanitizeDoc } from "../lib/sanitize-doc.js";
+import { TAGS } from "@itnab/constants";
 
-const VALID_TAGS = [
-    "تقنية",
-    "علم النفس",
-    "السياسة",
-    "التاريخ",
-    "الفلسفة",
-    "الاقتصاد",
-    "الأدب",
-    "الفن",
-    "الصحة",
-    "ريادة الأعمال",
-    "العلوم",
-    "الثقافة",
-];
+const VALID_TAGS = TAGS;
 
 const articleSchema = z.object({
     content: z.record(z.any()),

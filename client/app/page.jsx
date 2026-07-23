@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useContext } from "react";
-import { TAGS } from "@/components/constants";
+import { TAGS } from "@itnab/constants";
 import { ARTICLES, WRITERS } from "@/data/dummybData";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";

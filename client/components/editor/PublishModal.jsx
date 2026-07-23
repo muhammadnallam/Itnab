@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { TAGS } from "@/components/constants";
+import { TAGS } from "@itnab/constants";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import { handleArticle } from "@/lib/handlers";
