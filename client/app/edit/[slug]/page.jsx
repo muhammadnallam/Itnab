@@ -8,8 +8,10 @@ import "@/styles/_variables.scss";
 
 export default async function EditPage({ params }) {
     const { slug } = await params;
-    const session = await authClient.api.getSession({
-        headers: await headers(),
+    const { data: session } = await authClient.getSession({
+        fetchOptions: {
+            headers: await headers(),
+        },
     });
 
     if (!session) {
@@ -18,6 +20,9 @@ export default async function EditPage({ params }) {
 
     const article = await handleArticleRead(slug);
 
+    if (session.user.id !== article.authorId) {
+        redirect("/");
+    }
 
     const articleContent = {
         ...article.content,

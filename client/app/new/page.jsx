@@ -5,8 +5,10 @@ import { authClient } from "@/lib/auth-client";
 import "@/styles/_variables.scss";
 
 export default async function Page() {
-    const session = await authClient.api.getSession({
-        headers: await headers(),
+    const { data: session } = await authClient.getSession({
+        fetchOptions: {
+            headers: await headers(),
+        },
     });
 
     if (!session) {
