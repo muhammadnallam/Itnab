@@ -31,6 +31,7 @@ import {
 // --- Tiptap Node ---
 import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
 import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension";
+import { QuranVerseNode } from "@/components/tiptap-node/quran-verse-node/quran-verse-node-extension";
 import {
     ArticleTitle,
     ArticleDescription,
@@ -43,10 +44,12 @@ import "@/components/tiptap-node/list-node/list-node.scss";
 import "@/components/tiptap-node/image-node/image-node.scss";
 import "@/components/tiptap-node/heading-node/heading-node.scss";
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
+import "@/components/tiptap-node/quran-verse-node/quran-verse-node.scss";
 
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu";
 import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
+import { QuranVersePopover } from "@/components/tiptap-ui/quran-verse-popover";
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button";
@@ -126,6 +129,7 @@ const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
             <ToolbarSeparator />
             <ToolbarGroup>
                 <ImageUploadButton text="صورة" />
+                <QuranVersePopover />
             </ToolbarGroup>
             <Spacer />
             {isMobile && <ToolbarSeparator />}
@@ -267,6 +271,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                 upload: handleImageUpload,
                 onError: (error) => console.error("Upload failed:", error),
             }),
+            QuranVerseNode,
             CharacterCount,
         ],
         content: initialContent,

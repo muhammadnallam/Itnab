@@ -215,6 +215,9 @@ importers:
       '@itnab/constants':
         specifier: workspace:*
         version: link:../shared/constants
+      '@itnab/normalize':
+        specifier: workspace:*
+        version: link:../shared/normalize
       '@itnab/tiptap':
         specifier: workspace:*
         version: link:../shared/tiptap
@@ -327,6 +330,9 @@ importers:
       '@itnab/constants':
         specifier: workspace:*
         version: link:../shared/constants
+      '@itnab/normalize':
+        specifier: workspace:*
+        version: link:../shared/normalize
       '@itnab/tiptap':
         specifier: workspace:*
         version: link:../shared/tiptap
@@ -402,6 +408,8 @@ importers:
         version: 7.8.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3)
 
   shared/constants: {}
+
+  shared/normalize: {}
 
   shared/tiptap:
     dependencies:

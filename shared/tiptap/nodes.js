@@ -91,3 +91,44 @@ export const ImageUpload = Node.create({
         };
     },
 });
+
+export const QuranVerse = Node.create({
+    name: "quranVerse",
+    group: "inline",
+    inline: true,
+    atom: true,
+    selectable: true,
+    draggable: false,
+
+    addAttributes() {
+        return {
+            verseText: { default: "" },
+            surahName: { default: "" },
+            verseNumber: { default: 0 },
+        };
+    },
+
+    parseHTML() {
+        return [{ tag: 'span[data-type="quran-verse"]' }];
+    },
+
+    renderHTML({ HTMLAttributes }) {
+        return [
+            "span",
+            mergeAttributes(HTMLAttributes, {
+                "data-type": "quran-verse",
+                class: "quran-verse",
+            }),
+            [
+                "span",
+                { class: "quran-verse-text" },
+                "﴿ " + HTMLAttributes.verseText + " ﴾",
+            ],
+            [
+                "span",
+                { class: "quran-verse-ref" },
+                "[ " + HTMLAttributes.surahName + ": " + HTMLAttributes.verseNumber + " ]",
+            ],
+        ];
+    },
+});

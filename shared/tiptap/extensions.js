@@ -7,6 +7,7 @@ import {
     ArticleTitle,
     ArticleDescription,
     ImageUpload,
+    QuranVerse,
 } from "./nodes.js";
 
 export const extensions = [
@@ -21,4 +22,5 @@ export const extensions = [
     ArticleTitle,
     ArticleDescription,
     ImageUpload,
+    QuranVerse,
 ];

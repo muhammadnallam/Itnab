@@ -14,6 +14,7 @@
     "dependencies": {
         "@better-auth/i18n": "^1.6.23",
         "@itnab/constants": "workspace:*",
+        "@itnab/normalize": "workspace:*",
         "@itnab/tiptap": "workspace:*",
         "@prisma/adapter-pg": "^7.8.0",
         "@tiptap/core": "^3.27.3",

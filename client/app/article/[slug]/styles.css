@@ -325,3 +325,24 @@ article .content hr {
 article .content ::selection {
     background: color-mix(in srgb, var(--color-accent) 25%, transparent);
 }
+
+article .content .quran-verse {
+    display: inline;
+    color: #1a7a5a;
+    font-style: normal;
+    line-height: 2;
+    word-spacing: 2px;
+}
+
+article .content .quran-verse-text {
+    color: #1a7a5a;
+    font-weight: 500;
+}
+
+article .content .quran-verse-ref {
+    display: inline-block;
+    font-size: 0.8em;
+    color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+    margin-right: 4px;
+    font-weight: 400;
+}
