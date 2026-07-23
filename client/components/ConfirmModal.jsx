@@ -1,8 +1,6 @@
 import Modal from "@/components/Modal";
 import Button from "./Button";
 
-const OVERLAY = "rgba(15,15,20,0.6)";
-
 export default function ConfirmModal({
     icon: Icon,
     color,

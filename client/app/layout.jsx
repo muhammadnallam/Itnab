@@ -1,34 +1,7 @@
-import { StrictMode } from "react";
 import "./globals.css";
 import localFont from "next/font/local";
 import UserProvider from "@/context/UserContext";
 import ScreenProvider from "@/context/ScreenContext";
-
-const nastaliqUrdu = localFont({
-    src: [
-        {
-            path: "../public/fonts/NotoNastaliqUrdu-Regular.ttf",
-            weight: "400",
-            style: "normal",
-        },
-        {
-            path: "../public/fonts/NotoNastaliqUrdu-Medium.ttf",
-            weight: "500",
-            style: "normal",
-        },
-        {
-            path: "../public/fonts/NotoNastaliqUrdu-SemiBold.ttf",
-            weight: "600",
-            style: "normal",
-        },
-        {
-            path: "../public/fonts/NotoNastaliqUrdu-Bold.ttf",
-            weight: "700",
-            style: "normal",
-        },
-    ],
-    variable: "--font-wordmark",
-});
 
 const wordmarkFont = localFont({
     src: [
@@ -46,7 +19,7 @@ export const metadata = {
     description: "نافذة على الفكر والقلم العربي",
 };
 
-export default function RootLayout({ children, user }) {
+export default function RootLayout({ children }) {
     return (
         <html dir="rtl" lang="ar" className={wordmarkFont.variable}>
             <head>

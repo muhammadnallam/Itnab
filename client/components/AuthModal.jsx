@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { Eye, EyeOff, Bookmark } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { UserContext } from "@/context/UserContext";
 import InputField from "./InputField";
 import Button from "@/components/Button";
@@ -42,11 +42,6 @@ const BrandBadge = () => (
             margin: "0 auto 18px",
         }}
     >
-        {/* <Bookmark
-            size={20}
-            fill="var(--color-accent)"
-            stroke="var(--color-accent)"
-        /> */}
         <Image src={logo} alt="itnab logo"></Image>
     </div>
 );

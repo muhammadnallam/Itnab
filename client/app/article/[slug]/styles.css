@@ -53,7 +53,7 @@
     z-index: 1;
 }
 
-.articel-spacer {
+.article-spacer {
     height: 52px;
 }
 
@@ -82,20 +82,12 @@
         padding: 0 24px;
     }
 
-    .hero img {
-        border-radius: 3px;
-    }
 }
 
 @media (min-width: 1024px) {
     .article-hero {
         margin-top: 56px;
     }
-}
-
-.metadata .readtime,
-.metadata .date {
-    font-variant-numeric: tabular-nums;
 }
 
 article {

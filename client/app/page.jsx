@@ -18,7 +18,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
 
     const cardStyle = {
         background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
         borderRadius: "var(--border-radius)",
         padding: "24px 20px",
         marginBottom: 16,
