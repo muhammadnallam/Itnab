@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap");
 @import "tailwindcss";
+@import "../styles/_keyframe-animations.scss";
 
 :root {
     --font-family-sans: "Noto Sans Arabic", Cairo, "Segoe UI", sans-serif;

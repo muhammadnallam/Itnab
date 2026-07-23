@@ -148,7 +148,6 @@ function ModalFrame({ isOpen, onClose, title, footer, children, onSubmit }) {
                     bodyAndFooter
                 )}
             </div>
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
     );
 }
