@@ -8,7 +8,7 @@ async function requireAuth(req, res, next) {
         });
 
         if (!session) {
-            res.status(401).json({ error: "invalid credentials" });
+            res.status(401).json({ error: "بيانات الدخول غير صالحة" });
             return;
         }
 
@@ -16,7 +16,7 @@ async function requireAuth(req, res, next) {
         req.session = session.session;
         next();
     } catch (error) {
-        res.status(401).json({ error: "invalid credentials" });
+        res.status(401).json({ error: "بيانات الدخول غير صالحة" });
     }
 }
 

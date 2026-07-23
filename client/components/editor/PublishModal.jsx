@@ -153,7 +153,7 @@ function ModalFrame({ isOpen, onClose, title, footer, children, onSubmit }) {
     );
 }
 
-const handlePublishSubmit = (data) => handleArticle(data);
+const handlePublish = (data) => handleArticle(data);
 
 export default function PublishModal({
     isOpen,
@@ -252,7 +252,7 @@ export default function PublishModal({
                     payload.mode = "update";
                     payload.articleId = articleData?.id;
                 }
-                const result = await handlePublishSubmit(payload);
+                const result = await handlePublish(payload);
                 setLoading(false);
                 if (!result.success) {
                     if (result.errors.coverImage)

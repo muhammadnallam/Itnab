@@ -2,7 +2,8 @@ import "dotenv/config";
 import { Router } from "express";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
-import requireAuth from "../middleware/requireAuth";
+import requireAuth from "../middleware/requireAuth.js";
+import asyncErrorHandler from "../middleware/asyncErrorHandler.js";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -18,30 +19,26 @@ const upload = multer({
 
 const router = Router();
 
-router.post("/:folder", requireAuth, upload.single("file"), async (req, res) => {
+router.post("/:folder", requireAuth, upload.single("file"), asyncErrorHandler(async (req, res) => {
     const folder = req.params.folder || "";
-    try {
-        if (!req.file) {
-            return res
-                .status(400)
-                .json({ success: false, error: "No file provided" });
-        }
-
-        const result = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: `itnab/${folder}` },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                },
-            );
-            uploadStream.end(req.file.buffer);
-        });
-
-        res.json({ success: true, url: result.secure_url });
-    } catch (err) {
-        res.status(500).json({ success: false, error: "Upload failed" });
+    if (!req.file) {
+        return res
+            .status(400)
+            .json({ error: "الملف مطلوب" });
     }
-});
+
+    const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: `itnab/${folder}` },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            },
+        );
+        uploadStream.end(req.file.buffer);
+    });
+
+    res.json({ url: result.secure_url });
+}));
 
 export default router;

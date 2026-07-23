@@ -323,8 +323,12 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     description={"سيتم حذف هذا المقال ولن تستطيع إسترجاعه."}
                     buttonText={"حذف"}
                     onConfirm={async () => {
-                        await deleteArticle(articleData.slug);
-                        redirect("/");
+                        try {
+                            await deleteArticle(articleData.slug);
+                            redirect("/");
+                        } catch (err) {
+                            alert(err.message);
+                        }
                     }}
                     onCancel={() => setConfirmModal(false)}
                 />

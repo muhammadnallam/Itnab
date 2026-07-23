@@ -37,6 +37,11 @@ app.post("/api/content", (req, res) => {
     console.log(req.body);
 });
 
+app.use((err, req, res, next) => {
+    console.error("Unhandled error:", err);
+    res.status(500).json({ error: "حدث خطأ داخلي في الخادم" });
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

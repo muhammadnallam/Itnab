@@ -115,9 +115,9 @@ export async function handleArticle({
             success: false,
             errors: {
                 apiError:
-                    err.message || isUpdate
+                    err.message || (isUpdate
                         ? "حدث خطأ أثناء حفظ المقال"
-                        : "حدث خطأ أثناء نشر المقال",
+                        : "حدث خطأ أثناء نشر المقال"),
             },
         };
     }

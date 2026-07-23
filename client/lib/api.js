@@ -58,29 +58,27 @@ export async function publishArticle({ content, data }) {
         body: JSON.stringify({ content, data }),
     });
 
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(json.error || "حدث خطأ أثناء نشر المقال");
     return json;
 }
 
 export async function getArticle(slug) {
-    const res = await fetch(`${API_URL}/api/article/read/${slug}`, {
-        // Limits fetches and db queries by saving articles in cache, any request after 300s, it will be refetched.
-        // next: { revalidate: 300 },
-    });
-    if (!res.ok) throw new Error("المقال غير موجود");
-    return res.json();
+    const res = await fetch(`${API_URL}/api/article/read/${slug}`);
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || "المقال غير موجود");
+    return json;
 }
 
 export async function updateArticle({ content, data, articleId }) {
-    const res = await fetch(`${API_URL}/api/article/update`, {
+    const res = await fetch(`${API_URL}/api/article/update/${articleId}`, {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         method: "PUT",
-        body: JSON.stringify({ content, data, articleId }),
+        body: JSON.stringify({ content, data }),
     });
 
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(json.error || "حدث خطأ أثناء تعديل المقال");
     return json;
 }
@@ -91,6 +89,7 @@ export async function deleteArticle(slug) {
         method: "DELETE",
     });
 
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(json.error || "حدث خطأ أثناء حذف المقال");
+    return json;
 }

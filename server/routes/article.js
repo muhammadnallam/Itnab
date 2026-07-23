@@ -1,4 +1,5 @@
 import { Router } from "express";
+import asyncErrorHandler from "../middleware/asyncErrorHandler.js";
 import validateArticle from "../middleware/validateArticle.js";
 import requireAuth from "../middleware/requireAuth.js";
 import {
@@ -11,62 +12,86 @@ import {
 
 const router = Router();
 
-router.post("/create", requireAuth, validateArticle, async (req, res) => {
-    const { validatedContent, articleData } = req;
-    const userId = req.user.id;
-    const slug = await createArticle(validatedContent, articleData, userId);
-    res.status(200).json({ slug });
-});
+router.post(
+    "/create",
+    requireAuth,
+    validateArticle,
+    asyncErrorHandler(async (req, res) => {
+        const { validatedContent, articleData } = req;
+        const userId = req.user.id;
 
-router.get("/read/:slug", async (req, res) => {
-    const article = await getArticleBySlug(req.params.slug);
-    if (!article) return res.status(404).json({ error: "المقال غير موجود" });
-    res.json(article);
-});
+        const slug = await createArticle(validatedContent, articleData, userId);
+        if (!slug) {
+            return res.status(500).json({ error: "حدث خطأ أثناء نشر المقال" });
+        }
+        res.status(200).json({ slug });
+    }),
+);
 
-router.put("/update", requireAuth, validateArticle, async (req, res) => {
-    const { validatedContent, articleData } = req;
-    const userId = req.user.id;
-    const { articleId } = req.body;
+router.get(
+    "/read/:slug",
+    asyncErrorHandler(async (req, res) => {
+        const slug = req.params.slug;
+        const article = await getArticleBySlug(slug);
+        if (!article) {
+            return res.status(404).json({ error: "المقال غير موجود" });
+        }
+        res.json(article);
+    }),
+);
 
-    if (!articleId) {
-        return res.status(400).json({ error: "معرف المقال مطلوب" });
-    }
+router.put(
+    "/update/:id",
+    requireAuth,
+    validateArticle,
+    asyncErrorHandler(async (req, res) => {
+        const { validatedContent, articleData } = req;
+        const userId = req.user.id;
+        const articleId = req.params.id;
 
-    const article = await getArticleById(articleId);
-    if (!article) {
-        return res.status(404).json({ error: "المقال غير موجود" });
-    }
-    if (article.authorId !== userId) {
-        return res
-            .status(403)
-            .json({ error: "ليس لديك صلاحية تعديل هذا المقال" });
-    }
+        if (!articleId) {
+            return res.status(400).json({ error: "معرف المقال مطلوب" });
+        }
 
-    await updateArticle(articleId, validatedContent, articleData, userId);
-    res.json({ success: true });
-});
+        const article = await getArticleById(articleId);
+        if (!article) {
+            return res.status(404).json({ error: "المقال غير موجود" });
+        }
+        if (article.authorId !== userId) {
+            return res
+                .status(403)
+                .json({ error: "ليس لديك صلاحية تعديل هذا المقال" });
+        }
 
-router.delete("/delete/:slug", requireAuth, async (req, res) => {
-    const slug = req.params.slug;
-    const userId = req.user.id;
+        await updateArticle(articleId, validatedContent, articleData, userId);
+        res.status(200).json({ success: true });
+    }),
+);
 
-    if (!slug) {
-        return res.status(400).json({ error: "معرف المقال مطلوب" });
-    }
+router.delete(
+    "/delete/:slug",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        const slug = req.params.slug;
+        const userId = req.user.id;
 
-    const article = await getArticleBySlug(slug);
-    if (!article) {
-        return res.status(404).json({ error: "المقال غير موجود" });
-    }
-    if (article.authorId !== userId) {
-        return res
-            .status(403)
-            .json({ error: "ليس لديك صلاحية تعديل هذا المقال" });
-    }
+        if (!slug) {
+            return res.status(400).json({ error: "معرف المقال مطلوب" });
+        }
 
-    await deleteArticle(article.id);
-    res.json({ success: true });
-});
+        const article = await getArticleBySlug(slug);
+        if (!article) {
+            return res.status(404).json({ error: "المقال غير موجود" });
+        }
+        if (article.authorId !== userId) {
+            return res
+                .status(403)
+                .json({ error: "ليس لديك صلاحية تعديل هذا المقال" });
+        }
+
+        await deleteArticle(article.id);
+        res.status(200).json({ success: true });
+    }),
+);
 
 export default router;
