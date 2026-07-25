@@ -187,11 +187,11 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                             onClick={() => handleItemClick(item)}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.color =
-                                    "var(--color-accent)";
+                                    "var(--color-ink)";
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.color =
-                                    "var(--color-ink)";
+                                    "var(--color-mid)";
                             }}
                             style={menuItemStyle()}
                         >
@@ -227,7 +227,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                         style={{
                             display: "flex",
                             gap: 4,
-                            background: "var(--color-accent-light)",
+                            background: "var(--color-bg)",
                             borderRadius: 999,
                             padding: 4,
                         }}
