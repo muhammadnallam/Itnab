@@ -1,4 +1,5 @@
 const Avatar = ({
+    img,
     initials,
     size = 32,
     bg = "var(--color-mid)",
@@ -21,10 +22,22 @@ const Avatar = ({
             flexShrink: 0,
             userSelect: "none",
             cursor: "pointer",
+            overflow: "hidden",
         }}
     >
-        {/* TODO: Add avatar image or icon */}
-        {initials}
+        {img ? (
+            <img
+                src={img}
+                alt=""
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                }}
+            />
+        ) : (
+            initials
+        )}
     </div>
 );
 
