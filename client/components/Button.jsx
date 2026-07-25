@@ -21,19 +21,27 @@ export default function Button({
                               ? "var(--color-bg)"
                               : variant === "dark"
                                 ? "var(--color-dark-surface)"
-                                : "var(--color-accent)",
+                                : variant === "error"
+                                  ? "var(--color-error)"
+                                  : "var(--color-accent)",
                     color:
                         disabled || loading
                             ? "var(--color-disabled-txt)"
                             : variant === "secondary"
                               ? "var(--color-ink)"
                               : "var(--color-white)",
-                    border: "none",
+                    border: variant === "error"
+                        ? "1px solid var(--color-error)"
+                        : "none",
                     borderRadius: "var(--border-radius)",
                     padding: "12px 16px",
                     fontSize: 15,
                     fontWeight: 600,
-                    cursor: loading ? "wait" : !disabled ? "pointer" : "not-allowed",
+                    cursor: loading
+                        ? "wait"
+                        : !disabled
+                          ? "pointer"
+                          : "not-allowed",
                     transition: "background 0.2s, color 0.2s",
                     ...style,
                 }}
