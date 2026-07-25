@@ -30,11 +30,12 @@ export default function Button({
                             : variant === "secondary"
                               ? "var(--color-ink)"
                               : "var(--color-white)",
-                    border: variant === "error"
-                        ? "1px solid var(--color-error)"
-                        : "none",
+                    border:
+                        variant === "error"
+                            ? "1px solid var(--color-error)"
+                            : "none",
                     borderRadius: "var(--border-radius)",
-                    padding: "12px 16px",
+                    padding: "8px 10px",
                     fontSize: 15,
                     fontWeight: 600,
                     cursor: loading

@@ -1,8 +1,8 @@
-
 export default function InputField({
     type = "text",
     placeholder,
     value,
+    label,
     onChange,
     rightIcon,
     autoFocus,
@@ -13,12 +13,22 @@ export default function InputField({
     autoComplete,
     error,
     style,
-}){
+}) {
     const inputId = id || name;
     const errId = inputId ? `${inputId}-error` : undefined;
     return (
         <div>
             <div style={{ position: "relative" }}>
+                {label && <label htmlFor={id}
+                    style={{
+                        display: "block",
+                        fontSize: 13,
+                        color: "var(--color-mid)",
+                        marginBottom: 5,
+                    }}
+                >
+                    {label}
+                </label>}
                 <input
                     type={type}
                     name={name}
@@ -36,8 +46,8 @@ export default function InputField({
                         width: "100%",
                         boxSizing: "border-box",
                         padding: rightIcon
-                            ? "12px 48px 12px 16px"
-                            : "12px 16px",
+                            ? "8px 48px 8px 10px"
+                            : "8px 10px",
                         border: `1px solid ${error ? "var(--color-error)" : "var(--color-border)"}`,
                         borderRadius: 8,
                         fontSize: 15,
@@ -86,4 +96,4 @@ export default function InputField({
             )}
         </div>
     );
-};
+}

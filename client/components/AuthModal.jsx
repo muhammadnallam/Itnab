@@ -201,7 +201,7 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                     justifyContent: "center",
                     gap: 8,
                     width: "100%",
-                    padding: "10px 16px",
+                    padding: "8px 10px",
                     border: "1px solid var(--color-border)",
                     borderRadius: "var(--border-radius)",
                     background: loading
