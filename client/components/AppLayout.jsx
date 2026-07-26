@@ -12,6 +12,8 @@ export default function AppLayout({
     sidebarOpen = true,
     onToggleSidebar,
     onLogin,
+    centerMaxWidth = 640,
+    fullWidthContent,
 }) {
     const width = useContext(WidthContext);
     const isMobile = width < 768;
@@ -61,14 +63,16 @@ export default function AppLayout({
             transition: "transform 0.4s ease",
             willChange: "transform",
         },
-        centerWrap: {
-            padding: isTablet ? "24px 32px" : "24px 48px",
+        centerColumn: {
             minWidth: 0,
             minHeight: `calc(100vh - ${HEADER_H}px)`,
             borderLeft: isTablet ? "none" : "1px solid var(--color-border)",
         },
+        centerWrap: {
+            padding: isTablet ? "24px 32px" : "24px 48px",
+        },
         centerInner: {
-            maxWidth: 640,
+            maxWidth: centerMaxWidth,
             margin: "0 auto",
         },
         leftPanelWrap: {
@@ -91,6 +95,7 @@ export default function AppLayout({
             />
             {isMobile ? (
                 <>
+                    {fullWidthContent}
                     <main style={{ padding: "16px 16px 80px" }}>
                         {children}
                     </main>
@@ -101,9 +106,12 @@ export default function AppLayout({
                     <div style={styles.rightSidebarWrap}>
                         <RightSidebar isOpen={sidebarOpen} />
                     </div>
-                    <main style={styles.centerWrap}>
-                        <div style={styles.centerInner}>{children}</div>
-                    </main>
+                    <div style={styles.centerColumn}>
+                        {fullWidthContent}
+                        <div style={styles.centerWrap}>
+                            <div style={styles.centerInner}>{children}</div>
+                        </div>
+                    </div>
                     {leftPanel && !isTablet && (
                         <div
                             style={styles.leftPanelWrap}
