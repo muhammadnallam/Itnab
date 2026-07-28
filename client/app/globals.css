@@ -6,77 +6,49 @@
     --font-family-sans: "Noto Sans Arabic", Cairo, "Segoe UI", sans-serif;
     --font-family-serif: "Noto Serif Arabic", Georgia, serif;
 
-    /* Spacing scale (4px base) */
-    --sp-xs: 4px;
-    --sp-sm: 8px;
-    --sp-md: 16px;
-    --sp-lg: 24px;
-    --sp-xl: 48px;
-    --sp-2xl: 64px;
-    --sp-3: 12px;
-    --sp-5: 20px;
-    --sp-6: 24px;
-    --sp-8: 32px;
-    --sp-10: 40px;
-
     /* Border radius */
     --radius-btn: 8px;
     --radius-pill: 99px;
     --radius-input: 8px;
-    --border-radius: 8px; /* TODO: Replace the rest */
+    --border-radius: 8px;
 }
 
 @theme {
-    --color-accent: #004741; /* #004741 */
+    --color-accent: oklch(0.357862 0.062975 185.2884);
     --color-accent-hover: #153d2e;
     --color-accent-light: #f5ede8;
-    --color-accent-med: #7a4a32;
-    --color-accent-ring: rgba(60, 36, 22, 0.25);
+
+    --color-text-select: oklch(from var(--color-accent) l c h / 0.2);
+
     --color-gold: #c9a84c;
     --color-navy: #1b2d4f;
+
     --color-surface: #fdfcfa;
     --color-white: #fdfcfa;
-    /* --color-bg: #f9f9f9; */
-    --color-bg: #f0ede4;
-    --color-page-bg: #f0ede4;
-    --color-parchment: #f7f4ee;
-    /* --color-ink: #1a1a1a; */
+    --color-bg: #f5f3ec;
     --color-ink: #1a1714;
     --color-light-txt: #b7b8c2;
     --color-mid: #6b6b6b;
     --color-light: #4a4540;
     --color-tag-bg: #f2ede9;
-    --color-dark-card: #1a1a1a;
     --color-dark-surface: #2a2a2a;
     --color-border: #c8c0b4;
 
     --color-error: #d32f2f;
     --color-success: #2e7d5e;
-    
-    --color-error-light: #FCE8E6;
+
+    --color-error-light: #fce8e6;
     --color-disabled-bg: #f0f0f4;
     --color-disabled-txt: #b9bac4;
-    --color-surface-card: #fdfcfa;
 
     --color-text-dusk: #4a4540;
     /* New Emerald Theme */
-    /* --color-primary: #1a4d3a;
-    --color-primary-deep: #1a4d3a;
-    --color-primary-hover: #153d2e;
-    --color-primary-light: #2d6b52;
-    
+    /*
     --color-background: #f5f0e8;
-    --color-surface-subtle: #ede8df;
     
-    --color-ink: #1a1714;
     --color-text-ash: #8c8580;
-    --color-text-white: #ffffff;
-    --color-text-select: #e8f2ee;
     
-    --color-gold: #a07b2e;
     --color-gold-light: #c9a55a;
-    --color-error: #c0392b;
-    --color-success: #2e7d5e;
     --color-warning: #b7791f;
     
     --color-border: #c8c0b4;
@@ -94,7 +66,7 @@
         direction: rtl;
     }
     * {
-        font-family: var(--font-family-sans);
+        font-family: var(--font-family-serif);
     }
     body {
         background-color: var(--color-bg);
@@ -102,7 +74,7 @@
         min-height: 100vh;
     }
     ::selection {
-        background-color: rgba(0, 71, 65, 0.2);
+        background-color: var(--color-text-select);
         /* color: white; */
     }
 }
@@ -132,4 +104,21 @@
     ::-webkit-scrollbar-track {
         background: transparent;
     }
+}
+
+.card {
+    background: var(--color-surface);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    padding: 24px 20px;
+}
+
+.api-error {
+    margin: 0 0 16px;
+    padding: 8px 12px;
+    font-size: 13;
+    color: var(--color-error);
+    background: var(--color-error-light);
+    border-radius: var(--border-radius);
+    text-align: center;
 }

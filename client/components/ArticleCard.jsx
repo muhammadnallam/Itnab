@@ -79,7 +79,7 @@ const ArticleCard = ({ article, isMobile }) => {
                     </span>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                     <button
                         onClick={() => setSaved((s) => !s)}
                         className="cursor-pointer pl-1"

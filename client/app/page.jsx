@@ -6,22 +6,15 @@ import { ARTICLES, WRITERS } from "@/data/dummybData";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import Avatar from "@/components/Avatar";
-import Tabs from "@/components/Tabs";
+import Tabs from "@/components/ui/Tabs";
 import AuthModal from "@/components/AuthModal";
 import { UserContext } from "@/context/UserContext";
 import { WidthContext } from "@/context/ScreenContext";
-import Button from "@/components/Button";
+import Button from "@/components/ui/Button";
 
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const [subs, setSubs] = useState(WRITERS.map((w) => w.sub));
     const { user } = useContext(UserContext);
-
-    const cardStyle = {
-        background: "var(--color-surface)",
-        borderRadius: "var(--border-radius)",
-        padding: "24px 20px",
-        marginBottom: 16,
-    };
 
     if (!user) {
         return (
@@ -32,14 +25,10 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                 }}
             >
                 <div
+                    className="card"
                     style={{
-                        border: "1px solid var(--color-border)",
-                        borderRadius: 0,
-                        padding: "24px 20px",
                         textAlign: "center",
                         marginBottom: 16,
-                        borderRadius: "var(--border-radius)",
-                        background: "var(--color-surface)",
                     }}
                 >
                     <div
@@ -104,12 +93,11 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
     } else {
         return (
             <div style={{ display: "flex", flexDirection: "column" }}>
-                <div style={cardStyle}>
+                <div className="card mb-4">
                     <h4
                         style={{
                             fontSize: 15,
                             fontWeight: 700,
-                            color: "var(--color-ink)",
                             marginBottom: 16,
                         }}
                     >
@@ -117,7 +105,8 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                     </h4>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                         {TAGS.map((tag) => (
-                            <button
+                            <a
+                                href={`/tag/${tag}`}
                                 key={tag}
                                 style={{
                                     background: "var(--color-tag-bg)",
@@ -125,35 +114,18 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                     borderRadius: 99,
                                     padding: "6px 16px",
                                     fontSize: 13,
-                                    color: "var(--color-ink)",
                                     cursor: "pointer",
                                     transition:
                                         "background 0.15s, border-color 0.15s, color 0.15s",
                                 }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background =
-                                        "var(--color-accent-light)";
-                                    e.currentTarget.style.borderColor =
-                                        "var(--color-accent)";
-                                    e.currentTarget.style.color =
-                                        "var(--color-accent)";
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background =
-                                        "var(--color-tag-bg)";
-                                    e.currentTarget.style.borderColor =
-                                        "var(--color-border)";
-                                    e.currentTarget.style.color =
-                                        "var(--color-ink)";
-                                }}
                             >
                                 {tag}
-                            </button>
+                            </a>
                         ))}
                     </div>
                 </div>
 
-                <div style={cardStyle}>
+                <div className="card mb-4">
                     <div
                         style={{
                             display: "flex",
@@ -166,7 +138,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                             style={{
                                 fontSize: 15,
                                 fontWeight: 700,
-                                color: "var(--color-ink)",
                             }}
                         >
                             كتّاب مقترحون
@@ -212,7 +183,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                     flex: 1,
                                     fontSize: 15,
                                     fontWeight: 500,
-                                    color: "var(--color-ink)",
                                     lineHeight: 1.3,
                                 }}
                             >
@@ -280,8 +250,7 @@ export default function App() {
 
     const tabList = [
         { id: "foryou", label: "لك" },
-        { id: "latest", label: "أتابعهم" },
-        { id: "trending", label: "الأحدث" },
+        { id: "latest", label: "الأحدث" },
     ];
 
     return (

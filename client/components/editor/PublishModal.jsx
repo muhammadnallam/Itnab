@@ -2,10 +2,10 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { TAGS } from "@itnab/constants";
 import { useRouter } from "next/navigation";
-import Button from "@/components/Button";
+import Button from "@/components/ui/Button";
 import { handleArticle } from "@/lib/handlers";
 
-function InputField({ label, error, children }) {
+function Input({ label, error, children }) {
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <h3
@@ -272,7 +272,7 @@ export default function PublishModal({
                 onClose();
             }}
         >
-            <InputField label="صورة الغلاف" error={coverError}>
+            <Input label="صورة الغلاف" error={coverError}>
                 <label style={FILE_UPLOAD}>
                     <input
                         name="image"
@@ -292,7 +292,11 @@ export default function PublishModal({
                     />
                     {coverImage ? (
                         <img
-                            src={typeof coverImage === "string" ? coverImage : URL.createObjectURL(coverImage)}
+                            src={
+                                typeof coverImage === "string"
+                                    ? coverImage
+                                    : URL.createObjectURL(coverImage)
+                            }
                             alt=""
                             style={FILE_PREVIEW}
                         />
@@ -302,9 +306,9 @@ export default function PublishModal({
                         </span>
                     )}
                 </label>
-            </InputField>
+            </Input>
 
-            <InputField label="عنوان محركات البحث" error={seoTitleError}>
+            <Input label="عنوان محركات البحث" error={seoTitleError}>
                 <div
                     style={{ display: "flex", flexDirection: "column", gap: 6 }}
                 >
@@ -335,9 +339,9 @@ export default function PublishModal({
                         {seoTitle.length}/60
                     </div>
                 </div>
-            </InputField>
+            </Input>
 
-            <InputField label="وصف محركات البحث" error={seoDescriptionError}>
+            <Input label="وصف محركات البحث" error={seoDescriptionError}>
                 <div
                     style={{ display: "flex", flexDirection: "column", gap: 6 }}
                 >
@@ -372,9 +376,9 @@ export default function PublishModal({
                         {seoDescription.length}/160
                     </div>
                 </div>
-            </InputField>
+            </Input>
 
-            <InputField label="اختر الموضوع" error={tagError}>
+            <Input label="اختر الموضوع" error={tagError}>
                 <select
                     name="tags"
                     style={{ ...inputBase, cursor: "pointer" }}
@@ -393,7 +397,7 @@ export default function PublishModal({
                         </option>
                     ))}
                 </select>
-            </InputField>
+            </Input>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <label

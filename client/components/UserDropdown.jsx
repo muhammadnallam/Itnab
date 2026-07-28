@@ -79,19 +79,17 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
             />
             <div
                 ref={menuRef}
+                className="card"
                 style={{
                     position: "absolute",
                     top: "100%",
                     left: 0,
                     marginTop: 8,
                     width: 260,
-                    background: "var(--color-white)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--border-radius)",
                     zIndex: 80,
                     boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                    padding: 8,
                     overflow: "hidden",
+                    padding: 8,
                 }}
             >
                 {user && (

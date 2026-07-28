@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { UserContext } from "@/context/UserContext";
-import InputField from "./InputField";
-import Button from "@/components/Button";
-import Modal from "@/components/Modal";
+import Input from "./ui/Input";
+import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
 import { signInGoogle } from "@/lib/api";
 import { handleUser } from "@/lib/handlers";
 import Image from "next/image";
-import logo from "../public/logo.png"
+import logo from "../public/logo.png";
 
 const GoogleIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -174,57 +174,25 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                 </button>
             </p>
 
-            {apiError && (
-                <p
-                    role="alert"
+            {apiError && <p className="api-error">{apiError}</p>}
+            <Button
+                loading={loading}
+                onClick={handleGoogleSignIn}
+                variant="secondary"
+                style={{ width: "100%" }}
+            >
+                <div
                     style={{
-                        margin: "0 0 16px",
-                        padding: "8px 12px",
-                        fontSize: 13,
-                        color: "var(--color-error)",
-                        background: "var(--color-error-light)",
-                        borderRadius: "var(--border-radius)",
-                        textAlign: "center",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 8,
                     }}
                 >
-                    {apiError}
-                </p>
-            )}
-
-            <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={loading}
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8,
-                    width: "100%",
-                    padding: "8px 10px",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--border-radius)",
-                    background: loading
-                        ? "var(--color-disabled-bg)"
-                        : "var(--color-white)",
-                    color: "var(--color-ink)",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: loading ? "wait" : "pointer",
-                    transition: "background 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                    if (!loading)
-                        e.currentTarget.style.background = "var(--color-bg)";
-                }}
-                onMouseLeave={(e) => {
-                    if (!loading)
-                        e.currentTarget.style.background = "var(--color-white)";
-                }}
-            >
-                <GoogleIcon />
-                متابعة عبر Google
-            </button>
+                    <GoogleIcon />
+                    متابعة عبر Google
+                </div>
+            </Button>
 
             <div
                 style={{
@@ -260,7 +228,7 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <InputField
+                <Input
                     name="email"
                     type="email"
                     placeholder="البريد الإلكتروني"
@@ -274,7 +242,7 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                     autoComplete="email"
                     error={errors.email}
                 />
-                <InputField
+                <Input
                     name="password"
                     type={showPass ? "text" : "password"}
                     placeholder="كلمة المرور"

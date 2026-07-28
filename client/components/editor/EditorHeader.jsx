@@ -1,6 +1,6 @@
 import { ArrowLeft, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/Button";
+import Button from "@/components/ui/Button";
 
 export default function EditorHeader({
     setPublishModal,

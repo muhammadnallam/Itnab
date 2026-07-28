@@ -1,7 +1,7 @@
 export default function Button({
     children,
     onClick,
-    variant = "primary", // primary / secondary / dark
+    variant = "primary", // primary / secondary / dark / error
     disabled = false,
     loading = false,
     style,
