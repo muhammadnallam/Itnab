@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { validateDoc } from "../lib/editor-schema.js";
-import { sanitizeDoc } from "../lib/sanitize-doc.js";
+import { validateDoc } from "../lib/editorSchema.js";
+import { sanitizeDoc } from "../lib/sanitizeDoc.js";
 import { TAGS } from "@itnab/constants";
 
 const VALID_TAGS = TAGS;
