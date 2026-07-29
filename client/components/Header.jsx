@@ -1,7 +1,7 @@
 "use client";
 import { useContext, useState } from "react";
 import { Bell, Search, Menu, SquarePen } from "lucide-react";
-import Avatar from "@/components/Avatar";
+import Avatar from "@/components/ui/Avatar";
 import UserDropdown from "@/components/UserDropdown";
 import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
@@ -89,34 +89,35 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                 )}
             </div>
 
-            {!isMobile && <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    background: "var(--color-bg)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 99,
-                    padding: "8px 16px",
-                    flex: 1,
-                    maxWidth: 540,
-                }}
-            >
-                <Search size={18} />
-                <input
-                    placeholder="بحث"
+            {!isMobile && (
+                <div
                     style={{
-                        background: "none",
-                        border: "none",
-                        outline: "none",
-                        fontSize: 14,
-                        color: "var(--color-ink)",
-                        width: "100%",
-                        direction: "rtl",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        background: "var(--color-bg)",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: 99,
+                        padding: "8px 16px",
+                        flex: 1,
+                        maxWidth: 540,
                     }}
-                />
-            </div>}
-
+                >
+                    <Search size={18} />
+                    <input
+                        placeholder="بحث"
+                        style={{
+                            background: "none",
+                            border: "none",
+                            outline: "none",
+                            fontSize: 14,
+                            color: "var(--color-ink)",
+                            width: "100%",
+                            direction: "rtl",
+                        }}
+                    />
+                </div>
+            )}
 
             <div style={{ display: "flex", gap: 16 }}>
                 {user && (
@@ -147,7 +148,6 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                         اكتب
                     </button>
                 )}
-                
 
                 <button
                     style={{
@@ -181,4 +181,4 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
             </div>
         </header>
     );
-};
+}

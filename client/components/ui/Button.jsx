@@ -37,7 +37,6 @@ export default function Button({
                     borderRadius: "var(--border-radius)",
                     padding: "8px 10px",
                     fontSize: 15,
-                    fontWeight: 600,
                     cursor: loading
                         ? "wait"
                         : !disabled

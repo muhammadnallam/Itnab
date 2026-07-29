@@ -1,30 +1,15 @@
 "use client";
 
-import { useState, useContext } from "react";
-import {
-    MoreHorizontal,
-    Copy,
-    Globe,
-    Link2,
-} from "lucide-react";
-import Avatar from "@/components/Avatar";
-import Button from "@/components/Button";
-import ArticleCard from "@/components/ArticleCard";
-import Tabs from "@/components/Tabs";
+import { useState, useContext, useEffect } from "react";
+import { notFound } from "next/navigation";
+import { MoreHorizontal, Copy, Globe, Link2 } from "lucide-react";
+import Avatar from "@/components/ui/Avatar";
+import Button from "@/components/ui/Button";
+import Tabs from "@/components/ui/Tabs";
 import AppLayout from "@/components/AppLayout";
-import { ARTICLES } from "@/data/dummybData";
+import { getProfile } from "@/lib/api";
+import { UserContext } from "@/context/UserContext";
 import { WidthContext } from "@/context/ScreenContext";
-
-const PROFILE = {
-    name: "سارة الأمين",
-    initials: "سأ",
-    username: "sara_alamien",
-    followers: "١٢ ألف",
-    following: "٣٤٠",
-    articlesCount: 4,
-    bio: "كاتبة وباحثة في فلسفة العلوم والمعرفة. أكتب عن العقل والوجود والثقافة العربية. مؤلفة كتاب «حدود اليقين».",
-    banner: "https://images.unsplash.com/photo-1784570269737-21da4658a609?q=80&w=1631&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-};
 
 const PROFILE_TABS = [
     { id: "home", label: "المقالات" },
@@ -32,7 +17,10 @@ const PROFILE_TABS = [
     { id: "about", label: "حول" },
 ];
 
-const profileArticles = ARTICLES.filter((a) => a.author === "سارة الأمين");
+const formatCount = (n) => {
+    if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + " ألف";
+    return String(n);
+};
 
 const AboutTab = ({ profile }) => (
     <div style={{ padding: "24px 0" }}>
@@ -65,29 +53,33 @@ const AboutTab = ({ profile }) => (
             }}
         >
             <span>
-                <strong>{profile.followers}</strong>{" "}
+                <strong>{formatCount(profile.followersCount)}</strong>{" "}
                 <span style={{ color: "var(--color-light)" }}>متابع</span>
             </span>
             <span>
-                <strong>{profile.following}</strong>{" "}
+                <strong>{formatCount(profile.followingCount)}</strong>{" "}
                 <span style={{ color: "var(--color-light)" }}>يتابع</span>
             </span>
         </div>
     </div>
 );
 
+const getInitials = (name) => {
+    if (!name) return "?";
+    const parts = name.trim().split(/\s+/);
+    return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
+};
+
 const ProfilePanel = ({ profile, following, onToggleFollow }) => (
     <div
+        className="card"
         style={{
             width: "100%",
-            background: "var(--color-white)",
-            borderRadius: "var(--border-radius)",
-            border: "1px solid var(--color-border)",
             padding: 28,
         }}
     >
         <div style={{ display: "flex", justifyContent: "center" }}>
-            <Avatar initials={profile.initials} size={80} />
+            <Avatar initials={getInitials(profile.name)} size={80} />
         </div>
 
         <div
@@ -247,7 +239,7 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
                         color: "var(--color-ink)",
                     }}
                 >
-                    {profile.following}
+                    {formatCount(profile.followingCount)}
                 </span>
                 <span
                     dir="rtl"
@@ -280,7 +272,7 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
                         color: "var(--color-ink)",
                     }}
                 >
-                    {profile.followers}
+                    {formatCount(profile.followersCount)}
                 </span>
                 <span
                     dir="rtl"
@@ -336,7 +328,7 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
                     width: "100%",
                 }}
             >
-                {following ? "متابَع" : "متابعة"}
+                {following ? "إلغاء المتابعة" : "متابعة"}
             </Button>
         </div>
     </div>
@@ -344,18 +336,34 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
 
 export default function ProfilePage() {
     const [tab, setTab] = useState("home");
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [notFoundState, setNotFoundState] = useState(false);
     const [following, setFollowing] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const { user } = useContext(UserContext);
     const width = useContext(WidthContext);
     const isMobile = width < 768;
 
+    useEffect(() => {
+        if (!user) return;
+        getProfile(user.username)
+            .then(setProfile)
+            .catch(() => setNotFoundState(true))
+            .finally(() => setLoading(false));
+    }, [user]);
+
+    if (notFoundState) notFound();
+
     const toggleSidebar = () => setSidebarOpen((v) => !v);
+
+    if (loading) return null;
 
     return (
         <AppLayout
             leftPanel={
                 <ProfilePanel
-                    profile={PROFILE}
+                    profile={profile}
                     following={following}
                     onToggleFollow={() => setFollowing((f) => !f)}
                 />
@@ -374,16 +382,18 @@ export default function ProfilePage() {
                         background: "var(--color-surface-subtle)",
                     }}
                 >
-                    <img
-                        src={PROFILE.banner}
-                        alt=""
-                        style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            display: "block",
-                        }}
-                    />
+                    {profile.bannerUrl && (
+                        <img
+                            src={profile.bannerUrl}
+                            alt=""
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                display: "block",
+                            }}
+                        />
+                    )}
                 </div>
             }
         >
@@ -398,7 +408,7 @@ export default function ProfilePage() {
                     }}
                 >
                     <Avatar
-                        initials={PROFILE.initials}
+                        initials={getInitials(profile.name)}
                         size={52}
                         bg="var(--color-accent)"
                     />
@@ -411,7 +421,7 @@ export default function ProfilePage() {
                                 lineHeight: 1.2,
                             }}
                         >
-                            {PROFILE.name}
+                            {profile.name}
                         </div>
                         <div
                             style={{
@@ -419,7 +429,7 @@ export default function ProfilePage() {
                                 color: "var(--color-light)",
                             }}
                         >
-                            {PROFILE.followers} متابع
+                            {formatCount(profile.followersCount)} متابع
                         </div>
                     </div>
                     <button
@@ -446,7 +456,7 @@ export default function ProfilePage() {
                             width: "100%",
                         }}
                     >
-                        {following ? "متابَع" : "متابعة"}
+                        {following ? "إلغاء المتابعة" : "متابعة"}
                     </Button>
                 </div>
             )}
@@ -470,7 +480,7 @@ export default function ProfilePage() {
                             lineHeight: 1.15,
                         }}
                     >
-                        {PROFILE.name}
+                        {profile.name}
                     </h1>
                     <button
                         style={{
@@ -491,11 +501,11 @@ export default function ProfilePage() {
             <Tabs active={tab} setActive={setTab} tabList={PROFILE_TABS} />
 
             {tab === "about" ? (
-                <AboutTab profile={PROFILE} />
+                <AboutTab profile={profile} />
             ) : (
-                profileArticles.map((a) => (
-                    <ArticleCard key={a.id} article={a} isMobile={isMobile} />
-                ))
+                <div style={{ padding: "24px 0", color: "var(--color-mid)", textAlign: "center" }}>
+                    لا توجد مقالات بعد
+                </div>
             )}
         </AppLayout>
     );

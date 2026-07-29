@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import articleRouter from "./routes/article.js";
 import uploadRouter from "./routes/upload.js";
+import userRouter from "./routes/user.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import logger from "./middleware/logger.js";
@@ -27,11 +28,13 @@ app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
 });
 
-app.all("/api/auth/{*any}", toNodeHandler(auth));
+app.all("/api/auth/{*any}", logger, toNodeHandler(auth));
 
 app.use("/api/article", articleRouter);
 
 app.use("/api/upload", uploadRouter);
+
+app.use("/api/user", userRouter)
 
 app.use((err, req, res, next) => {
     console.error("Unhandled error:", err);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import Avatar from "@/components/Avatar";
+import Avatar from "@/components/ui/Avatar";
 import { Bookmark, Ellipsis } from "lucide-react";
 
 const ArticleCard = ({ article, isMobile }) => {
