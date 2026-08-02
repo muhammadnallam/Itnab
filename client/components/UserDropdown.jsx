@@ -1,14 +1,8 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { UserContext } from "@/context/UserContext";
 import { signOut } from "@/lib/api";
-import {
-    UserRound,
-    Settings,
-    LogOut,
-    Sun,
-    Monitor,
-    Moon,
-} from "lucide-react";
+import { UserRound, Settings, LogOut, Sun, Monitor, Moon } from "lucide-react";
+import { redirect } from "next/navigation";
 
 const navItems = {
     authed: [
@@ -61,7 +55,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
     const handleLogout = async () => {
         await signOut();
         setUser(null);
-        onClose();
+        redirect("/");
     };
 
     const handleLogin = () => {
@@ -163,12 +157,10 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                     <button
                         onClick={handleLogin}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.color =
-                                "var(--color-ink)";
+                            e.currentTarget.style.color = "var(--color-ink)";
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.color =
-                                "var(--color-mid)";
+                            e.currentTarget.style.color = "var(--color-mid)";
                         }}
                         style={menuItemStyle()}
                     >

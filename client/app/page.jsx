@@ -5,7 +5,7 @@ import { TAGS } from "@itnab/constants";
 import { ARTICLES, WRITERS } from "@/data/dummybData";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
-import Avatar from "@/components/Avatar";
+import Avatar from "@/components/ui/Avatar";
 import Tabs from "@/components/ui/Tabs";
 import AuthModal from "@/components/AuthModal";
 import { UserContext } from "@/context/UserContext";

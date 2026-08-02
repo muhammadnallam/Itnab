@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { renderTipTap } from "@/lib/render-tiptap-html";
-import Avatar from "@/components/Avatar";
+import Avatar from "@/components/ui/Avatar";
 import ArticleHeader from "@/app/article/[slug]/ArticleHeader";
 import "./styles.css";
 import { handleArticleRead } from "@/lib/handlers";
