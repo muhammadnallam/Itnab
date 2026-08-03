@@ -1,34 +1,13 @@
 import { Router } from "express";
-import { z } from "zod";
 import { fromNodeHeaders } from "better-auth/node";
-import requireAuth from "../middleware/requireAuth";
-import asyncErrorHandler from "../middleware/asyncErrorHandler";
-import { getProfile, updateProfile, updatePassword } from "../services/userService";
-
-const updateProfileSchema = z.object({
-    name: z.string().min(1, "الاسم مطلوب"),
-    username: z
-        .string()
-        .min(1, "اسم المستخدم مطلوب")
-        .regex(/^[a-zA-Z0-9_]+$/, "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط"),
-    bio: z.string().optional(),
-});
-
-const updatePasswordSchema = z.object({
-    currentPassword: z.string().min(1, "كلمة المرور الحالية مطلوبة"),
-    newPassword: z
-        .string()
-        .min(8, "كلمة المرور يجب أن تكون ٨ أحرف على الأقل")
-        .max(20, "كلمة المرور يجب أن تكون ٢٠ حرفًا كحد أقصى"),
-});
-
-const socialLinksSchema = z.object({
-    socialLinks: z.object({
-        website: z.string().optional(),
-        youtube: z.string().optional(),
-        x: z.string().optional(),
-    }),
-});
+import requireAuth from "../../middleware/requireAuth";
+import asyncErrorHandler from "../../middleware/asyncErrorHandler";
+import { getProfile, updateProfile, updatePassword } from "./user.service.js";
+import {
+    updateProfileSchema,
+    updatePasswordSchema,
+    socialLinksSchema,
+} from "./user.schema.js";
 
 const router = Router();
 
@@ -95,14 +74,12 @@ router.put(
             );
         } catch (err) {
             if (err.status || err.statusCode) {
-                return res
-                    .status(err.status || err.statusCode)
-                    .json({
-                        error:
-                            err.body?.message ||
-                            err.message ||
-                            "حدث خطأ أثناء تحديث كلمة المرور",
-                    });
+                return res.status(err.status || err.statusCode).json({
+                    error:
+                        err.body?.message ||
+                        err.message ||
+                        "حدث خطأ أثناء تحديث كلمة المرور",
+                });
             }
             throw err;
         }

@@ -2,9 +2,9 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import articleRouter from "./routes/article.js";
-import uploadRouter from "./routes/upload.js";
-import userRouter from "./routes/user.js";
+import articleRouter from "./modules/article/article.routes.js";
+import uploadRouter from "./modules/upload/upload.routes.js"
+import userRouter from "./modules/user/user.routes.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import logger from "./middleware/logger.js";

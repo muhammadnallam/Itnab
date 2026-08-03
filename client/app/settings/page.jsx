@@ -745,7 +745,6 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
     const { user } = useContext(UserContext);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => {
         if (!user) return;
         getProfile(user.username)

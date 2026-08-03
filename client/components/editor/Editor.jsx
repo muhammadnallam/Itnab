@@ -329,7 +329,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     buttonText={"حذف"}
                     onConfirm={async () => {
                         try {
-                            await deleteArticle(articleData.slug);
+                            await deleteArticle(articleData.id);
                             redirect("/");
                         } catch (err) {
                             alert(err.message);

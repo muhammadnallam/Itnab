@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma";
-import { auth } from "../lib/auth.js";
+import prisma from "../../lib/prisma.js";
+import { auth } from "../../lib/auth.js";
 
 export async function getProfile(username) {
     const user = await prisma.user.findUnique({
@@ -58,7 +58,12 @@ export async function updateProfile(userId, data) {
     return user;
 }
 
-export async function updatePassword(userId, currentPassword, newPassword, headers) {
+export async function updatePassword(
+    userId,
+    currentPassword,
+    newPassword,
+    headers,
+) {
     await auth.api.changePassword({
         body: {
             currentPassword,

@@ -65,14 +65,14 @@ export async function publishArticle({ content, data }) {
 }
 
 export async function getArticle(slug) {
-    const res = await fetch(`${API_URL}/api/article/read/${slug}`);
+    const res = await fetch(`${API_URL}/api/article/${slug}/read`);
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || "المقال غير موجود");
     return json;
 }
 
 export async function updateArticle({ content, data, articleId }) {
-    const res = await fetch(`${API_URL}/api/article/update/${articleId}`, {
+    const res = await fetch(`${API_URL}/api/article/${articleId}/update`, {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         method: "PUT",
@@ -84,8 +84,8 @@ export async function updateArticle({ content, data, articleId }) {
     return json;
 }
 
-export async function deleteArticle(slug) {
-    const res = await fetch(`${API_URL}/api/article/delete/${slug}`, {
+export async function deleteArticle(articleId) {
+    const res = await fetch(`${API_URL}/api/article/${articleId}/delete`, {
         credentials: "include",
         method: "DELETE",
     });

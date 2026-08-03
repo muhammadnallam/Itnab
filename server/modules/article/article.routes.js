@@ -1,13 +1,13 @@
 import { Router } from "express";
-import asyncErrorHandler from "../middleware/asyncErrorHandler.js";
-import validateArticle from "../middleware/validateArticle.js";
-import requireAuth from "../middleware/requireAuth.js";
+import asyncErrorHandler from "../../middleware/asyncErrorHandler.js";
+import validateArticle from "./article.validate.js";
+import requireAuth from "../../middleware/requireAuth.js";
 import {
     createArticle,
     getArticle,
     updateArticle,
     deleteArticle,
-} from "../services/articleService.js";
+} from "./article.service.js";
 
 const router = Router();
 
@@ -28,7 +28,7 @@ router.post(
 );
 
 router.get(
-    "/read/:slug",
+    "/:slug/read",
     asyncErrorHandler(async (req, res) => {
         const slug = req.params.slug;
         const article = await getArticle({ slug });
@@ -40,7 +40,7 @@ router.get(
 );
 
 router.put(
-    "/update/:id",
+    "/:id/update",
     requireAuth,
     validateArticle,
     asyncErrorHandler(async (req, res) => {
@@ -68,17 +68,17 @@ router.put(
 );
 
 router.delete(
-    "/delete/:slug",
+    "/:id/delete",
     requireAuth,
     asyncErrorHandler(async (req, res) => {
-        const slug = req.params.slug;
+        const id = req.params.id;
         const userId = req.user.id;
 
-        if (!slug) {
+        if (!id) {
             return res.status(400).json({ error: "معرف المقال مطلوب" });
         }
 
-        const article = await getArticle({ slug });
+        const article = await getArticle({ id });
         if (!article) {
             return res.status(404).json({ error: "المقال غير موجود" });
         }
