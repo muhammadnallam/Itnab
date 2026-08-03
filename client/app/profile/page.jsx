@@ -371,7 +371,7 @@ export default function ProfilePage() {
             sidebarOpen={sidebarOpen}
             onToggleSidebar={toggleSidebar}
             centerMaxWidth={700}
-            fullWidthContent={
+            fullWidthContent={profile.bannerUrl && (
                 <div
                     style={{
                         width: "1000px",
@@ -394,7 +394,7 @@ export default function ProfilePage() {
                             }}
                         />
                     )}
-                </div>
+                </div>)
             }
         >
             {isMobile && (
