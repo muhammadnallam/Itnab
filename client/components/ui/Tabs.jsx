@@ -1,4 +1,10 @@
-const Tabs = ({ active, setActive, tabList }) => (
+const Tabs = ({
+    active,
+    setActive,
+    tabList,
+    loading = false,
+    loadingMessage = "جاري التحميل...",
+}) => (
     <>
         <style>{`
       .tabs-scroll::-webkit-scrollbar { display: none; }
@@ -42,13 +48,33 @@ const Tabs = ({ active, setActive, tabList }) => (
                         marginBottom: -1,
                         transition: "color 0.15s",
                     }}
-                    onMouseEnter={(e) => { if (active !== tab.id) e.currentTarget.style.color = "var(--color-ink)"; }}
-                    onMouseLeave={(e) => { if (active !== tab.id) e.currentTarget.style.color = "var(--color-mid)"; }}
+                    onMouseEnter={(e) => {
+                        if (active !== tab.id)
+                            e.currentTarget.style.color = "var(--color-ink)";
+                    }}
+                    onMouseLeave={(e) => {
+                        if (active !== tab.id)
+                            e.currentTarget.style.color = "var(--color-mid)";
+                    }}
                 >
                     {tab.label}
                 </button>
             ))}
         </div>
+
+        {loading && (
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: 80,
+                }}
+            >
+                <span style={{ color: "var(--color-mid)", fontSize: 14 }}>
+                    {loadingMessage}
+                </span>
+            </div>
+        )}
     </>
 );
 

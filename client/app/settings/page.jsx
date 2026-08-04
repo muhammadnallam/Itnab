@@ -819,29 +819,12 @@ export default function SettingsPage() {
                             active={activeTab}
                             setActive={setActiveTab}
                             tabList={TABS}
+                            loading={loading}
+                            loadingMessage="جاري التحميل..."
                         />
 
                         <div style={{ paddingBottom: 48 }}>
-                            {loading ? (
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        marginTop: 80,
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            color: "var(--color-mid)",
-                                            fontSize: 14,
-                                        }}
-                                    >
-                                        جاري التحميل...
-                                    </span>
-                                </div>
-                            ) : (
-                                activePanel
-                            )}
+                            {!loading && activePanel}
                         </div>
                     </div>
                 </div>
