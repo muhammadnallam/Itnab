@@ -54,7 +54,7 @@ router.put(
     "/update-password",
     requireAuth,
     asyncErrorHandler(async (req, res) => {
-        const result = updatePasswordSchema.safeParse(req.body);
+        const result = passwordSchema.safeParse(req.body);
         if (!result.success) {
             const fieldErrors = result.error.flatten().fieldErrors;
             const firstError =

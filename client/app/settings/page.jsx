@@ -5,10 +5,16 @@ import Input from "@/components/ui/Input";
 import Toggle from "@/components/ui/Toggle";
 import { ArrowUpRight, Globe } from "lucide-react";
 import { useState, useContext, useEffect } from "react";
-import { handlePassword, handleProfile, handleSocialLinks } from "@/lib/handlers";
+import {
+    handlePassword,
+    handleProfile,
+    handleSocialLinks,
+} from "@/lib/handlers";
 import Tabs from "@/components/ui/Tabs";
+import ApiMessage from "@/components/ui/ApiMessage";
 import { UserContext } from "@/context/UserContext";
-import { getProfile } from "@/lib/api";
+import { getProfile, signOut } from "@/lib/api";
+import { redirect } from "next/navigation";
 
 const X = (props) => (
     <svg
@@ -111,7 +117,7 @@ const SectionHead = ({ title, mt = 40 }) => (
     </h2>
 );
 
-const TabAccount = ({ profile, userId, onProfileUpdated }) => {
+const TabAccount = ({ profile, onProfileUpdated }) => {
     const [name, setName] = useState(profile.name || "");
     const [username, setUsername] = useState(profile.username || "");
     const [bio, setBio] = useState(profile.bio || "");
@@ -138,7 +144,11 @@ const TabAccount = ({ profile, userId, onProfileUpdated }) => {
     const handleLinksSubmit = async () => {
         setLinksErrors({});
         setLinksLoading(true);
-        const result = await handleSocialLinks({ website, youtube, x: xAccount });
+        const result = await handleSocialLinks({
+            website,
+            youtube,
+            x: xAccount,
+        });
         setLinksLoading(false);
         if (Object.keys(result).length > 0) {
             setLinksErrors(result);
@@ -151,7 +161,7 @@ const TabAccount = ({ profile, userId, onProfileUpdated }) => {
         <div>
             <SectionHead title="الملف الشخصي" mt={32} />
 
-            {errors.apiError && <p className="api-error">{errors.apiError}</p>}
+            <ApiMessage style={{ marginTop: 16 }}>{errors.apiError}</ApiMessage>
 
             <div
                 style={{
@@ -216,13 +226,19 @@ const TabAccount = ({ profile, userId, onProfileUpdated }) => {
                     />
                 </div>
             </div>
-            <Button style={{ marginTop: 16 }} onClick={handleProfileSubmit} loading={loading}>
+            <Button
+                style={{ marginTop: 16 }}
+                onClick={handleProfileSubmit}
+                loading={loading}
+            >
                 تحديث حسابك
             </Button>
 
             <SectionHead title="الروابط" />
 
-            {linksErrors.apiError && <p className="api-error">{linksErrors.apiError}</p>}
+            {linksErrors.apiError && (
+                <p className="api-error">{linksErrors.apiError}</p>
+            )}
 
             <div
                 style={{
@@ -261,7 +277,11 @@ const TabAccount = ({ profile, userId, onProfileUpdated }) => {
                 />
             </div>
 
-            <Button style={{ marginTop: 16 }} onClick={handleLinksSubmit} loading={linksLoading}>
+            <Button
+                style={{ marginTop: 16 }}
+                onClick={handleLinksSubmit}
+                loading={linksLoading}
+            >
                 تحديث الروابط
             </Button>
 
@@ -484,6 +504,7 @@ const TabSecurity = () => {
             current: false,
         },
     ]);
+    const { setUser } = useContext(UserContext);
 
     const handlePasswordClick = async () => {
         setErrors({});
@@ -499,10 +520,10 @@ const TabSecurity = () => {
             setErrors(result);
             return;
         }
-        setCurrentPass("");
-        setNewPass("");
-        setConfirmPass("");
-        setPasswordUpdated(true);
+
+        await signOut();
+        setUser(null);
+        return redirect("/");
     };
 
     return (
@@ -510,7 +531,9 @@ const TabSecurity = () => {
             <SectionHead title="كلمة المرور" mt={32} />
 
             <div style={{ maxWidth: 400, marginTop: 16 }}>
-                {errors.apiError && <p className="api-error">{errors.apiError}</p>}
+                {errors.apiError && (
+                    <p className="api-error">{errors.apiError}</p>
+                )}
 
                 {passwordUpdated && (
                     <p
@@ -758,9 +781,24 @@ export default function SettingsPage() {
     };
 
     const TABS = [
-        { id: "account", label: "الحساب", panel: profile ? <TabAccount key={profile.username || "profile"} profile={profile} userId={user?.id} onProfileUpdated={handleProfileUpdated} /> : null },
+        {
+            id: "account",
+            label: "الحساب",
+            panel: profile ? (
+                <TabAccount
+                    key={profile.username || "profile"}
+                    profile={profile}
+                    userId={user?.id}
+                    onProfileUpdated={handleProfileUpdated}
+                />
+            ) : null,
+        },
         { id: "privacy", label: "الخصوصية", panel: <TabPrivacy /> },
-        { id: "notifications", label: "الإشعارات", panel: <TabNotifications /> },
+        {
+            id: "notifications",
+            label: "الإشعارات",
+            panel: <TabNotifications />,
+        },
         { id: "security", label: "الأمان", panel: <TabSecurity /> },
     ];
 
@@ -785,10 +823,25 @@ export default function SettingsPage() {
 
                         <div style={{ paddingBottom: 48 }}>
                             {loading ? (
-                                <div style={{ display: "flex", justifyContent: "center", marginTop: 80 }}>
-                                    <span style={{ color: "var(--color-mid)", fontSize: 14 }}>جاري التحميل...</span>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        marginTop: 80,
+                                    }}
+                                >
+                                    <span
+                                        style={{
+                                            color: "var(--color-mid)",
+                                            fontSize: 14,
+                                        }}
+                                    >
+                                        جاري التحميل...
+                                    </span>
                                 </div>
-                            ) : activePanel}
+                            ) : (
+                                activePanel
+                            )}
                         </div>
                     </div>
                 </div>

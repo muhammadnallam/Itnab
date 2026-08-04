@@ -1,6 +1,7 @@
 import { authClient } from "./auth-client";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+/* --------------------- Authentication ---------------------- */
 export async function getSession() {
     const { data } = await authClient.getSession();
     return data;
@@ -32,6 +33,7 @@ export async function signOut() {
     await authClient.signOut();
 }
 
+/* --------------------- Upload ---------------------- */
 export async function upload(file, folder) {
     const formData = new FormData();
     formData.append("file", file);
@@ -51,6 +53,7 @@ export async function upload(file, folder) {
     return data.url;
 }
 
+/* --------------------- Article ---------------------- */
 export async function publishArticle({ content, data }) {
     const res = await fetch(`${API_URL}/api/article/create`, {
         credentials: "include",
@@ -95,6 +98,7 @@ export async function deleteArticle(articleId) {
     return json;
 }
 
+/* --------------------- User & Profile ---------------------- */
 export async function getProfile(username) {
     const res = await fetch(`${API_URL}/api/user/${username}/profile`);
     const json = await res.json();
