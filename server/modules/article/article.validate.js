@@ -2,6 +2,7 @@ import { z } from "zod";
 import { validateDoc } from "./article.schema.js";
 import { sanitizeDoc } from "../../lib/sanitizeDoc.js";
 import { TAGS } from "@itnab/constants";
+import { ValidationError } from "../../lib/errors.js";
 
 const VALID_TAGS = TAGS;
 
@@ -20,9 +21,7 @@ const articleSchema = z.object({
 function validateArticle(req, res, next) {
     const parsed = articleSchema.safeParse(req.body);
     if (!parsed.success) {
-        res.status(400).json({
-            error: parsed.error.issues[0].message,
-        });
+        next(new ValidationError(parsed.error.issues[0].message));
         return;
     }
 
@@ -31,8 +30,7 @@ function validateArticle(req, res, next) {
     try {
         validateDoc(content);
     } catch (e) {
-        console.log(e);
-        res.status(400).json({ error: "بُنية المستند غير صالحة" });
+        next(new ValidationError("بُنية المستند غير صالحة"));
         return;
     }
 
@@ -40,14 +38,12 @@ function validateArticle(req, res, next) {
     try {
         sanitized = sanitizeDoc(content);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        next(new ValidationError(err.message));
         return;
     }
 
     if (data.wordCount < 500) {
-        res.status(400).json({
-            error: "يجب أن يحتوي المقال على 500 كلمة على الأقل",
-        });
+        next(new ValidationError("يجب أن يحتوي المقال على 500 كلمة على الأقل"));
         return;
     }
 

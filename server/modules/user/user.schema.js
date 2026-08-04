@@ -1,18 +1,19 @@
 import { z } from "zod";
 
-export const updateProfileSchema = z.object({
-    name: z.string().min(1, "الاسم مطلوب"),
+export const profileSchema = z.object({
+    name: z.string().min(1, "الاسم مطلوب").optional(),
     username: z
         .string()
         .min(1, "اسم المستخدم مطلوب")
         .regex(
             /^[a-zA-Z0-9_]+$/,
             "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط",
-        ),
+        )
+        .optional(),
     bio: z.string().optional(),
 });
 
-export const updatePasswordSchema = z.object({
+export const passwordSchema = z.object({
     currentPassword: z.string().min(1, "كلمة المرور الحالية مطلوبة"),
     newPassword: z
         .string()

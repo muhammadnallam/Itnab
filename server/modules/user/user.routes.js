@@ -4,8 +4,8 @@ import requireAuth from "../../middleware/requireAuth";
 import asyncErrorHandler from "../../middleware/asyncErrorHandler";
 import { getProfile, updateProfile, updatePassword } from "./user.service.js";
 import {
-    updateProfileSchema,
-    updatePasswordSchema,
+    profileSchema,
+    passwordSchema,
     socialLinksSchema,
 } from "./user.schema.js";
 
@@ -15,9 +15,6 @@ router.get(
     "/:username/profile",
     asyncErrorHandler(async (req, res) => {
         const profile = await getProfile(req.params.username);
-        if (!profile) {
-            return res.status(404).json({ error: "المستخدم غير موجود" });
-        }
         res.json(profile);
     }),
 );
@@ -26,7 +23,7 @@ router.put(
     "/update-profile",
     requireAuth,
     asyncErrorHandler(async (req, res) => {
-        const result = updateProfileSchema.safeParse(req.body);
+        const result = profileSchema.safeParse(req.body);
         if (!result.success) {
             const fieldErrors = result.error.flatten().fieldErrors;
             const firstError =
@@ -65,24 +62,12 @@ router.put(
             return res.status(400).json({ error: firstError });
         }
 
-        try {
-            await updatePassword(
-                req.user.id,
-                result.data.currentPassword,
-                result.data.newPassword,
-                fromNodeHeaders(req.headers),
-            );
-        } catch (err) {
-            if (err.status || err.statusCode) {
-                return res.status(err.status || err.statusCode).json({
-                    error:
-                        err.body?.message ||
-                        err.message ||
-                        "حدث خطأ أثناء تحديث كلمة المرور",
-                });
-            }
-            throw err;
-        }
+        await updatePassword(
+            req.user.id,
+            result.data.currentPassword,
+            result.data.newPassword,
+            fromNodeHeaders(req.headers),
+        );
         res.json({ success: true });
     }),
 );

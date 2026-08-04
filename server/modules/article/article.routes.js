@@ -17,12 +17,11 @@ router.post(
     validateArticle,
     asyncErrorHandler(async (req, res) => {
         const { validatedContent, articleData } = req;
-        const userId = req.user.id;
-
-        const slug = await createArticle(validatedContent, articleData, userId);
-        if (!slug) {
-            return res.status(500).json({ error: "حدث خطأ أثناء نشر المقال" });
-        }
+        const slug = await createArticle(
+            validatedContent,
+            articleData,
+            req.user.id,
+        );
         res.status(200).json({ slug });
     }),
 );
@@ -30,11 +29,7 @@ router.post(
 router.get(
     "/:slug/read",
     asyncErrorHandler(async (req, res) => {
-        const slug = req.params.slug;
-        const article = await getArticle({ slug });
-        if (!article) {
-            return res.status(404).json({ error: "المقال غير موجود" });
-        }
+        const article = await getArticle({ slug: req.params.slug });
         res.json(article);
     }),
 );
@@ -45,24 +40,12 @@ router.put(
     validateArticle,
     asyncErrorHandler(async (req, res) => {
         const { validatedContent, articleData } = req;
-        const userId = req.user.id;
-        const articleId = req.params.id;
-
-        if (!articleId) {
-            return res.status(400).json({ error: "معرف المقال مطلوب" });
-        }
-
-        const article = await getArticle({ id: articleId });
-        if (!article) {
-            return res.status(404).json({ error: "المقال غير موجود" });
-        }
-        if (article.authorId !== userId) {
-            return res
-                .status(403)
-                .json({ error: "ليس لديك صلاحية تعديل هذا المقال" });
-        }
-
-        await updateArticle(articleId, validatedContent, articleData, userId);
+        await updateArticle(
+            req.params.id,
+            validatedContent,
+            articleData,
+            req.user.id,
+        );
         res.status(200).json({ success: true });
     }),
 );
@@ -71,24 +54,7 @@ router.delete(
     "/:id/delete",
     requireAuth,
     asyncErrorHandler(async (req, res) => {
-        const id = req.params.id;
-        const userId = req.user.id;
-
-        if (!id) {
-            return res.status(400).json({ error: "معرف المقال مطلوب" });
-        }
-
-        const article = await getArticle({ id });
-        if (!article) {
-            return res.status(404).json({ error: "المقال غير موجود" });
-        }
-        if (article.authorId !== userId) {
-            return res
-                .status(403)
-                .json({ error: "ليس لديك صلاحية تعديل هذا المقال" });
-        }
-
-        await deleteArticle(article.id);
+        await deleteArticle(req.params.id, req.user.id);
         res.status(200).json({ success: true });
     }),
 );

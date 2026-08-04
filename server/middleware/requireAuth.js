@@ -1,5 +1,6 @@
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../lib/auth.js";
+import { AuthenticationError } from "../lib/errors.js";
 
 async function requireAuth(req, res, next) {
     try {
@@ -8,15 +9,14 @@ async function requireAuth(req, res, next) {
         });
 
         if (!session) {
-            res.status(401).json({ error: "بيانات الدخول غير صالحة" });
-            return;
+            return next(new AuthenticationError("بيانات الدخول غير صالحة"));
         }
 
         req.user = session.user;
         req.session = session.session;
         next();
     } catch (error) {
-        res.status(401).json({ error: "بيانات الدخول غير صالحة" });
+        next(new AuthenticationError("بيانات الدخول غير صالحة"));
     }
 }
 

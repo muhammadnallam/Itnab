@@ -1,7 +1,13 @@
 import normalizeArabic from "@itnab/normalize";
-import extractText from "../../lib/extractText";
-import prisma from "../../lib/prisma";
+import extractText from "../../lib/extractText.js";
+import prisma from "../../lib/prisma.js";
 import { nanoid } from "nanoid";
+import { Prisma } from "../../lib/generated/prisma/client.js";
+import {
+    NotFoundError,
+    ValidationError,
+    AuthorizationError,
+} from "../../lib/errors.js";
 
 async function slugify(title) {
     let slug = normalizeArabic(title)
@@ -53,15 +59,22 @@ export async function createArticle(validatedContent, articleData, userId) {
         });
 
         return slug;
-    } catch (err) {
-        console.error("Error creating article:", err);
-        throw new Error("حدث خطأ أثناء حفظ المقال");
+    } catch (e) {
+        if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === "P2002"
+        ) {
+            throw new ValidationError(
+                "تعذر حفظ المقال, يرجى المحاولة مرة أخرى",
+            );
+        }
+        throw e;
     }
 }
 
 export async function getArticle({ slug, id }) {
     try {
-        const article = await prisma.article.findUnique({
+        return await prisma.article.findUniqueOrThrow({
             where: slug ? { slug } : { id },
             include: {
                 author: {
@@ -69,10 +82,14 @@ export async function getArticle({ slug, id }) {
                 },
             },
         });
-        return article;
-    } catch (err) {
-        console.error("Error fetching article:", err);
-        throw new Error("حدث خطأ أثناء جلب المقال");
+    } catch (e) {
+        if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === "P2025"
+        ) {
+            throw new NotFoundError("المقال غير موجود");
+        }
+        throw e;
     }
 }
 
@@ -82,6 +99,11 @@ export async function updateArticle(
     articleData,
     userId,
 ) {
+    const article = await getArticle({ id: articleId });
+    if (article.authorId !== userId) {
+        throw new AuthorizationError("ليس لديك صلاحية تعديل هذا المقال");
+    }
+
     const { seoTitle, seoDescription, tag, sendEmail, coverImage, wordCount } =
         articleData;
     const title =
@@ -109,19 +131,34 @@ export async function updateArticle(
                 readTime,
             },
         });
-    } catch (err) {
-        console.error("Error updating article:", err);
-        throw new Error("حدث خطأ أثناء تعديل المقال");
+    } catch (e) {
+        if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === "P2025"
+        ) {
+            throw new NotFoundError("المقال غير موجود");
+        }
+        throw e;
     }
 }
 
-export async function deleteArticle(articleId) {
+export async function deleteArticle(articleId, userId) {
+    const article = await getArticle({ id: articleId });
+    if (article.authorId !== userId) {
+        throw new AuthorizationError("ليس لديك صلاحية حذف هذا المقال");
+    }
+
     try {
         await prisma.article.delete({
             where: { id: articleId },
         });
-    } catch (err) {
-        console.error("Error deleting article:", err);
-        throw new Error("حدث خطأ أثناء حذف المقال");
+    } catch (e) {
+        if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === "P2025"
+        ) {
+            throw new NotFoundError("المقال غير موجود");
+        }
+        throw e;
     }
 }

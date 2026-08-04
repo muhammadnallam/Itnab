@@ -1,6 +1,7 @@
 import { getSchema } from "@tiptap/core";
 import { Node as PMNode } from "prosemirror-model";
 import { extensions } from "@itnab/tiptap";
+import { ValidationError } from "../../lib/errors.js";
 
 const schema = getSchema(extensions);
 
@@ -14,7 +15,7 @@ function validateDoc(json) {
         first.type.name !== "articleTitle" ||
         !first.textContent.trim()
     ) {
-        throw new Error("عنوان المقال لا يمكن أن يكون خاليًا");
+        throw new ValidationError("عنوان المقال لا يمكن أن يكون خاليًا");
     }
 
     const second = doc.child(1);
@@ -23,7 +24,7 @@ function validateDoc(json) {
         second.type.name !== "articleDescription" ||
         !second.textContent.trim()
     ) {
-        throw new Error("وصف المقال لا يمكن أن يكون خاليًا");
+        throw new ValidationError("وصف المقال لا يمكن أن يكون خاليًا");
     }
 
     return doc;
