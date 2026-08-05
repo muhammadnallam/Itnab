@@ -179,7 +179,9 @@ export async function handlePassword({ currentPassword, newPassword, confirmPass
     }
 }
 
-export async function handleProfile({ name, username, bio }) {
+const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
+
+export async function handleProfile({ name, username, bio, avatar, banner }) {
     const errors = {};
 
     if (!name?.trim()) errors.name = "الاسم مطلوب";
@@ -187,11 +189,30 @@ export async function handleProfile({ name, username, bio }) {
     else if (!/^[a-zA-Z0-9_]+$/.test(username))
         errors.username = "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط";
 
+    if (avatar && typeof avatar !== "string" && avatar.size > MAX_IMAGE_SIZE)
+        errors.avatar = "الحد الأقصى 3 ميغابايت";
+    if (banner && typeof banner !== "string" && banner.size > MAX_IMAGE_SIZE)
+        errors.banner = "الحد الأقصى 3 ميغابايت";
+
     if (Object.keys(errors).length > 0) return errors;
 
     try {
-        await updateProfile({ name, username, bio });
-        return {};
+        let avatarUrl = avatar;
+        if (avatar && typeof avatar !== "string")
+            avatarUrl = await upload(avatar, "avatars");
+
+        let bannerUrl = banner;
+        if (banner && typeof banner !== "string")
+            bannerUrl = await upload(banner, "banners");
+
+        const profile = await updateProfile({
+            name,
+            username,
+            bio,
+            avatarUrl,
+            bannerUrl,
+        });
+        return { profile };
     } catch (err) {
         return { apiError: err.message || "حدث خطأ أثناء تحديث الملف الشخصي" };
     }

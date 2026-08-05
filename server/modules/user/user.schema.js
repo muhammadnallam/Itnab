@@ -11,6 +11,8 @@ export const profileSchema = z.object({
         )
         .optional(),
     bio: z.string().optional(),
+    avatarUrl: z.string().optional(),
+    bannerUrl: z.string().optional(),
 });
 
 export const passwordSchema = z.object({

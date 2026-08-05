@@ -3,8 +3,10 @@ import AppLayout from "@/components/AppLayout";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Toggle from "@/components/ui/Toggle";
-import { ArrowUpRight, Globe } from "lucide-react";
-import { useState, useContext, useEffect } from "react";
+import Avatar from "@/components/ui/Avatar";
+import ImagePicker from "@/components/ImagePicker";
+import { ArrowUpRight, Globe, Pencil } from "lucide-react";
+import { useState, useContext, useEffect, useRef } from "react";
 import {
     handlePassword,
     handleProfile,
@@ -121,24 +123,52 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
     const [name, setName] = useState(profile.name || "");
     const [username, setUsername] = useState(profile.username || "");
     const [bio, setBio] = useState(profile.bio || "");
+    const [avatar, setAvatar] = useState(profile.avatarUrl || null);
+    const [banner, setBanner] = useState(profile.bannerUrl || null);
     const [website, setWebsite] = useState(profile.socialLinks?.website || "");
     const [youtube, setYoutube] = useState(profile.socialLinks?.youtube || "");
     const [xAccount, setXAccount] = useState(profile.socialLinks?.x || "");
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [profileError, setProfileError] = useState({});
+    const [profileLoading, setProfileLoading] = useState(false);
     const [linksErrors, setLinksErrors] = useState({});
     const [linksLoading, setLinksLoading] = useState(false);
+    const avatarInputRef = useRef(null);
 
-    const handleProfileSubmit = async () => {
-        setErrors({});
-        setLoading(true);
-        const result = await handleProfile({ name, username, bio });
-        setLoading(false);
-        if (Object.keys(result).length > 0) {
-            setErrors(result);
+    const avatarDisplay =
+        avatar && typeof avatar !== "string"
+            ? URL.createObjectURL(avatar)
+            : avatar;
+
+    const handleAvatarChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 3 * 1024 * 1024) {
+            setProfileError((p) => ({
+                ...p,
+                avatar: "الحد الأقصى 3 ميغابايت",
+            }));
             return;
         }
-        onProfileUpdated({ name, username, bio });
+        setProfileError((p) => ({ ...p, avatar: "" }));
+        setAvatar(file);
+    };
+
+    const handleProfileSubmit = async () => {
+        setProfileError({});
+        setProfileLoading(true);
+        const result = await handleProfile({
+            name,
+            username,
+            bio,
+            avatar,
+            banner,
+        });
+        setProfileLoading(false);
+        if (result.profile) {
+            onProfileUpdated(result.profile);
+            return;
+        }
+        setProfileError(result);
     };
 
     const handleLinksSubmit = async () => {
@@ -161,7 +191,9 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
         <div>
             <SectionHead title="الملف الشخصي" mt={32} />
 
-            <ApiMessage style={{ marginTop: 16 }}>{errors.apiError}</ApiMessage>
+            <ApiMessage style={{ marginTop: 16 }}>
+                {profileError.apiError}
+            </ApiMessage>
 
             <div
                 style={{
@@ -171,23 +203,113 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
                     marginTop: 16,
                 }}
             >
+                <div>
+                    <label
+                        style={{
+                            display: "block",
+                            fontSize: 13,
+                            color: "var(--color-mid)",
+                            marginBottom: 5,
+                        }}
+                    >
+                        صورة الملف الشخصي
+                    </label>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 16,
+                        }}
+                    >
+                        <div
+                            style={{
+                                position: "relative",
+                                width: 88,
+                                height: 88,
+                                cursor: "pointer",
+                            }}
+                            onClick={() => avatarInputRef.current?.click()}
+                        >
+                            <Avatar
+                                img={avatarDisplay}
+                                initials={name?.trim()?.slice(0, 2) || ""}
+                                size={88}
+                                bg="var(--color-accent)"
+                            />
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    right: 0,
+                                    bottom: 0,
+                                    width: 28,
+                                    height: 28,
+                                    borderRadius: "50%",
+                                    background: "var(--color-ink)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    border: "2px solid var(--color-white)",
+                                }}
+                            >
+                                <Pencil size={14} color="var(--color-white)" />
+                            </div>
+                        </div>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            ref={avatarInputRef}
+                            onChange={handleAvatarChange}
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label
+                        style={{
+                            display: "block",
+                            fontSize: 13,
+                            color: "var(--color-mid)",
+                            marginBottom: 5,
+                        }}
+                    >
+                        صورة الغلاف
+                    </label>
+                    <div
+                        style={{
+                            borderRadius: "var(--border-radius)",
+                            overflow: "hidden",
+                        }}
+                    >
+                        <ImagePicker
+                            image={banner}
+                            setImage={setBanner}
+                            aspectRatio="1000/200"
+                            error={profileError.banner}
+                            setError={(msg) =>
+                                setProfileError((p) => ({ ...p, banner: msg }))
+                            }
+                            label="إضافة صورة غلاف"
+                            changeLabel="تغيير صورة الغلاف"
+                        />
+                    </div>
+                </div>
                 <Input
                     label="الاسم"
                     value={name}
                     onChange={(e) => {
                         setName(e.target.value);
-                        setErrors((p) => ({ ...p, name: "" }));
+                        setProfileError((p) => ({ ...p, name: "" }));
                     }}
-                    error={errors.name}
+                    error={profileError.name}
                 />
                 <Input
                     label="اسم المستخدم"
                     value={username}
                     onChange={(e) => {
                         setUsername(e.target.value);
-                        setErrors((p) => ({ ...p, username: "" }));
+                        setProfileError((p) => ({ ...p, username: "" }));
                     }}
-                    error={errors.username}
+                    error={profileError.username}
                 />
                 <div>
                     <label
@@ -229,7 +351,7 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
             <Button
                 style={{ marginTop: 16 }}
                 onClick={handleProfileSubmit}
-                loading={loading}
+                loading={profileLoading}
             >
                 تحديث حسابك
             </Button>

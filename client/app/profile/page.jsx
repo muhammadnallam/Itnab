@@ -79,7 +79,11 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
         }}
     >
         <div style={{ display: "flex", justifyContent: "center" }}>
-            <Avatar initials={getInitials(profile.name)} size={80} />
+            <Avatar
+                img={profile.avatarUrl}
+                initials={getInitials(profile.name)}
+                size={80}
+            />
         </div>
 
         <div
@@ -371,30 +375,32 @@ export default function ProfilePage() {
             sidebarOpen={sidebarOpen}
             onToggleSidebar={toggleSidebar}
             centerMaxWidth={700}
-            fullWidthContent={profile.bannerUrl && (
-                <div
-                    style={{
-                        width: "1000px",
-                        maxWidth: "100%",
-                        margin: "0 auto",
-                        height: isMobile ? 130 : 200,
-                        overflow: "hidden",
-                        background: "var(--color-surface-subtle)",
-                    }}
-                >
-                    {profile.bannerUrl && (
-                        <img
-                            src={profile.bannerUrl}
-                            alt=""
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                display: "block",
-                            }}
-                        />
-                    )}
-                </div>)
+            fullWidthContent={
+                profile.bannerUrl && (
+                    <div
+                        style={{
+                            width: "1000px",
+                            maxWidth: "100%",
+                            margin: "0 auto",
+                            height: isMobile ? 130 : 200,
+                            overflow: "hidden",
+                            background: "var(--color-surface-subtle)",
+                        }}
+                    >
+                        {profile.bannerUrl && (
+                            <img
+                                src={profile.bannerUrl}
+                                alt=""
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    display: "block",
+                                }}
+                            />
+                        )}
+                    </div>
+                )
             }
         >
             {isMobile && (
@@ -408,6 +414,7 @@ export default function ProfilePage() {
                     }}
                 >
                     <Avatar
+                        img={profile.avatarUrl}
                         initials={getInitials(profile.name)}
                         size={52}
                         bg="var(--color-accent)"
@@ -503,7 +510,13 @@ export default function ProfilePage() {
             {tab === "about" ? (
                 <AboutTab profile={profile} />
             ) : (
-                <div style={{ padding: "24px 0", color: "var(--color-mid)", textAlign: "center" }}>
+                <div
+                    style={{
+                        padding: "24px 0",
+                        color: "var(--color-mid)",
+                        textAlign: "center",
+                    }}
+                >
                     لا توجد مقالات بعد
                 </div>
             )}

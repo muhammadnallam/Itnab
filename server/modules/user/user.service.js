@@ -46,7 +46,15 @@ export async function getProfile(username) {
 }
 
 export async function updateProfile(userId, data) {
-    const allowed = ["name", "username", "bio", "socialLinks", "preferences"];
+    const allowed = [
+        "name",
+        "username",
+        "bio",
+        "avatarUrl",
+        "bannerUrl",
+        "socialLinks",
+        "preferences",
+    ];
     const updateData = {};
     for (const key of allowed) {
         if (data[key] !== undefined) updateData[key] = data[key];
