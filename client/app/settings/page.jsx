@@ -17,6 +17,8 @@ import ApiMessage from "@/components/ui/ApiMessage";
 import { UserContext } from "@/context/UserContext";
 import { getProfile, signOut } from "@/lib/api";
 import { redirect } from "next/navigation";
+import ConfirmModal from "@/components/ConfirmModal";
+import { Trash } from "lucide-react";
 
 const X = (props) => (
     <svg
@@ -132,6 +134,7 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
     const [profileLoading, setProfileLoading] = useState(false);
     const [linksErrors, setLinksErrors] = useState({});
     const [linksLoading, setLinksLoading] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
     const avatarInputRef = useRef(null);
 
     const avatarDisplay =
@@ -187,14 +190,18 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
         onProfileUpdated({ socialLinks: { website, youtube, x: xAccount } });
     };
 
+    const handleAccountDelete = () => {
+        // TODO
+        alert("Account Deleted!");
+        return;
+    };
+
     return (
         <div>
             <SectionHead title="الملف الشخصي" mt={32} />
-
             <ApiMessage style={{ marginTop: 16 }}>
                 {profileError.apiError}
             </ApiMessage>
-
             <div
                 style={{
                     display: "flex",
@@ -355,13 +362,10 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
             >
                 تحديث حسابك
             </Button>
-
             <SectionHead title="الروابط" />
-
             {linksErrors.apiError && (
                 <p className="api-error">{linksErrors.apiError}</p>
             )}
-
             <div
                 style={{
                     display: "flex",
@@ -398,22 +402,40 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
                     rightIcon={<X />}
                 />
             </div>
-
             <Button
-                style={{ marginTop: 16 }}
+                style={{ marginTop: 16 + 5 }}
                 onClick={handleLinksSubmit}
                 loading={linksLoading}
             >
                 تحديث الروابط
             </Button>
-
             <SectionHead title="منطقة خطر" />
             <SettingRow
                 topBorder={false}
                 label="حذف الحساب"
                 desc="سيؤدي هذا إلى حذف حسابك وجميع محتواك بصورة دائمة."
                 danger
-                control={<Button variant="error">حذف الحساب</Button>}
+                control={
+                    <Button
+                        variant="error"
+                        onClick={() => setConfirmDelete(true)}
+                    >
+                        حذف الحساب
+                    </Button>
+                }
+            />
+            <ConfirmModal
+                isOpen={confirmDelete}
+                onCancel={() => setConfirmDelete(false)}
+                onConfirm={() => handleAccountDelete()}
+                icon={Trash}
+                color={"var(--color-error)"}
+                icoBackground={"var(--color-error-light)"}
+                title={"حذف الحساب نهائيًا"}
+                description={
+                    "سيتم حذف حسابك وجميع محتواك بصورة دائمة. هذا الإجراء نهائي ولا يمكن التراجع عنه"
+                }
+                buttonText={"حذف الحساب"}
             />
         </div>
     );
@@ -606,26 +628,6 @@ const TabSecurity = () => {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [passwordUpdated, setPasswordUpdated] = useState(false);
-    const [sessions] = useState([
-        {
-            device: "Chrome — Windows",
-            location: "الجيزة, مصر",
-            last: "الآن",
-            current: true,
-        },
-        {
-            device: "Safari — iPhone",
-            location: "الجيزة, مصر",
-            last: "منذ ساعتين",
-            current: false,
-        },
-        {
-            device: "Firefox — MacOS",
-            location: "لندن، المملكة المتحدة",
-            last: "منذ ٣ أيام",
-            current: false,
-        },
-    ]);
     const { setUser } = useContext(UserContext);
 
     const handlePasswordClick = async () => {
@@ -746,93 +748,6 @@ const TabSecurity = () => {
                     تحديث كلمة المرور
                 </Button>
             </div>
-
-            <SectionHead title="الجلسات النشطة" />
-            <div style={{ marginTop: 12 }}>
-                {sessions.map((s, i) => (
-                    <div
-                        key={i}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: "14px 0",
-                            borderTop:
-                                i === 0
-                                    ? "none"
-                                    : "1px solid var(--color-border)",
-                        }}
-                    >
-                        <div>
-                            <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 8,
-                                    marginBottom: 3,
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        fontSize: 14,
-                                        fontWeight: 500,
-                                        color: "var(--color-ink)",
-                                    }}
-                                >
-                                    {s.device}
-                                </span>
-                                {s.current && (
-                                    <span
-                                        style={{
-                                            fontSize: 11,
-                                            background:
-                                                "var(--color-accent-light)",
-                                            color: "var(--color-accent)",
-                                            borderRadius: 99,
-                                            padding: "2px 8px",
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        الجلسة الحالية
-                                    </span>
-                                )}
-                            </div>
-                            <div
-                                style={{
-                                    fontSize: 12,
-                                    color: "var(--color-mid)",
-                                }}
-                            >
-                                {s.location} · {s.last}
-                            </div>
-                        </div>
-                        {!s.current && (
-                            <button
-                                style={{
-                                    background: "none",
-                                    border: "1px solid var(--color-border)",
-                                    borderRadius: 4,
-                                    padding: "5px 12px",
-                                    fontSize: 12,
-                                    color: "var(--color-error)",
-                                    cursor: "pointer",
-                                    transition: "border-color 0.15s",
-                                }}
-                                onMouseEnter={(e) =>
-                                    (e.currentTarget.style.borderColor =
-                                        "var(--color-error)")
-                                }
-                                onMouseLeave={(e) =>
-                                    (e.currentTarget.style.borderColor =
-                                        "var(--color-border)")
-                                }
-                            >
-                                إنهاء
-                            </button>
-                        )}
-                    </div>
-                ))}
-            </div>
         </>
     );
 };
@@ -915,12 +830,12 @@ export default function SettingsPage() {
                 />
             ) : null,
         },
-        { id: "privacy", label: "الخصوصية", panel: <TabPrivacy /> },
-        {
-            id: "notifications",
-            label: "الإشعارات",
-            panel: <TabNotifications />,
-        },
+        // { id: "privacy", label: "الخصوصية", panel: <TabPrivacy /> },
+        // {
+        //     id: "notifications",
+        //     label: "الإشعارات",
+        //     panel: <TabNotifications />,
+        // },
         { id: "security", label: "الأمان", panel: <TabSecurity /> },
     ];
 
