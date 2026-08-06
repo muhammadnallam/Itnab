@@ -5,8 +5,10 @@ import cookieParser from "cookie-parser";
 import articleRouter from "./modules/article/article.routes.js";
 import uploadRouter from "./modules/upload/upload.routes.js";
 import userRouter from "./modules/user/user.routes.js";
+import feedRouter from "./modules/feed/feed.routes.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
+import { startGravityCron } from "./lib/gravity.js";
 import logger from "./middleware/logger.js";
 
 const app = express();
@@ -36,6 +38,8 @@ app.use("/api/upload", uploadRouter);
 
 app.use("/api/user", userRouter);
 
+app.use("/api/feed", feedRouter);
+
 app.use((err, req, res, next) => {
     if (err.status) {
         return res.status(err.status).json({ error: err.message });
@@ -43,6 +47,8 @@ app.use((err, req, res, next) => {
     console.error("Unhandled error:", err);
     res.status(500).json({ error: "حدث خطأ داخلي في الخادم" });
 });
+
+startGravityCron();
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

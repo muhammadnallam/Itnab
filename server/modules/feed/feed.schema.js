@@ -1,0 +1,14 @@
+import { z } from "zod";
+
+export const feedQuerySchema = z.object({
+    sort: z.enum(["top", "new"]).default("top"),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+    author: z.string().uuid("معرف المؤلف غير صالح").optional(),
+});
+
+export const listsQuerySchema = z.object({
+    author: z.string().uuid("معرف المؤلف غير صالح"),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+});
