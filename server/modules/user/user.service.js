@@ -1,7 +1,9 @@
 import prisma from "../../lib/prisma.js";
 import { auth } from "../../lib/auth.js";
-import { Prisma } from "../../lib/generated/prisma/client.js";
-import { ValidationError, NotFoundError } from "../../lib/errors.js";
+import {
+    ValidationError,
+    handlePrismaError,
+} from "../../lib/errors.js";
 
 export async function getProfile(username) {
     let user;
@@ -27,13 +29,7 @@ export async function getProfile(username) {
             },
         });
     } catch (err) {
-        if (
-            err instanceof Prisma.PrismaClientKnownRequestError &&
-            err.code === "P2025"
-        ) {
-            throw new NotFoundError("المستخدم غير موجود");
-        }
-        throw err;
+        handlePrismaError(err, { notFoundMsg: "المستخدم غير موجود" });
     }
 
     const { _count, ...userData } = user;
@@ -90,20 +86,11 @@ export async function updateProfile(userId, data) {
         });
         return profile;
     } catch (err) {
-        if (err instanceof Prisma.PrismaClientKnownRequestError) {
-            switch (err.code) {
-                case "P2002":
-                    throw new ValidationError(
-                        "اسم المستخدم موجود بالفعل",
-                        "username",
-                    );
-                case "P2025":
-                    throw new NotFoundError("المستخدم غير موجود");
-                default:
-                    throw err;
-            }
-        }
-        throw err;
+        handlePrismaError(err, {
+            notFoundMsg: "المستخدم غير موجود",
+            duplicateMsg: "اسم المستخدم موجود بالفعل",
+            duplicateField: "username",
+        });
     }
 }
 
@@ -137,12 +124,6 @@ export async function deleteUserAccount(userId) {
             where: { id: userId },
         });
     } catch (err) {
-        if (
-            err instanceof Prisma.PrismaClientKnownRequestError &&
-            err.code === "P2025"
-        ) {
-            throw new NotFoundError("المستخدم غير موجود");
-        }
-        throw err;
+        handlePrismaError(err, { notFoundMsg: "المستخدم غير موجود" });
     }
 }

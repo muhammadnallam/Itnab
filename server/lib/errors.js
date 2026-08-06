@@ -1,3 +1,5 @@
+import { Prisma } from "./generated/prisma/client.js";
+
 export class ValidationError extends Error {
     constructor(message, field) {
         super(message);
@@ -37,4 +39,18 @@ export class AuthenticationError extends Error {
         this.name = "AuthenticationError";
         this.status = 401;
     }
+}
+
+export function handlePrismaError(e, options = {}) {
+    if (!(e instanceof Prisma.PrismaClientKnownRequestError)) throw e;
+
+    const { notFoundMsg, duplicateMsg, duplicateField } = options;
+
+    if (e.code === "P2025" && notFoundMsg) {
+        throw new NotFoundError(notFoundMsg);
+    }
+    if (e.code === "P2002" && duplicateMsg) {
+        throw new ValidationError(duplicateMsg, duplicateField);
+    }
+    throw e;
 }

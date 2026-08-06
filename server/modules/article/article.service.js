@@ -2,11 +2,9 @@ import normalizeArabic from "@itnab/normalize";
 import extractText from "../../lib/extractText.js";
 import prisma from "../../lib/prisma.js";
 import { nanoid } from "nanoid";
-import { Prisma } from "../../lib/generated/prisma/client.js";
 import {
-    NotFoundError,
-    ValidationError,
     AuthorizationError,
+    handlePrismaError,
 } from "../../lib/errors.js";
 
 async function slugify(title) {
@@ -60,15 +58,9 @@ export async function createArticle(validatedContent, articleData, userId) {
 
         return slug;
     } catch (e) {
-        if (
-            e instanceof Prisma.PrismaClientKnownRequestError &&
-            e.code === "P2002"
-        ) {
-            throw new ValidationError(
-                "تعذر حفظ المقال, يرجى المحاولة مرة أخرى",
-            );
-        }
-        throw e;
+        handlePrismaError(e, {
+            duplicateMsg: "تعذر حفظ المقال, يرجى المحاولة مرة أخرى",
+        });
     }
 }
 
@@ -83,13 +75,7 @@ export async function getArticle({ slug, id }) {
             },
         });
     } catch (e) {
-        if (
-            e instanceof Prisma.PrismaClientKnownRequestError &&
-            e.code === "P2025"
-        ) {
-            throw new NotFoundError("المقال غير موجود");
-        }
-        throw e;
+        handlePrismaError(e, { notFoundMsg: "المقال غير موجود" });
     }
 }
 
@@ -132,13 +118,7 @@ export async function updateArticle(
             },
         });
     } catch (e) {
-        if (
-            e instanceof Prisma.PrismaClientKnownRequestError &&
-            e.code === "P2025"
-        ) {
-            throw new NotFoundError("المقال غير موجود");
-        }
-        throw e;
+        handlePrismaError(e, { notFoundMsg: "المقال غير موجود" });
     }
 }
 
@@ -153,12 +133,6 @@ export async function deleteArticle(articleId, userId) {
             where: { id: articleId },
         });
     } catch (e) {
-        if (
-            e instanceof Prisma.PrismaClientKnownRequestError &&
-            e.code === "P2025"
-        ) {
-            throw new NotFoundError("المقال غير موجود");
-        }
-        throw e;
+        handlePrismaError(e, { notFoundMsg: "المقال غير موجود" });
     }
 }
