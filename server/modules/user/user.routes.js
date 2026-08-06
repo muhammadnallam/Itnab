@@ -2,7 +2,12 @@ import { Router } from "express";
 import { fromNodeHeaders } from "better-auth/node";
 import requireAuth from "../../middleware/requireAuth";
 import asyncErrorHandler from "../../middleware/asyncErrorHandler";
-import { getProfile, updateProfile, updatePassword } from "./user.service.js";
+import {
+    getProfile,
+    updateProfile,
+    updatePassword,
+    deleteUserAccount,
+} from "./user.service.js";
 import {
     profileSchema,
     passwordSchema,
@@ -68,6 +73,15 @@ router.put(
             result.data.newPassword,
             fromNodeHeaders(req.headers),
         );
+        res.json({ success: true });
+    }),
+);
+
+router.post(
+    "/delete-account",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        await deleteUserAccount(req.user.id);
         res.json({ success: true });
     }),
 );

@@ -130,3 +130,19 @@ export async function updatePassword(
         throw new ValidationError(message);
     }
 }
+
+export async function deleteUserAccount(userId) {
+    try {
+        await prisma.user.delete({
+            where: { id: userId },
+        });
+    } catch (err) {
+        if (
+            err instanceof Prisma.PrismaClientKnownRequestError &&
+            err.code === "P2025"
+        ) {
+            throw new NotFoundError("المستخدم غير موجود");
+        }
+        throw err;
+    }
+}

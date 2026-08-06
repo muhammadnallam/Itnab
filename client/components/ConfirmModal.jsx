@@ -11,6 +11,8 @@ export default function ConfirmModal({
     onCancel,
     onConfirm,
     isOpen,
+    loading = false,
+    error = null,
 }) {
     return (
         <Modal open={isOpen} onClose={onCancel} style={{ textAlign: "center" }}>
@@ -55,6 +57,21 @@ export default function ConfirmModal({
                 {description}
             </p>
 
+            {error && (
+                <p
+                    style={{
+                        margin: "0 0 16px",
+                        padding: "8px 12px",
+                        fontSize: 13,
+                        color: "var(--color-error)",
+                        background: "var(--color-error-light)",
+                        borderRadius: "var(--border-radius)",
+                    }}
+                >
+                    {error}
+                </p>
+            )}
+
             {/* Actions — deliberately kept LTR so Cancel stays left and the
             primary action stays right, matching the original layout. */}
             <div
@@ -68,12 +85,14 @@ export default function ConfirmModal({
                 <Button
                     onClick={onCancel}
                     variant="secondary"
+                    disabled={loading}
                     style={{ width: "50%" }}
                 >
                     إلغاء
                 </Button>
                 <Button
                     onClick={onConfirm}
+                    loading={loading}
                     style={{ background: color, width: "50%" }}
                 >
                     {buttonText}

@@ -23,6 +23,7 @@ model User {
   createdAt   DateTime @default(now())
 
   articles      Article[]
+  lists List[]
   following     Follow[]   @relation("follower")
   followers     Follow[]   @relation("following")
   likes         Like[]
@@ -57,12 +58,27 @@ model Article {
   updatedAt      DateTime @updatedAt
 
   authorId String @db.Uuid
-  author   User   @relation(fields: [authorId], references: [id])
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
+  lists     List[]
   likes     Like[]
   bookmarks Bookmark[]
   shares    Share[]
   views     View[]       @relation("articleViews")
+}
+
+model List {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  authorId String @db.Uuid
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  articles Article[]
+
+  @@map("list")
 }
 
 // Interactions were separated to simplify queries and make indexing more efficient.
@@ -71,8 +87,8 @@ model Article {
 model Follow {
   followerId  String   @db.Uuid
   followingId String   @db.Uuid
-  follower    User     @relation("follower", fields: [followerId], references: [id])
-  following   User     @relation("following", fields: [followingId], references: [id])
+  follower    User     @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 
   @@id([followerId, followingId])
@@ -81,8 +97,8 @@ model Follow {
 model Like {
   userId    String   @db.Uuid
   articleId String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id])
-  article   Article  @relation(fields: [articleId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@id([userId, articleId])
@@ -91,8 +107,8 @@ model Like {
 model Bookmark {
   userId    String   @db.Uuid
   articleId String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id])
-  article   Article  @relation(fields: [articleId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@id([userId, articleId])
@@ -101,8 +117,8 @@ model Bookmark {
 model Share {
   userId    String   @db.Uuid
   articleId String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id])
-  article   Article  @relation(fields: [articleId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@id([userId, articleId])
@@ -115,7 +131,7 @@ model View {
   userId    String?  @db.Uuid // Optional for counting guests views
   articleId String   @db.Uuid
   user      User?    @relation("userViews", fields: [userId], references: [id])
-  article   Article  @relation("articleViews", fields: [articleId], references: [id])
+  article   Article  @relation("articleViews", fields: [articleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   // TODO: Add device type, browser, and location for analytics.

@@ -26,7 +26,7 @@ export async function signUpEmail(email, password, name) {
 export async function signInGoogle() {
     // const { error } = await authClient.signIn.social({ provider: "google" });
     // if (error) throw new Error(error.message || "فشل تسجيل الدخول عبر Google");
-    throw new Error("التسجيل عبر Google غير متاح حاليًا")
+    throw new Error("التسجيل عبر Google غير متاح حاليًا");
 }
 
 export async function signOut() {
@@ -115,7 +115,8 @@ export async function updateProfile(data) {
     });
 
     const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(json.error || "حدث خطأ أثناء تحديث الملف الشخصي");
+    if (!res.ok)
+        throw new Error(json.error || "حدث خطأ أثناء تحديث الملف الشخصي");
     return json;
 }
 
@@ -141,6 +142,18 @@ export async function updatePassword(data) {
     });
 
     const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(json.error || "حدث خطأ أثناء تحديث كلمة المرور");
+    if (!res.ok)
+        throw new Error(json.error || "حدث خطأ أثناء تحديث كلمة المرور");
+    return json;
+}
+
+export async function deleteAccount() {
+    const res = await fetch(`${API_URL}/api/user/delete-account`, {
+        credentials: "include",
+        method: "POST",
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error || "حدث خطأ أثناء حذف الحساب");
     return json;
 }

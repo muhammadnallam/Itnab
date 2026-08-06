@@ -15,7 +15,7 @@ import {
 import Tabs from "@/components/ui/Tabs";
 import ApiMessage from "@/components/ui/ApiMessage";
 import { UserContext } from "@/context/UserContext";
-import { getProfile, signOut } from "@/lib/api";
+import { getProfile, signOut, deleteAccount } from "@/lib/api";
 import { redirect } from "next/navigation";
 import ConfirmModal from "@/components/ConfirmModal";
 import { Trash } from "lucide-react";
@@ -135,6 +135,9 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
     const [linksErrors, setLinksErrors] = useState({});
     const [linksLoading, setLinksLoading] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState(null);
+    const { setUser } = useContext(UserContext);
     const avatarInputRef = useRef(null);
 
     const avatarDisplay =
@@ -190,10 +193,19 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
         onProfileUpdated({ socialLinks: { website, youtube, x: xAccount } });
     };
 
-    const handleAccountDelete = () => {
-        // TODO
-        alert("Account Deleted!");
-        return;
+    const handleAccountDelete = async () => {
+        setDeleting(true);
+        setDeleteError(null);
+        try {
+            await deleteAccount();
+        } catch (err) {
+            setDeleteError(err.message || "حدث خطأ أثناء حذف الحساب");
+            setDeleting(false);
+            return;
+        }
+        await signOut();
+        setUser(null);
+        redirect("/");
     };
 
     return (
@@ -436,6 +448,8 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
                     "سيتم حذف حسابك وجميع محتواك بصورة دائمة. هذا الإجراء نهائي ولا يمكن التراجع عنه"
                 }
                 buttonText={"حذف الحساب"}
+                loading={deleting}
+                error={deleteError}
             />
         </div>
     );
