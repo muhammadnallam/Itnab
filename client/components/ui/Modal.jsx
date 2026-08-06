@@ -44,6 +44,7 @@ export default function Modal({ open, onClose, style, children }) {
                 <button
                     type="button"
                     onClick={onClose}
+                    className="text-mid hover:text-ink"
                     style={{
                         position: "absolute",
                         top: 18,
@@ -51,17 +52,10 @@ export default function Modal({ open, onClose, style, children }) {
                         background: "none",
                         border: "none",
                         cursor: "pointer",
-                        color: "var(--color-mid)",
                         display: "flex",
                         padding: 4,
                         transition: "color 0.15s",
                     }}
-                    onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "var(--color-ink)")
-                    }
-                    onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "var(--color-mid)")
-                    }
                 >
                     <X size={18} />
                 </button>

@@ -156,15 +156,10 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                 {!user && (
                     <button
                         onClick={handleLogin}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.color = "var(--color-ink)";
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.color = "var(--color-mid)";
-                        }}
+                        className="text-mid hover:text-ink"
                         style={menuItemStyle()}
                     >
-                        <UserRound size={18} stroke="var(--color-mid)" />
+                        <UserRound size={18} stroke="currentColor" />
                         <span style={{ fontWeight: 500 }}>تسجيل الدخول</span>
                     </button>
                 )}
@@ -175,17 +170,10 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
                         <button
                             key={item.label}
                             onClick={() => handleItemClick(item)}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.color =
-                                    "var(--color-ink)";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.color =
-                                    "var(--color-mid)";
-                            }}
+                            className="text-mid hover:text-ink"
                             style={menuItemStyle()}
                         >
-                            <Icon size={18} stroke="var(--color-mid)" />
+                            <Icon size={18} stroke="currentColor" />
                             <span style={{ fontWeight: 500 }}>
                                 {item.label}
                             </span>
@@ -300,7 +288,6 @@ function menuItemStyle() {
         background: "none",
         cursor: "pointer",
         fontSize: 13,
-        color: "var(--color-mid)",
         textAlign: "right",
         borderRadius: 0,
         transition: "color 0.12s",

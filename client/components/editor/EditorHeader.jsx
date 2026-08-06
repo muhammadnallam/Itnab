@@ -35,6 +35,7 @@ export default function EditorHeader({
                         التالي
                     </Button>
                     <button
+                        className="text-mid hover:text-error"
                         style={{
                             display: "flex",
                             alignItems: "center",
@@ -42,17 +43,10 @@ export default function EditorHeader({
                             background: "none",
                             border: "none",
                             cursor: "pointer",
-                            color: "var(--color-mid)",
                             padding: 8,
                             borderRadius: 6,
                             transition: "color 0.15s",
                         }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.color = "var(--color-error)")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.color = "var(--color-mid)")
-                        }
                         onClick={() => {
                             setConfirmModal(true);
                         }}
@@ -76,6 +70,7 @@ export default function EditorHeader({
                     </div>
                     <button
                         onClick={() => router.push("/")}
+                        className="text-mid hover:text-ink"
                         style={{
                             display: "flex",
                             alignItems: "center",
@@ -83,19 +78,12 @@ export default function EditorHeader({
                             background: "none",
                             border: "none",
                             cursor: "pointer",
-                            color: "var(--color-mid)",
                             fontSize: 15,
                             padding: "4px 6px",
                             borderRadius: 6,
                             marginBottom: 5,
                             transition: "color 0.15s",
                         }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.color = "var(--color-ink)")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.color = "var(--color-mid)")
-                        }
                     >
                         رجوع
                         <ArrowLeft size={20} />

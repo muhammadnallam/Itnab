@@ -63,45 +63,35 @@ export default function ArticleHeader() {
             <div className="article-header-icons">
                 <button
                     aria-label="share article"
+                    className="text-mid hover:text-ink"
                     style={{
                         cursor: "pointer",
-                        color: "var(--color-mid)",
                         transition: "color 0.15s",
                     }}
-                    onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "var(--color-ink)")
-                    }
-                    onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "var(--color-mid)")
-                    }
                 >
                     <Download size={24} />
                 </button>
                 <button
                     aria-label="save article"
                     onClick={() => setSaved((s) => !s)}
+                    className={
+                        saved ? "text-accent" : "text-mid hover:text-accent"
+                    }
                     style={{
                         background: "none",
                         border: "none",
                         cursor: "pointer",
                         transition: "color 0.15s",
                     }}
-                    onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "var(--color-accent)")
-                    }
-                    onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "var(--color-mid)")
-                    }
                 >
                     <Bookmark
                         size={24}
                         fill={saved ? "var(--color-accent)" : "none"}
-                        color={
-                            saved ? "var(--color-accent)" : "var(--color-mid)"
-                        }
+                        color="currentColor"
                     />
                 </button>
                 <button
+                    className="text-mid hover:text-ink"
                     style={{
                         display: "flex",
                         alignItems: "center",
@@ -109,18 +99,11 @@ export default function ArticleHeader() {
                         background: "none",
                         border: "none",
                         cursor: "pointer",
-                        color: "var(--color-mid)",
                         fontSize: 15,
                         padding: "4px 6px",
                         borderRadius: 6,
                         textDecoration: "none",
                     }}
-                    onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "var(--color-ink)")
-                    }
-                    onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "var(--color-mid)")
-                    }
                     onClick={() => {
                         router.push("/");
                     }}

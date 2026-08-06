@@ -31,6 +31,11 @@ const MobileBottomNav = () => {
                 return (
                     <button
                         key={item.label}
+                        className={
+                            item.active
+                                ? "text-accent"
+                                : "text-mid hover:text-ink"
+                        }
                         style={{
                             flex: 1,
                             display: "flex",
@@ -40,15 +45,10 @@ const MobileBottomNav = () => {
                             background: "none",
                             border: "none",
                             cursor: "pointer",
-                            color: item.active
-                                ? "var(--color-accent)"
-                                : "var(--color-mid)",
                             fontSize: 13,
                             gap: 4,
                             transition: "color 0.15s",
                         }}
-                        onMouseEnter={(e) => { if (!item.active) e.currentTarget.style.color = "var(--color-ink)"; }}
-                        onMouseLeave={(e) => { if (!item.active) e.currentTarget.style.color = "var(--color-mid)"; }}
                     >
                         <Icon
                             size={22}

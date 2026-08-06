@@ -82,38 +82,23 @@ const ArticleCard = ({ article, isMobile }) => {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setSaved((s) => !s)}
-                        className="cursor-pointer pl-1"
+                        className={`cursor-pointer pl-1 ${
+                            saved ? "text-accent" : "text-mid hover:text-ink"
+                        }`}
                         style={{ transition: "color 0.15s" }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.color =
-                                "var(--color-accent)")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.color = "var(--color-mid)")
-                        }
                     >
                         <Bookmark
                             size={19}
                             fill={saved ? "var(--color-accent)" : "none"}
-                            color={
-                                saved
-                                    ? "var(--color-accent)"
-                                    : "var(--color-mid)"
-                            }
+                            color="currentColor"
                         />
                     </button>
 
                     <button
-                        className="cursor-pointer text-mid ml-1"
+                        className="cursor-pointer text-mid ml-1 hover:text-ink"
                         style={{
                             transition: "color 0.15s",
                         }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.color = "var(--color-ink)")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.color = "var(--color-mid)")
-                        }
                     >
                         <Ellipsis size={19} />
                     </button>

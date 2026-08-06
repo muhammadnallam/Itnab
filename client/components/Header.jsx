@@ -31,21 +31,15 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                 {!isMobile && (
                     <button
                         onClick={onToggleSidebar}
+                        className="text-mid hover:text-ink"
                         style={{
                             background: "none",
                             border: "none",
                             cursor: "pointer",
-                            color: "var(--color-mid)",
                             display: "flex",
                             padding: 4,
                             transition: "color 0.15s",
                         }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.color = "var(--color-ink)")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.color = "var(--color-mid)")
-                        }
                     >
                         <Menu size={24}></Menu>
                     </button>
@@ -68,21 +62,15 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                 </a>
                 {isMobile && (
                     <button
+                        className="text-mid hover:text-ink"
                         style={{
                             background: "none",
                             border: "none",
                             cursor: "pointer",
-                            color: "var(--color-mid)",
                             display: "flex",
                             padding: 4,
                             transition: "color 0.15s",
                         }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.color = "var(--color-ink)")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.color = "var(--color-mid)")
-                        }
                     >
                         <Search size={22} />
                     </button>
@@ -125,24 +113,18 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                         onClick={() => {
                             router.push("/new");
                         }}
+                        className="text-mid hover:text-ink"
                         style={{
                             display: "flex",
                             alignItems: "center",
                             gap: 6,
                             background: "none",
                             border: "none",
-                            color: "var(--color-mid)",
                             fontSize: 15,
                             cursor: "pointer",
                             flexShrink: 0,
                             transition: "color 0.15s",
                         }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.color = "var(--color-ink)")
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.color = "var(--color-mid)")
-                        }
                     >
                         <SquarePen size={24} />
                         اكتب
@@ -150,17 +132,11 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                 )}
 
                 <button
+                    className="text-mid hover:text-ink"
                     style={{
                         cursor: "pointer",
-                        color: "var(--color-mid)",
                         transition: "color 0.15s",
                     }}
-                    onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "var(--color-ink)")
-                    }
-                    onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "var(--color-mid)")
-                    }
                 >
                     <Bell size={24} />
                 </button>

@@ -64,7 +64,6 @@ const iconBtnStyle = {
     cursor: "pointer",
     padding: 0,
     display: "flex",
-    color: "var(--color-mid)",
     transition: "color 0.15s",
 };
 
@@ -263,15 +262,8 @@ export const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                         <button
                             type="button"
                             onClick={() => setShowPass((s) => !s)}
+                            className="text-mid hover:text-ink"
                             style={iconBtnStyle}
-                            onMouseEnter={(e) =>
-                                (e.currentTarget.style.color =
-                                    "var(--color-ink)")
-                            }
-                            onMouseLeave={(e) =>
-                                (e.currentTarget.style.color =
-                                    "var(--color-mid)")
-                            }
                         >
                             {showPass ? (
                                 <Eye size={16} />

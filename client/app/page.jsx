@@ -143,22 +143,14 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                             كتّاب مقترحون
                         </h4>
                         <button
+                            className="text-accent hover:text-accent-hover"
                             style={{
                                 background: "none",
                                 border: "none",
                                 cursor: "pointer",
                                 fontSize: 13,
-                                color: "var(--color-accent)",
                                 transition: "color 0.15s",
                             }}
-                            onMouseEnter={(e) =>
-                                (e.currentTarget.style.color =
-                                    "var(--color-accent-hover)")
-                            }
-                            onMouseLeave={(e) =>
-                                (e.currentTarget.style.color =
-                                    "var(--color-accent)")
-                            }
                         >
                             عرض الكل
                         </button>
@@ -194,13 +186,12 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                         s.map((v, j) => (j === i ? !v : v)),
                                     )
                                 }
+                                className={
+                                    subs[i]
+                                        ? "bg-accent-light text-ink hover:bg-[#d0d0d0]"
+                                        : "bg-accent text-white hover:bg-accent-hover"
+                                }
                                 style={{
-                                    background: subs[i]
-                                        ? "var(--color-accent-light)"
-                                        : "var(--color-accent)",
-                                    color: subs[i]
-                                        ? "var(--color-ink)"
-                                        : "var(--color-white)",
                                     border: "none",
                                     borderRadius: 99,
                                     padding: "6px 16px",
@@ -209,20 +200,6 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                                     fontWeight: 500,
                                     flexShrink: 0,
                                     transition: "background 0.15s",
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (subs[i]) {
-                                        e.currentTarget.style.background =
-                                            "#d0d0d0";
-                                    } else {
-                                        e.currentTarget.style.background =
-                                            "var(--color-accent-hover)";
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = subs[i]
-                                        ? "var(--color-border)"
-                                        : "var(--color-accent)";
                                 }}
                             >
                                 {subs[i] ? "متابَع" : "اشترك"}

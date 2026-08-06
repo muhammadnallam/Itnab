@@ -28,6 +28,11 @@ const Tabs = ({
                 <button
                     key={tab.id}
                     onClick={() => setActive(tab.id)}
+                    className={
+                        active === tab.id
+                            ? "text-ink"
+                            : "text-mid hover:text-ink"
+                    }
                     style={{
                         background: "none",
                         border: "none",
@@ -36,10 +41,6 @@ const Tabs = ({
                         fontSize: 15,
                         whiteSpace: "nowrap",
                         flexShrink: 0,
-                        color:
-                            active === tab.id
-                                ? "var(--color-ink)"
-                                : "var(--color-mid)",
                         fontWeight: 400,
                         borderBottom:
                             active === tab.id
@@ -47,14 +48,6 @@ const Tabs = ({
                                 : "2px solid transparent",
                         marginBottom: -1,
                         transition: "color 0.15s",
-                    }}
-                    onMouseEnter={(e) => {
-                        if (active !== tab.id)
-                            e.currentTarget.style.color = "var(--color-ink)";
-                    }}
-                    onMouseLeave={(e) => {
-                        if (active !== tab.id)
-                            e.currentTarget.style.color = "var(--color-mid)";
                     }}
                 >
                     {tab.label}

@@ -38,6 +38,11 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                             <Link
                                 key={item.label}
                                 href={item.link}
+                                className={
+                                    active
+                                        ? "text-accent"
+                                        : "text-mid hover:text-ink"
+                                }
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
@@ -47,9 +52,6 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                                     background: "none",
                                     border: "none",
                                     cursor: "pointer",
-                                    color: active
-                                        ? "var(--color-accent)"
-                                        : "var(--color-mid)",
                                     fontSize: 15,
                                     fontWeight: active ? 700 : 400,
                                     borderRadius: 0,
@@ -57,18 +59,6 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                                     textDecoration: "none",
                                     textAlign: "right",
                                     transition: "color 0.15s",
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (!active) {
-                                        e.currentTarget.style.color =
-                                            "var(--color-ink)";
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (!active) {
-                                        e.currentTarget.style.color =
-                                            "var(--color-mid)";
-                                    }
                                 }}
                             >
                                 <Icon
@@ -79,7 +69,7 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                                     color={
                                         active
                                             ? "var(--color-accent)"
-                                            : "var(--color-mid)"
+                                            : "currentColor"
                                     }
                                 />
                                 {item.label}

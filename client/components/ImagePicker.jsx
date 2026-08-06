@@ -36,6 +36,9 @@ export default function ImagePicker({
                 </div>
             )}
             <label
+                className={`${
+                    error ? "text-error" : "text-mid"
+                } border-b border-border hover:text-ink hover:border-ink`}
                 style={{
                     display: "flex",
                     alignItems: "center",
@@ -44,17 +47,7 @@ export default function ImagePicker({
                     padding: "12px 0",
                     cursor: "pointer",
                     fontSize: 13,
-                    color: error ? "var(--color-error, #c0392b)" : "var(--color-mid)",
-                    borderBottom: "1px solid var(--color-border)",
                     transition: "color 0.15s, border-color 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "var(--color-ink)";
-                    e.currentTarget.style.borderColor = "var(--color-ink)";
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.color = error ? "var(--color-error, #c0392b)" : "var(--color-mid)";
-                    e.currentTarget.style.borderColor = "var(--color-border)";
                 }}
             >
                 <input

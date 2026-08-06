@@ -5,6 +5,7 @@ export default function Button({
     disabled = false,
     loading = false,
     style,
+    className,
     ...rest
 }) {
     return (
@@ -12,6 +13,9 @@ export default function Button({
             <button
                 onClick={onClick}
                 disabled={disabled || loading}
+                className={["enabled:hover:brightness-90", className]
+                    .filter(Boolean)
+                    .join(" ")}
                 style={{
                     display: "block",
                     background:
@@ -46,13 +50,6 @@ export default function Button({
                     ...style,
                 }}
                 {...rest}
-                onMouseEnter={(e) =>
-                    (e.currentTarget.style.filter =
-                        !disabled && !loading ? "brightness(0.9)" : "none")
-                }
-                onMouseLeave={(e) =>
-                    (e.currentTarget.style.filter = "brightness(1)")
-                }
             >
                 {loading ? (
                     <span
