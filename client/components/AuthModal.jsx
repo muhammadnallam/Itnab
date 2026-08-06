@@ -30,7 +30,7 @@ const GoogleIcon = () => (
     </svg>
 );
 
-const BrandBadge = () => (
+export const BrandBadge = () => (
     <div
         style={{
             width: 48,
@@ -89,7 +89,7 @@ const COPY = {
     },
 };
 
-const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
+export const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
@@ -179,7 +179,11 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
                 loading={loading}
                 onClick={handleGoogleSignIn}
                 variant="secondary"
-                style={{ width: "100%" }}
+                style={{
+                    width: "100%",
+                    background: "var(--color-white)",
+                    border: "1px solid var(--color-border)",
+                }}
             >
                 <div
                     style={{
@@ -281,7 +285,13 @@ const AuthForm = ({ mode, onSwitchMode, onSubmit, onClose }) => {
             </div>
 
             <div style={{ marginTop: 16 }}>
-                <Button loading={loading} style={{ width: "100%" }}>
+                <Button
+                    loading={loading}
+                    style={{
+                        width: "100%",
+                        border: "1px solid var(--color-accent)",
+                    }}
+                >
                     {copy.submit}
                 </Button>
             </div>
