@@ -10,9 +10,9 @@ export const profileSchema = z.object({
             "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط",
         )
         .optional(),
-    bio: z.string().optional(),
-    avatarUrl: z.string().optional(),
-    bannerUrl: z.string().optional(),
+    bio: z.string().nullable().optional(),
+    avatarUrl: z.string().nullable().optional(),
+    bannerUrl: z.string().nullable().optional(),
 });
 
 export const passwordSchema = z.object({
@@ -25,8 +25,8 @@ export const passwordSchema = z.object({
 
 export const socialLinksSchema = z.object({
     socialLinks: z.object({
-        website: z.string().optional(),
-        youtube: z.string().optional(),
-        x: z.string().optional(),
+        website: z.string().nullable().optional(),
+        youtube: z.string().nullable().optional(),
+        x: z.string().nullable().optional(),
     }),
 });
