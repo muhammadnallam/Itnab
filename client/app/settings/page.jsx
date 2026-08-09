@@ -15,7 +15,8 @@ import {
 import Tabs from "@/components/ui/Tabs";
 import ApiMessage from "@/components/ui/ApiMessage";
 import { UserContext } from "@/context/UserContext";
-import { getProfile, signOut, deleteAccount } from "@/lib/api";
+import { getProfile, deleteAccount } from "@/lib/api/user";
+import { signOut } from "@/lib/api/auth";
 import { redirect } from "next/navigation";
 import ConfirmModal from "@/components/ConfirmModal";
 import { Trash } from "lucide-react";
@@ -818,6 +819,9 @@ export default function SettingsPage() {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const { user } = useContext(UserContext);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const toggleSidebar = () => setSidebarOpen((v) => !v);
 
     useEffect(() => {
         if (!user) return;
@@ -856,7 +860,11 @@ export default function SettingsPage() {
     const activePanel = TABS.find((t) => t.id === activeTab)?.panel;
 
     return (
-        <AppLayout leftPanel={<HelpPanel />}>
+        <AppLayout
+            leftPanel={<HelpPanel />}
+            sidebarOpen={sidebarOpen}
+            onToggleSidebar={toggleSidebar}
+        >
             <>
                 <div>
                     <div

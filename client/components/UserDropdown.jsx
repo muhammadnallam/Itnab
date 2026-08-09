@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { UserContext } from "@/context/UserContext";
-import { signOut } from "@/lib/api";
+import { signOut } from "@/lib/api/auth";
 import { UserRound, Settings, LogOut, Sun, Monitor, Moon } from "lucide-react";
 import { redirect } from "next/navigation";
 
@@ -55,6 +55,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
     const handleLogout = async () => {
         await signOut();
         setUser(null);
+        onClose();
         redirect("/");
     };
 

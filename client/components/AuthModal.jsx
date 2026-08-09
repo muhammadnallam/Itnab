@@ -4,7 +4,7 @@ import { UserContext } from "@/context/UserContext";
 import Input from "./ui/Input";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
-import { signInGoogle } from "@/lib/api";
+import { signInGoogle } from "@/lib/api/auth";
 import { handleUser } from "@/lib/handlers";
 import Image from "next/image";
 import logo from "../public/logo.png";

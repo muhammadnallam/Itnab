@@ -32,10 +32,7 @@ import {
 import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
 import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension";
 import { QuranVerseNode } from "@/components/tiptap-node/quran-verse-node/quran-verse-node-extension";
-import {
-    ArticleTitle,
-    ArticleDescription,
-} from "@itnab/tiptap";
+import { ArticleTitle, ArticleDescription } from "@itnab/tiptap";
 import { ProtectedNodes } from "@/components/tiptap-extension/protected-nodes-extension";
 import "@/components/tiptap-node/blockquote-node/blockquote-node.scss";
 import "@/components/tiptap-node/code-block-node/code-block-node.scss";
@@ -82,7 +79,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 import "./styles.scss";
 import { Trash } from "lucide-react";
 import CoverImage from "./CoverImageNode";
-import { deleteArticle } from "@/lib/api";
+import { deleteArticle } from "@/lib/api/article";
 
 const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
     return (

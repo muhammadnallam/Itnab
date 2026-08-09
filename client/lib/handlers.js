@@ -1,16 +1,8 @@
 import { notFound } from "next/navigation";
-import {
-    upload,
-    publishArticle,
-    updateArticle,
-    getArticle,
-    getSession,
-    signInEmail,
-    signUpEmail,
-    updatePassword,
-    updateProfile,
-    updateSocialLinks,
-} from "./api";
+import { getSession, signInEmail, signUpEmail } from "./api/auth";
+import { upload } from "./api/upload";
+import { publishArticle, updateArticle, getArticle } from "./api/article";
+import { updateProfile, updateSocialLinks, updatePassword } from "./api/user";
 import { processContentImages } from "./processImages";
 
 export async function handleArticle({
@@ -118,7 +110,8 @@ export async function handleArticle({
             success: false,
             errors: {
                 apiError:
-                    err.message || (isUpdate
+                    err.message ||
+                    (isUpdate
                         ? "حدث خطأ أثناء حفظ المقال"
                         : "حدث خطأ أثناء نشر المقال"),
             },
@@ -156,10 +149,15 @@ export async function handleUser(mode, email, password, setUser) {
     }
 }
 
-export async function handlePassword({ currentPassword, newPassword, confirmPass }) {
+export async function handlePassword({
+    currentPassword,
+    newPassword,
+    confirmPass,
+}) {
     const errors = {};
 
-    if (!currentPassword?.trim()) errors.currentPass = "كلمة المرور الحالية مطلوبة";
+    if (!currentPassword?.trim())
+        errors.currentPass = "كلمة المرور الحالية مطلوبة";
     if (!newPassword?.trim()) errors.newPass = "كلمة المرور الجديدة مطلوبة";
     else if (newPassword.length < 8)
         errors.newPass = "كلمة المرور يجب أن تكون ٨ أحرف على الأقل";
@@ -187,7 +185,8 @@ export async function handleProfile({ name, username, bio, avatar, banner }) {
     if (!name?.trim()) errors.name = "الاسم مطلوب";
     if (!username?.trim()) errors.username = "اسم المستخدم مطلوب";
     else if (!/^[a-zA-Z0-9_]+$/.test(username))
-        errors.username = "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط";
+        errors.username =
+            "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط";
 
     if (avatar && typeof avatar !== "string" && avatar.size > MAX_IMAGE_SIZE)
         errors.avatar = "الحد الأقصى 3 ميغابايت";
@@ -214,6 +213,7 @@ export async function handleProfile({ name, username, bio, avatar, banner }) {
         });
         return { profile };
     } catch (err) {
+        console.log({ name, username, bio, avatar, banner });
         return { apiError: err.message || "حدث خطأ أثناء تحديث الملف الشخصي" };
     }
 }

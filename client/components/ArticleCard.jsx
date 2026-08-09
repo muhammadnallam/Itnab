@@ -66,8 +66,7 @@ const ArticleCard = ({ article, isMobile }) => {
             <div className="flex justify-between gap-2.5 mt-3">
                 <div className="flex items-center gap-2.5">
                     <span
-                        className="text-xs bg-text-select rounded-full whitespace-nowrap shrink-0"
-                        style={{ padding: "4px 10px" }}
+                        className="text-xs whitespace-nowrap shrink-0"
                     >
                         {article.topic}
                     </span>

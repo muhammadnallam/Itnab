@@ -1,4 +1,4 @@
-import { upload } from "./api";
+import { upload } from "./api/upload";
 import { getPendingImageFiles, clearPendingImageFiles } from "./tiptap-utils";
 
 export async function processContentImages(content) {

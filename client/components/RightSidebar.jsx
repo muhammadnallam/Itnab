@@ -53,7 +53,7 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                                     border: "none",
                                     cursor: "pointer",
                                     fontSize: 15,
-                                    fontWeight: active ? 700 : 400,
+                                    fontWeight: active ? 500 : 400,
                                     borderRadius: 0,
                                     marginBottom: 4,
                                     textDecoration: "none",
