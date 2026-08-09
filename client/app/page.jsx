@@ -2,7 +2,7 @@
 
 import { useState, useContext } from "react";
 import { TAGS } from "@itnab/constants";
-import { ARTICLES, WRITERS } from "@/data/dummybData";
+import { WRITERS } from "@/data/dummybData";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import Avatar from "@/components/ui/Avatar";
@@ -11,6 +11,11 @@ import AuthModal from "@/components/AuthModal";
 import { UserContext } from "@/context/UserContext";
 import { WidthContext } from "@/context/ScreenContext";
 import Button from "@/components/ui/Button";
+import usePaginatedFeed from "@/hooks/use-paginated-feed";
+import {
+    getTopArticles,
+    getNewestArticles,
+} from "@/lib/api/feed";
 
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const [subs, setSubs] = useState(WRITERS.map((w) => w.sub));
@@ -230,6 +235,13 @@ export default function App() {
         { id: "latest", label: "الأحدث" },
     ];
 
+    // Focused tab loads first; the other is prefetched right after.
+    const top = usePaginatedFeed((page) => getTopArticles({ page }));
+    const latest = usePaginatedFeed((page) => getNewestArticles({ page }), {
+        enabled: top.loaded,
+    });
+    const feed = tab === "foryou" ? top : latest;
+
     return (
         <>
             <AppLayout
@@ -240,10 +252,36 @@ export default function App() {
                 onToggleSidebar={toggleSidebar}
                 onLogin={openLogin}
             >
-                <Tabs active={tab} setActive={setTab} tabList={tabList} />
-                {ARTICLES.map((a) => (
-                    <ArticleCard key={a.id} article={a} isMobile={isMobile} />
-                ))}
+                <Tabs
+                    active={tab}
+                    setActive={setTab}
+                    tabList={tabList}
+                    loading={feed.loading}
+                    loadingMessage="جاري التحميل..."
+                />
+                {feed.loading ? null : (
+                    <>
+                        {feed.items.map((a) => (
+                            <ArticleCard
+                                key={a.id}
+                                article={a}
+                                isMobile={isMobile}
+                            />
+                        ))}
+                        {feed.hasMore && (
+                            <div style={{ padding: "16px 0" }}>
+                                <Button
+                                    onClick={feed.loadMore}
+                                    loading={feed.loadingMore}
+                                    variant="secondary"
+                                    style={{ width: "100%" }}
+                                >
+                                    عرض المزيد
+                                </Button>
+                            </div>
+                        )}
+                    </>
+                )}
             </AppLayout>
             {modal && (
                 <AuthModal

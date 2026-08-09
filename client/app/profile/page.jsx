@@ -7,13 +7,17 @@ import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import Tabs from "@/components/ui/Tabs";
 import AppLayout from "@/components/AppLayout";
-import { getProfile } from "@/lib/api";
+import ArticleCard from "@/components/ArticleCard";
+import { getProfile } from "@/lib/api/user";
+import { getAuthorArticles, getUserLists, parseList } from "@/lib/api/feed";
 import { UserContext } from "@/context/UserContext";
 import { WidthContext } from "@/context/ScreenContext";
+import ListCard from "@/components/ListCard";
+import usePaginatedFeed from "@/hooks/use-paginated-feed";
 
 const PROFILE_TABS = [
     { id: "home", label: "المقالات" },
-    { id: "reposts", label: "القوائم" },
+    { id: "lists", label: "القوائم" },
     { id: "about", label: "حول" },
 ];
 
@@ -144,6 +148,7 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
         >
             <button
                 aria-label="Copy"
+                className="text-mid hover:bg-bg"
                 style={{
                     display: "flex",
                     alignItems: "center",
@@ -152,22 +157,15 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
                     height: 40,
                     borderRadius: "50%",
                     border: "1px solid var(--color-border)",
-                    background: "none",
-                    color: "var(--color-mid)",
                     cursor: "pointer",
                     transition: "background 0.15s",
                 }}
-                onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "var(--color-bg)")
-                }
-                onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "none")
-                }
             >
                 <Copy size={16} strokeWidth={2} />
             </button>
             <button
                 aria-label="website"
+                className="text-mid hover:bg-bg"
                 style={{
                     display: "flex",
                     alignItems: "center",
@@ -176,22 +174,15 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
                     height: 40,
                     borderRadius: "50%",
                     border: "1px solid var(--color-border)",
-                    background: "none",
-                    color: "var(--color-mid)",
                     cursor: "pointer",
                     transition: "background 0.15s",
                 }}
-                onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "var(--color-bg)")
-                }
-                onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "none")
-                }
             >
                 <Globe size={16} strokeWidth={2} />
             </button>
             <button
                 aria-label="Link"
+                className="text-mid hover:bg-bg"
                 style={{
                     display: "flex",
                     alignItems: "center",
@@ -200,17 +191,9 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
                     height: 40,
                     borderRadius: "50%",
                     border: "1px solid var(--color-border)",
-                    background: "none",
-                    color: "var(--color-mid)",
                     cursor: "pointer",
                     transition: "background 0.15s",
                 }}
-                onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "var(--color-bg)")
-                }
-                onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "none")
-                }
             >
                 <Link2
                     size={16}
@@ -348,6 +331,15 @@ export default function ProfilePage() {
     const { user } = useContext(UserContext);
     const width = useContext(WidthContext);
     const isMobile = width < 768;
+
+    // Articles tab is focused first; lists are prefetched right after.
+    const articles = usePaginatedFeed(
+        (page) => getAuthorArticles(user?.id, { page }),
+        { enabled: Boolean(user) },
+    );
+    const lists = usePaginatedFeed((page) => getUserLists(user?.id, { page }), {
+        enabled: articles.loaded,
+    });
 
     useEffect(() => {
         if (!user) return;
@@ -505,10 +497,70 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            <Tabs active={tab} setActive={setTab} tabList={PROFILE_TABS} />
+            <Tabs
+                active={tab}
+                setActive={setTab}
+                tabList={PROFILE_TABS}
+                loading={
+                    tab === "about"
+                        ? false
+                        : tab === "lists"
+                          ? lists.loading
+                          : articles.loading
+                }
+                loadingMessage="جاري التحميل..."
+            />
 
             {tab === "about" ? (
                 <AboutTab profile={profile} />
+            ) : tab === "lists" ? (
+                <div>
+                    {lists.loading ? null : (
+                        <>
+                            {lists.items.map((l) => (
+                                <ListCard
+                                    key={l.id}
+                                    list={parseList(l, profile?.name)}
+                                    isMobile={isMobile}
+                                />
+                            ))}
+                            {lists.hasMore && (
+                                <div style={{ padding: "16px 0" }}>
+                                    <Button
+                                        onClick={lists.loadMore}
+                                        loading={lists.loadingMore}
+                                        variant="secondary"
+                                        style={{ width: "100%" }}
+                                    >
+                                        عرض المزيد
+                                    </Button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            ) : articles.loading ? null : articles.items.length ? (
+                <>
+                    {articles.items.map((a) => (
+                        <ArticleCard
+                            key={a.id}
+                            article={a}
+                            isMobile={isMobile}
+                        />
+                    ))}
+                    {articles.hasMore && (
+                        <div style={{ padding: "16px 0" }}>
+                            <Button
+                                onClick={articles.loadMore}
+                                loading={articles.loadingMore}
+                                variant="secondary"
+                                style={{ width: "100%" }}
+                            >
+                                عرض المزيد
+                            </Button>
+                        </div>
+                    )}
+                </>
             ) : (
                 <div
                     style={{
