@@ -4,6 +4,7 @@ import Avatar from "@/components/ui/Avatar";
 import ArticleHeader from "@/app/article/[slug]/ArticleHeader";
 import "./styles.css";
 import { handleArticleRead } from "@/lib/handlers";
+import { Share2, Bookmark } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -35,6 +36,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ArticlePage({ params }) {
+    const saved = false;
     const { slug } = await params;
     const article = await handleArticleRead(slug);
     if (!article) notFound();
@@ -46,90 +48,53 @@ export default async function ArticlePage({ params }) {
     const authorInitial = article.author?.name?.[0] || "?";
 
     return (
-        <main className="article-page">
+        <main className="article-page overflow-x-hidden">
             <ArticleHeader />
             <div className="article-spacer" />
-            <figure className="article-hero">
-                <img src={article.coverImage} alt={title} />
-            </figure>
-            <article>
-                <h1>{title}</h1>
-                <p className="subhead">{subtitle}</p>
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                        marginBottom: 36,
-                        padding: "20px 0",
-                        borderTop: "1px solid var(--color-border)",
-                        borderBottom: "1px solid var(--color-border)",
-                    }}
-                    className="metadata"
-                >
-                    <Avatar
-                        initials={authorInitial}
-                        size={44}
-                        bg="var(--color-accent)"
+            <main className="max-w-2xl mx-auto px-5 md:px-0 pt-8 md:pt-14">
+                <p className="text-accent tracking-widest font-bold mb-4">
+                    {article.topic}
+                </p>
+                <h1 className="text-4xl md:text-6xl leading-tight font-normal mb-5">
+                    {article.title}
+                </h1>
+                <p className="text-xl md:text-2xl text-mid leading-snug mb-6">
+                    {article.subtitle}
+                </p>
+                <p className="mb-8 md:mb-10">
+                    من{" "}
+                    <a href="#" className="underline hover:text-accent">
+                        {article.author?.name}
+                    </a>
+                </p>
+            </main>
+            <div className="relative left-1/2 -translate-x-1/2 w-screen">
+                <figure className="mx-auto" style={{ maxWidth: "980px" }}>
+                    <img
+                        src={article.coverImage}
+                        alt={article.title}
+                        className="hero-img"
                     />
-                    <div style={{ flex: 1 }}>
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 8,
-                                marginBottom: 4,
-                                fontSize: 15,
-                            }}
-                        >
-                            <span
-                                style={{
-                                    fontWeight: 500,
-                                    color: "var(--color-ink)",
-                                }}
-                            >
-                                {article.author?.name}
-                            </span>
-                            <button
-                                style={{
-                                    background: "none",
-                                    border: "1px solid var(--color-border)",
-                                    borderRadius: 99,
-                                    padding: "3px 12px",
-                                    color: "var(--color-mid)",
-                                    cursor: "pointer",
-                                    fontWeight: 500,
-                                    transition: "all 0.15s",
-                                }}
-                            >
-                                {"متابعة"}
-                            </button>
-                        </div>
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 8,
-                                color: "var(--color-mid)",
-                            }}
-                        >
-                            <span>{article.topic}</span>
-                            <span>·</span>
-                            <span
-                                style={{
-                                    whiteSpace: "nowrap",
-                                    flexShrink: 0,
-                                }}
-                                className="read-time"
-                            >
-                                {readTime} دقائق قراءة
-                            </span>
-                            <span>·</span>
-                            <span className="date">
-                                {formatDate(article.createdAt)}
-                            </span>
-                        </div>
+                </figure>
+            </div>
+            {/* <figure className="article-hero">
+                <img src={article.coverImage} alt={title} />
+                </figure> */}
+            <article>
+                <div className="flex items-center justify-between border-b border-gray-300 pb-4 mb-10">
+                    <div className="flex items-center gap-5 ui-font text-xs text-gray-700 uppercase font-medium">
+                        <button className="flex items-center gap-1.5 text-mid hover:text-ink">
+                            <Bookmark
+                                size={19}
+                                strokeWidth={1.75}
+                                fill={saved ? "currentColor" : "none"}
+                            />
+                            حفظ{" "}
+                        </button>
                     </div>
+                    <span className="text-sm tracking-widetext-ink">
+                        {article.createdAt}
+                    </span>
                 </div>
                 <div
                     className="content"
