@@ -5,6 +5,7 @@ import Avatar from "@/components/ui/Avatar";
 import UserDropdown from "@/components/UserDropdown";
 import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Header({ onLogin, onToggleSidebar, isMobile }) {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -44,7 +45,7 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                         <Menu size={24}></Menu>
                     </button>
                 )}
-                <a href="/">
+                <Link href="/">
                     <span
                         style={{
                             fontFamily: "var(--font-wordmark)",
@@ -59,7 +60,7 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                     >
                         إطناب
                     </span>
-                </a>
+                </Link>
                 {isMobile && (
                     <button
                         className="text-mid hover:text-ink"

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Bookmark, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ArticleHeader() {
     const [hidden, setHidden] = useState(false);
@@ -43,7 +44,7 @@ export default function ArticleHeader() {
         <header
             className={`article-header${hidden ? " article-header-hidden" : ""}`}
         >
-            <a href="/">
+            <Link href="/">
                 <span
                     style={{
                         fontFamily: "var(--font-wordmark)",
@@ -58,7 +59,7 @@ export default function ArticleHeader() {
                 >
                     إطناب
                 </span>
-            </a>
+            </Link>
 
             <div className="article-header-icons">
                 <button
