@@ -43,7 +43,7 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                         const Icon = item.icon;
                         const active =
                             item.label === "حسابي"
-                                ? pathname === `/profile/${user?.username}`
+                                ? pathname === `/@${user?.username}`
                                 : pathname === item.link;
                         return (
                             <Link

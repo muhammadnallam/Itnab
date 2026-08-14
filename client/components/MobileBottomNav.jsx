@@ -38,7 +38,7 @@ const MobileBottomNav = () => {
                 const Icon = item.icon;
                 const active =
                     item.label === "أنت"
-                        ? pathname === `/profile/${user?.username}`
+                        ? pathname === `/@${user?.username}`
                         : pathname === item.link;
                 return (
                     <Link
