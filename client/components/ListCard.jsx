@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Bookmark, Ellipsis } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
+import RequireAuth from "@/components/RequireAuth";
 
 export default function ListCard({ list, isMobile }) {
     const [saved, setSaved] = useState(false);
@@ -89,19 +90,21 @@ export default function ListCard({ list, isMobile }) {
                         {list.storyCount} قصة
                     </p>
                     <div className="flex-1"></div>
-                    <button
-                        onClick={() => setSaved((s) => !s)}
-                        className={`cursor-pointer pl-1 ${
-                            saved ? "text-accent" : "text-mid hover:text-accent"
-                        }`}
-                        style={{ transition: "color 0.15s" }}
-                    >
-                        <Bookmark
-                            size={19}
-                            fill={saved ? "var(--color-accent)" : "none"}
-                            color="currentColor"
-                        />
-                    </button>
+                    <RequireAuth>
+                        <button
+                            onClick={() => setSaved((s) => !s)}
+                            className={`cursor-pointer pl-1 ${
+                                saved ? "text-accent" : "text-mid hover:text-accent"
+                            }`}
+                            style={{ transition: "color 0.15s" }}
+                        >
+                            <Bookmark
+                                size={19}
+                                fill={saved ? "var(--color-accent)" : "none"}
+                                color="currentColor"
+                            />
+                        </button>
+                    </RequireAuth>
 
                     <button
                         className="cursor-pointer text-mid ml-1 hover:text-ink"

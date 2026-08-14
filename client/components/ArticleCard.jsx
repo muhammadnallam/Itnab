@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import Avatar from "@/components/ui/Avatar";
+import RequireAuth from "@/components/RequireAuth";
 import { Bookmark, Ellipsis } from "lucide-react";
 
 const ArticleCard = ({ article, isMobile }) => {
@@ -13,7 +14,6 @@ const ArticleCard = ({ article, isMobile }) => {
                 borderBottom: "1px solid var(--color-border)",
             }}
         >
-            {/* TODO: Additional Information (Reason of recommendation / Reshared by ..) */}
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="flex items-center gap-2 mb-2.5 text-sm">
@@ -78,19 +78,20 @@ const ArticleCard = ({ article, isMobile }) => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => setSaved((s) => !s)}
-                        className={`cursor-pointer pl-1 ${
-                            saved ? "text-accent" : "text-mid hover:text-ink"
-                        }`}
-                        style={{ transition: "color 0.15s" }}
-                    >
-                        <Bookmark
-                            size={19}
-                            fill={saved ? "var(--color-accent)" : "none"}
-                            color="currentColor"
-                        />
-                    </button>
+                    <RequireAuth onClick={() => setSaved((s) => !s)} mode="login">
+                        <button
+                            className={`cursor-pointer pl-1 ${
+                                saved ? "text-accent" : "text-mid hover:text-ink"
+                            }`}
+                            style={{ transition: "color 0.15s" }}
+                        >
+                            <Bookmark
+                                size={19}
+                                fill={saved ? "var(--color-accent)" : "none"}
+                                color="currentColor"
+                            />
+                        </button>
+                    </RequireAuth>
 
                     <button
                         className="cursor-pointer text-mid ml-1 hover:text-ink"

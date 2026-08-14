@@ -7,7 +7,7 @@ import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function Header({ onLogin, onToggleSidebar, isMobile }) {
+export default function Header({ onToggleSidebar, isMobile }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const { user } = useContext(UserContext);
     const router = useRouter();
@@ -152,7 +152,6 @@ export default function Header({ onLogin, onToggleSidebar, isMobile }) {
                     <UserDropdown
                         open={menuOpen}
                         onClose={() => setMenuOpen(false)}
-                        onLogin={onLogin}
                     />
                 </div>
             </div>

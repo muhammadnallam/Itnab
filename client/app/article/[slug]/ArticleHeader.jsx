@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Bookmark, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import RequireAuth from "@/components/RequireAuth";
 
 export default function ArticleHeader() {
     const [hidden, setHidden] = useState(false);
@@ -72,25 +73,27 @@ export default function ArticleHeader() {
                 >
                     <Download size={24} />
                 </button>
-                <button
-                    aria-label="save article"
-                    onClick={() => setSaved((s) => !s)}
-                    className={
-                        saved ? "text-accent" : "text-mid hover:text-accent"
-                    }
-                    style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        transition: "color 0.15s",
-                    }}
-                >
-                    <Bookmark
-                        size={24}
-                        fill={saved ? "var(--color-accent)" : "none"}
-                        color="currentColor"
-                    />
-                </button>
+                <RequireAuth>
+                    <button
+                        aria-label="save article"
+                        onClick={() => setSaved((s) => !s)}
+                        className={
+                            saved ? "text-accent" : "text-mid hover:text-accent"
+                        }
+                        style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            transition: "color 0.15s",
+                        }}
+                    >
+                        <Bookmark
+                            size={24}
+                            fill={saved ? "var(--color-accent)" : "none"}
+                            color="currentColor"
+                        />
+                    </button>
+                </RequireAuth>
                 <button
                     className="text-mid hover:text-ink"
                     style={{

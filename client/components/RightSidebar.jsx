@@ -11,12 +11,13 @@ import {
     Ellipsis,
 } from "lucide-react";
 import { UserContext } from "@/context/UserContext";
+import RequireAuth from "@/components/RequireAuth";
 
 const BASE_NAV_ITEMS = [
     { icon: House, label: "الرئيسية", link: "/" },
-    { icon: Inbox, label: "الاشتراكات", link: "/subscriptions" },
-    { icon: Bookmark, label: "مكتبتي", link: "/library" },
-    { icon: ChartColumn, label: "الإحصائيات", link: "/analytics" },
+    { icon: Inbox, label: "الاشتراكات", link: "/subscriptions", protected: true },
+    { icon: Bookmark, label: "مكتبتي", link: "/library", protected: true },
+    { icon: ChartColumn, label: "الإحصائيات", link: "/analytics", protected: true },
 ];
 
 const RightSidebar = ({ isOpen, isActive } = {}) => {
@@ -25,7 +26,7 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
     const profileLink = user?.username ? `/@${user.username}` : "/auth";
     const NAV_ITEMS = [
         ...BASE_NAV_ITEMS,
-        { icon: UserRound, label: "حسابي", link: profileLink },
+        { icon: UserRound, label: "حسابي", link: profileLink, protected: true },
     ];
 
     return (
@@ -45,7 +46,7 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                             item.label === "حسابي"
                                 ? pathname === `/@${user?.username}`
                                 : pathname === item.link;
-                        return (
+                        const link = (
                             <Link
                                 key={item.label}
                                 href={item.link}
@@ -85,6 +86,11 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                                 />
                                 {item.label}
                             </Link>
+                        );
+                        return item.protected ? (
+                            <RequireAuth key={item.label}>{link}</RequireAuth>
+                        ) : (
+                            link
                         );
                     })}
                 </nav>

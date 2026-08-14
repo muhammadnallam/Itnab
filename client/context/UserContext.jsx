@@ -7,13 +7,14 @@ export const UserContext = createContext(null);
 
 export default function UserProvider({ children }) {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        handleInitSession(setUser);
+        handleInitSession(setUser, setLoading);
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, loading }}>
             {children}
         </UserContext.Provider>
     );

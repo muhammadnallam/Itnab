@@ -2,6 +2,7 @@ import "./globals.css";
 import localFont from "next/font/local";
 import UserProvider from "@/context/UserContext";
 import ScreenProvider from "@/context/ScreenContext";
+import AuthModalProvider from "@/context/AuthModalContext";
 
 const wordmarkFont = localFont({
     src: [
@@ -40,7 +41,9 @@ export default function RootLayout({ children }) {
             </head>
             <body>
                 <ScreenProvider>
-                    <UserProvider>{children}</UserProvider>
+                    <UserProvider>
+                        <AuthModalProvider>{children}</AuthModalProvider>
+                    </UserProvider>
                 </ScreenProvider>
             </body>
         </html>

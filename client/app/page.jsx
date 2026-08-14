@@ -7,9 +7,10 @@ import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import Avatar from "@/components/ui/Avatar";
 import Tabs from "@/components/ui/Tabs";
-import AuthModal from "@/components/AuthModal";
+import RequireAuth from "@/components/RequireAuth";
 import { UserContext } from "@/context/UserContext";
 import { WidthContext } from "@/context/ScreenContext";
+import { useAuthModal } from "@/context/AuthModalContext";
 import Button from "@/components/ui/Button";
 import usePaginatedFeed from "@/hooks/use-paginated-feed";
 import {
@@ -185,30 +186,32 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                             >
                                 {w.name}
                             </span>
-                            <button
-                                onClick={() =>
-                                    setSubs((s) =>
-                                        s.map((v, j) => (j === i ? !v : v)),
-                                    )
-                                }
-                                className={
-                                    subs[i]
-                                        ? "bg-accent-light text-ink hover:bg-[#d0d0d0]"
-                                        : "bg-accent text-white hover:bg-accent-hover"
-                                }
-                                style={{
-                                    border: "none",
-                                    borderRadius: 99,
-                                    padding: "6px 16px",
-                                    fontSize: 13,
-                                    cursor: "pointer",
-                                    fontWeight: 500,
-                                    flexShrink: 0,
-                                    transition: "background 0.15s",
-                                }}
-                            >
-                                {subs[i] ? "متابَع" : "اشترك"}
-                            </button>
+                            <RequireAuth>
+                                <button
+                                    onClick={() =>
+                                        setSubs((s) =>
+                                            s.map((v, j) => (j === i ? !v : v)),
+                                        )
+                                    }
+                                    className={
+                                        subs[i]
+                                            ? "bg-accent-light text-ink hover:bg-[#d0d0d0]"
+                                            : "bg-accent text-white hover:bg-accent-hover"
+                                    }
+                                    style={{
+                                        border: "none",
+                                        borderRadius: 99,
+                                        padding: "6px 16px",
+                                        fontSize: 13,
+                                        cursor: "pointer",
+                                        fontWeight: 500,
+                                        flexShrink: 0,
+                                        transition: "background 0.15s",
+                                    }}
+                                >
+                                    {subs[i] ? "متابَع" : "اشترك"}
+                                </button>
+                            </RequireAuth>
                         </div>
                     ))}
                 </div>
@@ -219,15 +222,12 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
 
 export default function App() {
     const [tab, setTab] = useState("foryou");
-    const [modal, setModal] = useState(null); // null | "signin" | "signup"
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const width = useContext(WidthContext);
+    const { openAuth } = useAuthModal();
 
     const isMobile = width < 768;
 
-    const openLogin = () => setModal("login");
-    const openSignUp = () => setModal("signup");
-    const closeModal = () => setModal(null);
     const toggleSidebar = () => setSidebarOpen((v) => !v);
 
     const tabList = [
@@ -246,11 +246,13 @@ export default function App() {
         <>
             <AppLayout
                 leftPanel={
-                    <LeftPanel onLogin={openLogin} onSignUp={openSignUp} />
+                    <LeftPanel
+                        onLogin={() => openAuth("login")}
+                        onSignUp={() => openAuth("signup")}
+                    />
                 }
                 sidebarOpen={sidebarOpen}
                 onToggleSidebar={toggleSidebar}
-                onLogin={openLogin}
             >
                 <Tabs
                     active={tab}
@@ -283,13 +285,6 @@ export default function App() {
                     </>
                 )}
             </AppLayout>
-            {modal && (
-                <AuthModal
-                    open={Boolean(modal)}
-                    defaultMode={modal}
-                    onClose={closeModal}
-                />
-            )}
         </>
     );
 }

@@ -9,6 +9,7 @@ import {
     UserRound,
 } from "lucide-react";
 import { UserContext } from "@/context/UserContext";
+import RequireAuth from "@/components/RequireAuth";
 
 const MobileBottomNav = () => {
     const pathname = usePathname();
@@ -16,8 +17,8 @@ const MobileBottomNav = () => {
     const profileLink = user?.username ? `/@${user.username}` : "/auth";
     const items = [
         { icon: House, label: "الرئيسية", link: "/" },
-        { icon: Inbox, label: "الاشتراكات", link: "/subscriptions" },
-        { icon: Bookmark, label: "المكتبة", link: "/library" },
+        { icon: Inbox, label: "الاشتراكات", link: "/subscriptions", protected: true },
+        { icon: Bookmark, label: "المكتبة", link: "/library", protected: true },
         { icon: UserRound, label: "أنت", link: profileLink },
     ];
     return (
@@ -40,7 +41,7 @@ const MobileBottomNav = () => {
                     item.label === "أنت"
                         ? pathname === `/@${user?.username}`
                         : pathname === item.link;
-                return (
+                const link = (
                     <Link
                         key={item.label}
                         href={item.link}
@@ -73,6 +74,11 @@ const MobileBottomNav = () => {
                         />
                         <span>{item.label}</span>
                     </Link>
+                );
+                return item.protected ? (
+                    <RequireAuth key={item.label}>{link}</RequireAuth>
+                ) : (
+                    link
                 );
             })}
         </nav>

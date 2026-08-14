@@ -11,7 +11,6 @@ export default function AppLayout({
     leftPanel,
     sidebarOpen = true,
     onToggleSidebar,
-    onLogin,
     centerMaxWidth = 640,
     fullWidthContent,
 }) {
@@ -89,7 +88,6 @@ export default function AppLayout({
     return (
         <div style={styles.root}>
             <Header
-                onLogin={onLogin}
                 onToggleSidebar={onToggleSidebar}
                 isMobile={isMobile}
             />

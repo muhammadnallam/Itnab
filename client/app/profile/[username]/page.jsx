@@ -12,6 +12,7 @@ import { getProfile } from "@/lib/api/user";
 import { getAuthorArticles, getUserLists, parseList } from "@/lib/api/feed";
 import { WidthContext } from "@/context/ScreenContext";
 import ListCard from "@/components/ListCard";
+import RequireAuth from "@/components/RequireAuth";
 import usePaginatedFeed from "@/hooks/use-paginated-feed";
 
 const PROFILE_TABS = [
@@ -307,15 +308,16 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
         </div>
 
         <div style={{ marginTop: 20 }}>
-            <Button
-                onClick={onToggleFollow}
-                variant={following ? "secondary" : "primary"}
-                style={{
-                    width: "100%",
-                }}
-            >
-                {following ? "إلغاء المتابعة" : "متابعة"}
-            </Button>
+            <RequireAuth onClick={onToggleFollow} mode="login">
+                <Button
+                    variant={following ? "secondary" : "primary"}
+                    style={{
+                        width: "100%",
+                    }}
+                >
+                    {following ? "إلغاء المتابعة" : "متابعة"}
+                </Button>
+            </RequireAuth>
         </div>
     </div>
 );
@@ -462,15 +464,17 @@ export default function ProfilePage() {
 
             {isMobile && (
                 <div style={{ margin: "20px 0" }}>
-                    <Button
-                        onClick={() => setFollowing((f) => !f)}
-                        variant={following ? "secondary" : "primary"}
-                        style={{
-                            width: "100%",
-                        }}
-                    >
-                        {following ? "إلغاء المتابعة" : "متابعة"}
-                    </Button>
+                    <RequireAuth>
+                        <Button
+                            onClick={() => setFollowing((f) => !f)}
+                            variant={following ? "secondary" : "primary"}
+                            style={{
+                                width: "100%",
+                            }}
+                        >
+                            {following ? "إلغاء المتابعة" : "متابعة"}
+                        </Button>
+                    </RequireAuth>
                 </div>
             )}
 

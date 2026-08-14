@@ -1,5 +1,7 @@
+"use client";
 import { useEffect, useRef, useState, useContext } from "react";
 import { UserContext } from "@/context/UserContext";
+import { useAuthModal } from "@/context/AuthModalContext";
 import { signOut } from "@/lib/api/auth";
 import { UserRound, Settings, LogOut, Sun, Monitor, Moon } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -15,9 +17,10 @@ const themeOptions = [
     { value: "system", label: "النظام", icon: Monitor },
 ];
 
-const UserDropdown = ({ open, onClose, onLogin }) => {
+const UserDropdown = ({ open, onClose }) => {
     const menuRef = useRef(null);
     const { user, setUser } = useContext(UserContext);
+    const { openAuth } = useAuthModal();
     const [theme, setTheme] = useState("light");
 
     useEffect(() => {
@@ -48,7 +51,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
 
     const handleItemClick = (item) => {
         if (item.href) {
-            window.location.href = item.href;
+            window.location.assign(item.href);
             onClose();
             return;
         }
@@ -64,7 +67,7 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
 
     const handleLogin = () => {
         onClose();
-        onLogin && onLogin();
+        openAuth("login");
     };
 
     if (!open) return null;

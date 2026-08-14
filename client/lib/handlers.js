@@ -227,11 +227,13 @@ export async function handleSocialLinks({ website, youtube, x }) {
     }
 }
 
-export async function handleInitSession(setUser) {
+export async function handleInitSession(setUser, setLoading) {
     try {
         const session = await getSession();
         setUser(session?.user || null);
     } catch {
         setUser(null);
+    } finally {
+        setLoading?.(false);
     }
 }
