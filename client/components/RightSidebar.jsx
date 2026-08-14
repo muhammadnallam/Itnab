@@ -1,5 +1,7 @@
+"use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useContext } from "react";
 import {
     House,
     Inbox,
@@ -8,17 +10,23 @@ import {
     UserRound,
     Ellipsis,
 } from "lucide-react";
+import { UserContext } from "@/context/UserContext";
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
     { icon: House, label: "الرئيسية", link: "/" },
     { icon: Inbox, label: "الاشتراكات", link: "/subscriptions" },
     { icon: Bookmark, label: "مكتبتي", link: "/library" },
     { icon: ChartColumn, label: "الإحصائيات", link: "/analytics" },
-    { icon: UserRound, label: "حسابي", link: "/profile" },
 ];
 
 const RightSidebar = ({ isOpen, isActive } = {}) => {
     const pathname = usePathname();
+    const { user } = useContext(UserContext);
+    const profileLink = user?.username ? `/@${user.username}` : "/auth";
+    const NAV_ITEMS = [
+        ...BASE_NAV_ITEMS,
+        { icon: UserRound, label: "حسابي", link: profileLink },
+    ];
 
     return (
         <div>
@@ -33,7 +41,10 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
                 <nav style={{ flex: 1 }}>
                     {NAV_ITEMS.map((item) => {
                         const Icon = item.icon;
-                        const active = pathname === item.link;
+                        const active =
+                            item.label === "حسابي"
+                                ? pathname === `/profile/${user?.username}`
+                                : pathname === item.link;
                         return (
                             <Link
                                 key={item.label}

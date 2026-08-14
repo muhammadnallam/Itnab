@@ -18,7 +18,8 @@ const ArticleCard = ({ article, isMobile }) => {
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="flex items-center gap-2 mb-2.5 text-sm">
                         <Avatar
-                            initials={article.authorAvatar}
+                            initials={article.authorInitials}
+                            img={article.authorAvatarUrl}
                             size={24}
                             bg="var(--color-accent)"
                         />
@@ -65,9 +66,7 @@ const ArticleCard = ({ article, isMobile }) => {
 
             <div className="flex justify-between gap-2.5 mt-3">
                 <div className="flex items-center gap-2.5">
-                    <span
-                        className="text-xs whitespace-nowrap shrink-0"
-                    >
+                    <span className="text-xs whitespace-nowrap shrink-0">
                         {article.topic}
                     </span>
                     <span className="text-(--color-light) text-sm font-bold">

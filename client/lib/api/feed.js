@@ -33,7 +33,8 @@ export function parseArticle(a) {
         topic: a.topic,
         readTime: a.readTime,
         author: a.author?.name || "",
-        authorAvatar: getInitials(a.author?.name),
+        authorInitials: getInitials(a.author?.name),
+        authorAvatarUrl: a.author?.avatarUrl,
         date: formatArabicDate(a.createdAt),
     };
 }
@@ -43,7 +44,9 @@ export function parseList(l, ownerName) {
         id: l.id,
         name: l.name,
         ownerName,
-        ownerAvatar: getInitials(ownerName),
+        ownerInitials: getInitials(ownerName),
+        authorAvatarUrl: l.owner?.avatarUrl,
+        date: formatArabicDate(l.createdAt),
         storyCount: l._count?.articles ?? 0,
         images: [],
     };

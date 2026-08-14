@@ -1,16 +1,24 @@
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useContext } from "react";
 import {
     House,
     Inbox,
     Bookmark,
     UserRound,
 } from "lucide-react";
+import { UserContext } from "@/context/UserContext";
 
 const MobileBottomNav = () => {
+    const pathname = usePathname();
+    const { user } = useContext(UserContext);
+    const profileLink = user?.username ? `/@${user.username}` : "/auth";
     const items = [
-        { icon: House, label: "الرئيسية", active: true },
-        { icon: Inbox, label: "الاشتراكات", active: false },
-        { icon: Bookmark, label: "المكتبة", active: false },
-        { icon: UserRound, label: "أنت", active: false },
+        { icon: House, label: "الرئيسية", link: "/" },
+        { icon: Inbox, label: "الاشتراكات", link: "/subscriptions" },
+        { icon: Bookmark, label: "المكتبة", link: "/library" },
+        { icon: UserRound, label: "أنت", link: profileLink },
     ];
     return (
         <nav
@@ -28,11 +36,16 @@ const MobileBottomNav = () => {
         >
             {items.map((item) => {
                 const Icon = item.icon;
+                const active =
+                    item.label === "أنت"
+                        ? pathname === `/profile/${user?.username}`
+                        : pathname === item.link;
                 return (
-                    <button
+                    <Link
                         key={item.label}
+                        href={item.link}
                         className={
-                            item.active
+                            active
                                 ? "text-accent"
                                 : "text-mid hover:text-ink"
                         }
@@ -47,15 +60,19 @@ const MobileBottomNav = () => {
                             cursor: "pointer",
                             fontSize: 13,
                             gap: 4,
+                            textDecoration: "none",
                             transition: "color 0.15s",
                         }}
                     >
                         <Icon
                             size={22}
-                            fill={item.active ? "var(--color-accent)" : "none"}
+                            fill={active ? "var(--color-accent)" : "none"}
+                            color={
+                                active ? "var(--color-accent)" : "currentColor"
+                            }
                         />
                         <span>{item.label}</span>
-                    </button>
+                    </Link>
                 );
             })}
         </nav>

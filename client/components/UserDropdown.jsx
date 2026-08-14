@@ -5,10 +5,7 @@ import { UserRound, Settings, LogOut, Sun, Monitor, Moon } from "lucide-react";
 import { redirect } from "next/navigation";
 
 const navItems = {
-    authed: [
-        { icon: UserRound, label: "الملف الشخصي", href: "/profile" },
-        { icon: Settings, label: "الإعدادات", href: "/settings" },
-    ],
+    authed: [{ icon: Settings, label: "الإعدادات", href: "/settings" }],
     guest: [],
 };
 
@@ -41,7 +38,13 @@ const UserDropdown = ({ open, onClose, onLogin }) => {
         };
     }, [open, onClose]);
 
-    const menuItems = user ? navItems.authed : navItems.guest;
+    const profileHref = user?.username ? `/@${user.username}` : "/auth";
+    const menuItems = user
+        ? [
+              { icon: UserRound, label: "الملف الشخصي", href: profileHref },
+              ...navItems.authed,
+          ]
+        : navItems.guest;
 
     const handleItemClick = (item) => {
         if (item.href) {

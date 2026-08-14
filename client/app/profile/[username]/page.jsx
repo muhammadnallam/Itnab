@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useContext, useEffect } from "react";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { MoreHorizontal, Copy, Globe, Link2 } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
@@ -10,7 +10,6 @@ import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import { getProfile } from "@/lib/api/user";
 import { getAuthorArticles, getUserLists, parseList } from "@/lib/api/feed";
-import { UserContext } from "@/context/UserContext";
 import { WidthContext } from "@/context/ScreenContext";
 import ListCard from "@/components/ListCard";
 import usePaginatedFeed from "@/hooks/use-paginated-feed";
@@ -322,32 +321,47 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
 );
 
 export default function ProfilePage() {
+    const params = useParams();
+    const username = params?.username;
     const [tab, setTab] = useState("home");
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [notFoundState, setNotFoundState] = useState(false);
     const [following, setFollowing] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const { user } = useContext(UserContext);
     const width = useContext(WidthContext);
     const isMobile = width < 768;
 
     // Articles tab is focused first; lists are prefetched right after.
     const articles = usePaginatedFeed(
-        (page) => getAuthorArticles(user?.id, { page }),
-        { enabled: Boolean(user) },
+        (page) => getAuthorArticles(profile?.id, { page }),
+        { enabled: Boolean(profile) },
     );
-    const lists = usePaginatedFeed((page) => getUserLists(user?.id, { page }), {
-        enabled: articles.loaded,
+    const lists = usePaginatedFeed((page) => getUserLists(profile?.id, { page }), {
+        enabled: Boolean(profile),
     });
 
     useEffect(() => {
-        if (!user) return;
-        getProfile(user.username)
-            .then(setProfile)
-            .catch(() => setNotFoundState(true))
-            .finally(() => setLoading(false));
-    }, [user]);
+        if (!username) return;
+        let cancelled = false;
+        setLoading(true);
+        setProfile(null);
+        setNotFoundState(false);
+        setTab("home");
+        getProfile(username)
+            .then((p) => {
+                if (!cancelled) setProfile(p);
+            })
+            .catch(() => {
+                if (!cancelled) setNotFoundState(true);
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [username]);
 
     if (notFoundState) notFound();
 
