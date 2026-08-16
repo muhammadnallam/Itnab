@@ -5,15 +5,15 @@ import Header from "@/components/Header";
 import RightSidebar from "@/components/RightSidebar";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import { WidthContext } from "@/context/ScreenContext";
+import { useSidebar } from "@/context/SidebarContext";
 
 export default function AppLayout({
     children,
     leftPanel,
-    sidebarOpen = true,
-    onToggleSidebar,
     centerMaxWidth = 640,
     fullWidthContent,
 }) {
+    const { sidebarOpen, toggleSidebar } = useSidebar();
     const width = useContext(WidthContext);
     const isMobile = width < 768;
     const isTablet = width >= 768 && width < 1100;
@@ -88,7 +88,7 @@ export default function AppLayout({
     return (
         <div style={styles.root}>
             <Header
-                onToggleSidebar={onToggleSidebar}
+                onToggleSidebar={toggleSidebar}
                 isMobile={isMobile}
             />
             {isMobile ? (

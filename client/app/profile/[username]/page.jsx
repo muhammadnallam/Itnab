@@ -330,7 +330,6 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [notFoundState, setNotFoundState] = useState(false);
     const [following, setFollowing] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
     const width = useContext(WidthContext);
     const isMobile = width < 768;
 
@@ -367,8 +366,6 @@ export default function ProfilePage() {
 
     if (notFoundState) notFound();
 
-    const toggleSidebar = () => setSidebarOpen((v) => !v);
-
     if (loading) return null;
 
     return (
@@ -380,8 +377,6 @@ export default function ProfilePage() {
                     onToggleFollow={() => setFollowing((f) => !f)}
                 />
             }
-            sidebarOpen={sidebarOpen}
-            onToggleSidebar={toggleSidebar}
             centerMaxWidth={700}
             fullWidthContent={
                 profile.bannerUrl && (

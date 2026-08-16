@@ -819,9 +819,6 @@ export default function SettingsPage() {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const { user } = useContext(UserContext);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-
-    const toggleSidebar = () => setSidebarOpen((v) => !v);
 
     useEffect(() => {
         if (!user) return;
@@ -862,8 +859,6 @@ export default function SettingsPage() {
     return (
         <AppLayout
             leftPanel={<HelpPanel />}
-            sidebarOpen={sidebarOpen}
-            onToggleSidebar={toggleSidebar}
         >
             <>
                 <div>

@@ -16,15 +16,12 @@ const TABS = [
 export default function Library() {
     const [activeTab, setActiveTab] = useState("articles");
     const [loading, setLoading] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
 
     const width = useContext(WidthContext);
     const isMobile = width < 768;
 
-    const toggleSidebar = () => setSidebarOpen((v) => !v);
-
     return (
-        <AppLayout sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar}>
+        <AppLayout>
             <Tabs
                 active={activeTab}
                 setActive={setActiveTab}
