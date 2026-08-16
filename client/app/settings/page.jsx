@@ -6,19 +6,19 @@ import Toggle from "@/components/ui/Toggle";
 import Avatar from "@/components/ui/Avatar";
 import ImagePicker from "@/components/ImagePicker";
 import { ArrowUpRight, Globe, Pencil } from "lucide-react";
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useRef } from "react";
 import {
-    handlePassword,
-    handleProfile,
-    handleSocialLinks,
+    validatePasswordFields,
+    validateProfileFields,
 } from "@/lib/handlers";
 import Tabs from "@/components/ui/Tabs";
 import ApiMessage from "@/components/ui/ApiMessage";
 import { UserContext } from "@/context/UserContext";
-import { getProfile, deleteAccount } from "@/lib/api/user";
 import { signOut } from "@/lib/api/auth";
+import { upload } from "@/lib/api/upload";
 import { redirect } from "next/navigation";
 import ConfirmModal from "@/components/ConfirmModal";
+import { useUser } from "@/hooks/useUser";
 import { Trash } from "lucide-react";
 
 const X = (props) => (
@@ -122,7 +122,15 @@ const SectionHead = ({ title, mt = 40 }) => (
     </h2>
 );
 
-const TabAccount = ({ profile, onProfileUpdated }) => {
+const TabAccount = ({
+    profile,
+    updateProfile,
+    isUpdatingProfile,
+    updateSocialLinks,
+    isUpdatingSocialLinks,
+    deleteAccount,
+    isDeleting,
+}) => {
     const [name, setName] = useState(profile.name || "");
     const [username, setUsername] = useState(profile.username || "");
     const [bio, setBio] = useState(profile.bio || "");
@@ -132,11 +140,8 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
     const [youtube, setYoutube] = useState(profile.socialLinks?.youtube || "");
     const [xAccount, setXAccount] = useState(profile.socialLinks?.x || "");
     const [profileError, setProfileError] = useState({});
-    const [profileLoading, setProfileLoading] = useState(false);
     const [linksErrors, setLinksErrors] = useState({});
-    const [linksLoading, setLinksLoading] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
-    const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState(null);
     const { setUser } = useContext(UserContext);
     const avatarInputRef = useRef(null);
@@ -162,46 +167,51 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
 
     const handleProfileSubmit = async () => {
         setProfileError({});
-        setProfileLoading(true);
-        const result = await handleProfile({
+        const errors = validateProfileFields({
             name,
             username,
             bio,
             avatar,
             banner,
         });
-        setProfileLoading(false);
-        if (result.profile) {
-            onProfileUpdated(result.profile);
-            return;
+        setProfileError(errors);
+        if (Object.keys(errors).length > 0) return;
+        try {
+            let avatarUrl = avatar;
+            if (avatar && typeof avatar !== "string")
+                avatarUrl = await upload(avatar, "avatars");
+
+            let bannerUrl = banner;
+            if (banner && typeof banner !== "string")
+                bannerUrl = await upload(banner, "banners");
+
+            await updateProfile({ name, username, bio, avatarUrl, bannerUrl });
+        } catch (err) {
+            setProfileError({
+                apiError: err.message || "حدث خطأ أثناء تحديث الملف الشخصي",
+            });
         }
-        setProfileError(result);
     };
 
     const handleLinksSubmit = async () => {
         setLinksErrors({});
-        setLinksLoading(true);
-        const result = await handleSocialLinks({
-            website,
-            youtube,
-            x: xAccount,
-        });
-        setLinksLoading(false);
-        if (Object.keys(result).length > 0) {
-            setLinksErrors(result);
-            return;
+        try {
+            await updateSocialLinks({
+                socialLinks: { website, youtube, x: xAccount },
+            });
+        } catch (err) {
+            setLinksErrors({
+                apiError: err.message || "حدث خطأ أثناء تحديث الروابط",
+            });
         }
-        onProfileUpdated({ socialLinks: { website, youtube, x: xAccount } });
     };
 
     const handleAccountDelete = async () => {
-        setDeleting(true);
         setDeleteError(null);
         try {
             await deleteAccount();
         } catch (err) {
             setDeleteError(err.message || "حدث خطأ أثناء حذف الحساب");
-            setDeleting(false);
             return;
         }
         await signOut();
@@ -371,7 +381,7 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
             <Button
                 style={{ marginTop: 16 }}
                 onClick={handleProfileSubmit}
-                loading={profileLoading}
+                loading={isUpdatingProfile}
             >
                 تحديث حسابك
             </Button>
@@ -418,7 +428,7 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
             <Button
                 style={{ marginTop: 16 + 5 }}
                 onClick={handleLinksSubmit}
-                loading={linksLoading}
+                loading={isUpdatingSocialLinks}
             >
                 تحديث الروابط
             </Button>
@@ -449,7 +459,7 @@ const TabAccount = ({ profile, onProfileUpdated }) => {
                     "سيتم حذف حسابك وجميع محتواك بصورة دائمة. هذا الإجراء نهائي ولا يمكن التراجع عنه"
                 }
                 buttonText={"حذف الحساب"}
-                loading={deleting}
+                loading={isDeleting}
                 error={deleteError}
             />
         </div>
@@ -636,30 +646,39 @@ const TabNotifications = () => {
     );
 };
 
-const TabSecurity = () => {
+const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
     const [currentPass, setCurrentPass] = useState("");
     const [newPass, setNewPass] = useState("");
     const [confirmPass, setConfirmPass] = useState("");
     const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
     const [passwordUpdated, setPasswordUpdated] = useState(false);
     const { setUser } = useContext(UserContext);
 
     const handlePasswordClick = async () => {
         setErrors({});
         setPasswordUpdated(false);
-        setLoading(true);
-        const result = await handlePassword({
+        const errs = validatePasswordFields({
             currentPassword: currentPass,
             newPassword: newPass,
             confirmPass,
         });
-        setLoading(false);
-        if (Object.keys(result).length > 0) {
-            setErrors(result);
+        if (Object.keys(errs).length > 0) {
+            setErrors(errs);
+            return;
+        }
+        try {
+            await updatePassword({
+                currentPassword: currentPass,
+                newPassword: newPass,
+            });
+        } catch (err) {
+            setErrors({
+                apiError: err.message || "حدث خطأ أثناء تحديث كلمة المرور",
+            });
             return;
         }
 
+        setPasswordUpdated(true);
         await signOut();
         setUser(null);
         return redirect("/");
@@ -759,7 +778,7 @@ const TabSecurity = () => {
                         error={errors.confirmPass}
                     />
                 </div>
-                <Button onClick={handlePasswordClick} loading={loading}>
+                <Button onClick={handlePasswordClick} loading={isUpdatingPassword}>
                     تحديث كلمة المرور
                 </Button>
             </div>
@@ -816,21 +835,19 @@ const HelpPanel = () => (
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("account");
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
     const { user } = useContext(UserContext);
-
-    useEffect(() => {
-        if (!user) return;
-        getProfile(user.username)
-            .then(setProfile)
-            .catch(() => setProfile(null))
-            .finally(() => setLoading(false));
-    }, [user]);
-
-    const handleProfileUpdated = (updated) => {
-        setProfile((prev) => ({ ...prev, ...updated }));
-    };
+    const {
+        profile,
+        isLoading,
+        updateProfile,
+        isUpdatingProfile,
+        updateSocialLinks,
+        isUpdatingSocialLinks,
+        updatePassword,
+        isUpdatingPassword,
+        deleteAccount,
+        isDeleting,
+    } = useUser(user?.username);
 
     const TABS = [
         {
@@ -840,18 +857,25 @@ export default function SettingsPage() {
                 <TabAccount
                     key={profile.username || "profile"}
                     profile={profile}
-                    userId={user?.id}
-                    onProfileUpdated={handleProfileUpdated}
+                    updateProfile={updateProfile}
+                    isUpdatingProfile={isUpdatingProfile}
+                    updateSocialLinks={updateSocialLinks}
+                    isUpdatingSocialLinks={isUpdatingSocialLinks}
+                    deleteAccount={deleteAccount}
+                    isDeleting={isDeleting}
                 />
             ) : null,
         },
-        // { id: "privacy", label: "الخصوصية", panel: <TabPrivacy /> },
-        // {
-        //     id: "notifications",
-        //     label: "الإشعارات",
-        //     panel: <TabNotifications />,
-        // },
-        { id: "security", label: "الأمان", panel: <TabSecurity /> },
+        {
+            id: "security",
+            label: "الأمان",
+            panel: (
+                <TabSecurity
+                    updatePassword={updatePassword}
+                    isUpdatingPassword={isUpdatingPassword}
+                />
+            ),
+        },
     ];
 
     const activePanel = TABS.find((t) => t.id === activeTab)?.panel;
@@ -873,12 +897,12 @@ export default function SettingsPage() {
                             active={activeTab}
                             setActive={setActiveTab}
                             tabList={TABS}
-                            loading={loading}
+                            loading={isLoading}
                             loadingMessage="جاري التحميل..."
                         />
 
                         <div style={{ paddingBottom: 48 }}>
-                            {!loading && activePanel}
+                            {!isLoading && activePanel}
                         </div>
                     </div>
                 </div>

@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 import { Editor } from "@/components/editor/Editor";
-import { handleArticleRead } from "@/lib/handlers";
+import { getArticleBySlug } from "@/lib/data/articles";
 import "@/styles/_variables.scss";
 
 export default async function EditPage({ params }) {
@@ -18,7 +18,12 @@ export default async function EditPage({ params }) {
         redirect("/auth");
     }
 
-    const article = await handleArticleRead(slug);
+    let article;
+    try {
+        article = await getArticleBySlug(slug);
+    } catch {
+        notFound();
+    }
 
     if (session.user.id !== article.authorId) {
         redirect("/");

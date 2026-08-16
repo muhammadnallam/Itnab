@@ -79,7 +79,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 import "./styles.scss";
 import { Trash } from "lucide-react";
 import CoverImage from "./CoverImageNode";
-import { deleteArticle } from "@/lib/api/article";
+import { useArticle } from "@/hooks/useArticle";
 
 const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
     return (
@@ -160,6 +160,7 @@ const MobileToolbarContent = ({ type, onBack }) => (
 export function Editor({ articleContent, articleData, mode } = {}) {
     const isUpdate = mode === "update";
     const isMobile = useIsBreakpoint();
+    const { remove } = useArticle(articleData?.slug);
     const [mobileView, setMobileView] = useState("main");
     const toolbarRef = useRef(null);
     const [publishModal, setPublishModal] = useState(false);
@@ -326,7 +327,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     buttonText={"حذف"}
                     onConfirm={async () => {
                         try {
-                            await deleteArticle(articleData.id);
+                            await remove.mutateAsync(articleData.id);
                             redirect("/");
                         } catch (err) {
                             alert(err.message);

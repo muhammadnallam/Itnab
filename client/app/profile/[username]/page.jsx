@@ -8,12 +8,13 @@ import Button from "@/components/ui/Button";
 import Tabs from "@/components/ui/Tabs";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
-import { getProfile } from "@/lib/api/user";
-import { getAuthorArticles, getUserLists, parseList } from "@/lib/api/feed";
 import { WidthContext } from "@/context/ScreenContext";
 import ListCard from "@/components/ListCard";
 import RequireAuth from "@/components/RequireAuth";
-import usePaginatedFeed from "@/hooks/use-paginated-feed";
+import { useArticleList } from "@/hooks/useArticleList";
+import { useUserLists } from "@/hooks/useUserLists";
+import { useUser } from "@/hooks/useUser";
+import { parseList } from "@/lib/api/feed";
 
 const PROFILE_TABS = [
     { id: "home", label: "المقالات" },
@@ -326,47 +327,26 @@ export default function ProfilePage() {
     const params = useParams();
     const username = params?.username;
     const [tab, setTab] = useState("home");
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [notFoundState, setNotFoundState] = useState(false);
     const [following, setFollowing] = useState(false);
     const width = useContext(WidthContext);
     const isMobile = width < 768;
 
+    const { profile, isLoading, error } = useUser(username);
+
     // Articles tab is focused first; lists are prefetched right after.
-    const articles = usePaginatedFeed(
-        (page) => getAuthorArticles(profile?.id, { page }),
+    const articles = useArticleList(
+        { sort: "new", author: profile?.id },
         { enabled: Boolean(profile) },
     );
-    const lists = usePaginatedFeed((page) => getUserLists(profile?.id, { page }), {
-        enabled: Boolean(profile),
-    });
+    const lists = useUserLists(profile?.id, { enabled: Boolean(profile) });
 
     useEffect(() => {
-        if (!username) return;
-        let cancelled = false;
-        setLoading(true);
-        setProfile(null);
-        setNotFoundState(false);
         setTab("home");
-        getProfile(username)
-            .then((p) => {
-                if (!cancelled) setProfile(p);
-            })
-            .catch(() => {
-                if (!cancelled) setNotFoundState(true);
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-        return () => {
-            cancelled = true;
-        };
     }, [username]);
 
-    if (notFoundState) notFound();
+    if (error) notFound();
 
-    if (loading) return null;
+    if (isLoading || !profile) return null;
 
     return (
         <AppLayout

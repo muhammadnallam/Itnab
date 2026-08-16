@@ -1,11 +1,25 @@
+"use client";
+
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import Avatar from "@/components/ui/Avatar";
 import RequireAuth from "@/components/RequireAuth";
 import { Bookmark, Ellipsis } from "lucide-react";
+import { queryKeys } from "@/lib/query-keys";
+import { getArticle } from "@/lib/api/article";
 
 const ArticleCard = ({ article, isMobile }) => {
     const [saved, setSaved] = useState(false);
+    const qc = useQueryClient();
+
+    const prefetchArticle = () => {
+        if (!article.slug) return;
+        qc.prefetchQuery({
+            queryKey: queryKeys.article(article.slug),
+            queryFn: () => getArticle(article.slug),
+        });
+    };
 
     return (
         <article
@@ -13,6 +27,7 @@ const ArticleCard = ({ article, isMobile }) => {
                 padding: "24px 0",
                 borderBottom: "1px solid var(--color-border)",
             }}
+            onMouseEnter={prefetchArticle}
         >
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>

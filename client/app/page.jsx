@@ -12,8 +12,7 @@ import { UserContext } from "@/context/UserContext";
 import { WidthContext } from "@/context/ScreenContext";
 import { useAuthModal } from "@/context/AuthModalContext";
 import Button from "@/components/ui/Button";
-import usePaginatedFeed from "@/hooks/use-paginated-feed";
-import { getTopArticles, getNewestArticles } from "@/lib/api/feed";
+import { useArticleList } from "@/hooks/useArticleList";
 
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const [subs, setSubs] = useState(WRITERS.map((w) => w.sub));
@@ -237,10 +236,8 @@ export default function App() {
     ];
 
     // Focused tab loads first; the other is prefetched right after.
-    const top = usePaginatedFeed((page) => getTopArticles({ page }));
-    const latest = usePaginatedFeed((page) => getNewestArticles({ page }), {
-        enabled: top.loaded,
-    });
+    const top = useArticleList({ sort: "top" });
+    const latest = useArticleList({ sort: "new" }, { enabled: top.loaded });
     const feed = tab === "foryou" ? top : latest;
 
     return (

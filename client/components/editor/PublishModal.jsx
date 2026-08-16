@@ -2,8 +2,14 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { TAGS } from "@itnab/constants";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import Button from "@/components/ui/Button";
-import { handleArticle } from "@/lib/handlers";
+import {
+    validateArticleFields,
+    prepareArticlePayload,
+} from "@/lib/handlers";
+import { useArticle } from "@/hooks/useArticle";
+import { queryKeys } from "@/lib/query-keys";
 
 function Input({ label, error, children }) {
     return (
@@ -152,8 +158,6 @@ function ModalFrame({ isOpen, onClose, title, footer, children, onSubmit }) {
     );
 }
 
-const handlePublish = (data) => handleArticle(data);
-
 export default function PublishModal({
     isOpen,
     onClose,
@@ -184,6 +188,8 @@ export default function PublishModal({
     const [sendEmail, setSendEmail] = useState(false);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const qc = useQueryClient();
+    const { publish, update } = useArticle(articleData?.slug);
 
     const inputBase = {
         width: "100%",
@@ -237,7 +243,6 @@ export default function PublishModal({
                 setSeoTitleError("");
                 setSeoDescriptionError("");
                 setTagError("");
-                setLoading(true);
                 const payload = {
                     coverImage,
                     seoTitle,
@@ -247,29 +252,40 @@ export default function PublishModal({
                     content,
                     wordCount,
                 };
-                if (isUpdate) {
-                    payload.mode = "update";
-                    payload.articleId = articleData?.id;
+                setLoading(true);
+                try {
+                    const errors = validateArticleFields(payload);
+                    if (errors.coverImage)
+                        setCoverError(errors.coverImage);
+                    if (errors.seoTitle)
+                        setSeoTitleError(errors.seoTitle);
+                    if (errors.seoDescription)
+                        setSeoDescriptionError(errors.seoDescription);
+                    if (errors.tag) setTagError(errors.tag);
+                    if (Object.keys(errors).length > 0) return;
+
+                    const prepared = await prepareArticlePayload(payload);
+                    const mutation = isUpdate ? update : publish;
+                    const result = await mutation.mutateAsync(
+                        isUpdate
+                            ? { ...prepared, articleId: articleData?.id }
+                            : prepared,
+                    );
+                    if (isUpdate) {
+                        qc.invalidateQueries({
+                            queryKey: queryKeys.article(articleData?.slug),
+                        });
+                        router.refresh();
+                        router.push(`/article/${articleData?.slug}`);
+                    } else {
+                        router.push(`/article/${result.slug}`);
+                    }
+                    onClose();
+                } catch (err) {
+                    alert(err.message || "حدث خطأ أثناء حفظ المقال");
+                } finally {
+                    setLoading(false);
                 }
-                const result = await handlePublish(payload);
-                setLoading(false);
-                if (!result.success) {
-                    if (result.errors.coverImage)
-                        setCoverError(result.errors.coverImage);
-                    if (result.errors.seoTitle)
-                        setSeoTitleError(result.errors.seoTitle);
-                    if (result.errors.seoDescription)
-                        setSeoDescriptionError(result.errors.seoDescription);
-                    if (result.errors.tag) setTagError(result.errors.tag);
-                    if (result.errors.apiError) alert(result.errors.apiError);
-                    return;
-                }
-                if (isUpdate) {
-                    router.push(`/article/${articleData?.slug}`);
-                } else {
-                    router.push(`/article/${result.slug}`);
-                }
-                onClose();
             }}
         >
             <Input label="صورة الغلاف" error={coverError}>

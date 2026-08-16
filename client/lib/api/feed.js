@@ -1,6 +1,6 @@
-import { API_URL } from "./config";
+import { fetcher } from "@/lib/fetcher";
 
-function formatArabicDate(iso) {
+export function formatArabicDate(iso) {
     if (!iso) return "";
     const date = new Date(iso);
     const diffMs = date.getTime() - Date.now();
@@ -54,10 +54,7 @@ export function parseList(l, ownerName) {
 
 async function fetchFeed(path, params) {
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${API_URL}/api/feed/${path}?${query}`);
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(json.error || "حدث خطأ أثناء جلب البيانات");
-    return json;
+    return fetcher(`/api/feed/${path}?${query}`);
 }
 
 export async function getFeedArticles({
