@@ -1,24 +1,64 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Avatar from "@/components/ui/Avatar";
 import RequireAuth from "@/components/RequireAuth";
 import { Bookmark, Ellipsis } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
-import { getArticle } from "@/lib/api/article";
-import { useSave } from "@/hooks/useSave";
+import { saveArticle, unsaveArticle } from "@/lib/api/interactions";
+import { reportError } from "@/lib/notify";
+
+const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function mapArticles(data, mapper) {
+    if (!data) return data;
+    if (Array.isArray(data.pages)) {
+        return {
+            ...data,
+            pages: data.pages.map((page) => ({
+                ...page,
+                items: page.items?.map(mapper),
+            })),
+        };
+    }
+    if (Array.isArray(data)) return data.map(mapper);
+    return data;
+}
 
 const ArticleCard = ({ article, isMobile }) => {
-    const { saved, toggle: toggleSave } = useSave(article?.id);
+    const id = article?.id;
+    const saved = article?.saved ?? false;
     const qc = useQueryClient();
 
-    const prefetchArticle = () => {
-        if (!article.slug) return;
-        qc.prefetchQuery({
-            queryKey: queryKeys.article(article.slug),
-            queryFn: () => getArticle(article.slug),
-        });
+    const mutation = useMutation({
+        mutationFn: () => (saved ? unsaveArticle(id) : saveArticle(id)),
+        onMutate: async () => {
+            await qc.cancelQueries({ queryKey: queryKeys.allArticles() });
+            const previous = qc.getQueriesData({
+                queryKey: queryKeys.allArticles(),
+            });
+            qc.setQueriesData(
+                { queryKey: queryKeys.allArticles() },
+                (data) =>
+                    mapArticles(data, (a) =>
+                        a.id === id ? { ...a, saved: !saved } : a,
+                    ),
+            );
+            return { previous };
+        },
+        onError: (err, _vars, context) => {
+            context.previous.forEach(([queryKey, data]) =>
+                qc.setQueryData(queryKey, data),
+            );
+            reportError(err);
+        },
+    });
+
+    const toggleSave = () => {
+        if (!UUID_RE.test(id ?? "")) return;
+        mutation.mutate();
     };
 
     return (
@@ -27,7 +67,6 @@ const ArticleCard = ({ article, isMobile }) => {
                 padding: "24px 0",
                 borderBottom: "1px solid var(--color-border)",
             }}
-            onMouseEnter={prefetchArticle}
         >
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>

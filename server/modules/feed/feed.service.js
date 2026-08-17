@@ -40,7 +40,7 @@ async function assertAuthorExists(authorId) {
     if (!author) throw new NotFoundError("الكاتب غير موجود");
 }
 
-export async function getFeed({ sort, author, page, pageSize }) {
+export async function getFeed({ sort, author, page, pageSize, userId }) {
     if (author) await assertAuthorExists(author);
 
   const where = author
@@ -50,24 +50,41 @@ export async function getFeed({ sort, author, page, pageSize }) {
 
     const cacheable = sort === "top" && !author;
     const cacheKey = `top:${page}:${pageSize}`;
-    if (cacheable) {
-        const cached = getFeedCache(cacheKey);
-        if (cached) return cached;
+    let result = cacheable ? getFeedCache(cacheKey) : null;
+    if (!result) {
+        const [articles, total] = await Promise.all([
+            prisma.article.findMany({
+                where,
+                orderBy,
+                select: ARTICLE_METADATA_SELECT,
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+            }),
+            prisma.article.count({ where }),
+        ]);
+
+        result = { articles, ...buildMeta(total, page, pageSize) };
+        if (cacheable) setFeedCache(cacheKey, result);
     }
 
-    const [articles, total] = await Promise.all([
-        prisma.article.findMany({
-            where,
-            orderBy,
-            select: ARTICLE_METADATA_SELECT,
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        }),
-        prisma.article.count({ where }),
-    ]);
+    if (userId && result.articles.length > 0) {
+        const bookmarks = await prisma.bookmark.findMany({
+            where: {
+                userId,
+                articleId: { in: result.articles.map((a) => a.id) },
+            },
+            select: { articleId: true },
+        });
+        const savedSet = new Set(bookmarks.map((b) => b.articleId));
+        result = {
+            ...result,
+            articles: result.articles.map((a) => ({
+                ...a,
+                saved: savedSet.has(a.id),
+            })),
+        };
+    }
 
-    const result = { articles, ...buildMeta(total, page, pageSize) };
-    if (cacheable) setFeedCache(cacheKey, result);
     return result;
 }
 

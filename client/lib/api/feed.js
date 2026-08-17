@@ -36,6 +36,7 @@ export function parseArticle(a) {
         authorInitials: getInitials(a.author?.name),
         authorAvatarUrl: a.author?.avatarUrl,
         date: formatArabicDate(a.createdAt),
+        saved: a.saved ?? false,
     };
 }
 
