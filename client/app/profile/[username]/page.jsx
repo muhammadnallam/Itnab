@@ -9,11 +9,13 @@ import Tabs from "@/components/ui/Tabs";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import { WidthContext } from "@/context/ScreenContext";
+import { UserContext } from "@/context/UserContext";
 import ListCard from "@/components/ListCard";
 import RequireAuth from "@/components/RequireAuth";
 import { useArticleList } from "@/hooks/useArticleList";
 import { useUserLists } from "@/hooks/useUserLists";
 import { useUser } from "@/hooks/useUser";
+import { useFollow } from "@/hooks/useFollow";
 import { parseList } from "@/lib/api/feed";
 
 const PROFILE_TABS = [
@@ -27,7 +29,7 @@ const formatCount = (n) => {
     return String(n);
 };
 
-const AboutTab = ({ profile }) => (
+const AboutTab = ({ profile, followerCount }) => (
     <div style={{ padding: "24px 0" }}>
         <h3
             style={{
@@ -58,7 +60,7 @@ const AboutTab = ({ profile }) => (
             }}
         >
             <span>
-                <strong>{formatCount(profile.followersCount)}</strong>{" "}
+                <strong>{formatCount(followerCount)}</strong>{" "}
                 <span style={{ color: "var(--color-light)" }}>متابع</span>
             </span>
             <span>
@@ -75,7 +77,14 @@ const getInitials = (name) => {
     return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
 };
 
-const ProfilePanel = ({ profile, following, onToggleFollow }) => (
+const ProfilePanel = ({
+    profile,
+    following,
+    followerCount,
+    isMutating,
+    isOwnProfile,
+    onToggleFollow,
+}) => (
     <div
         className="card"
         style={{
@@ -260,7 +269,7 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
                         color: "var(--color-ink)",
                     }}
                 >
-                    {formatCount(profile.followersCount)}
+                    {formatCount(followerCount)}
                 </span>
                 <span
                     dir="rtl"
@@ -308,18 +317,21 @@ const ProfilePanel = ({ profile, following, onToggleFollow }) => (
             </div>
         </div>
 
-        <div style={{ marginTop: 20 }}>
-            <RequireAuth onClick={onToggleFollow} mode="login">
-                <Button
-                    variant={following ? "secondary" : "primary"}
-                    style={{
-                        width: "100%",
-                    }}
-                >
-                    {following ? "إلغاء المتابعة" : "متابعة"}
-                </Button>
-            </RequireAuth>
-        </div>
+        {!isOwnProfile && (
+            <div style={{ marginTop: 20 }}>
+                <RequireAuth onClick={onToggleFollow} mode="login">
+                    <Button
+                        variant={following ? "secondary" : "primary"}
+                        loading={isMutating}
+                        style={{
+                            width: "100%",
+                        }}
+                    >
+                        {following ? "إلغاء المتابعة" : "متابعة"}
+                    </Button>
+                </RequireAuth>
+            </div>
+        )}
     </div>
 );
 
@@ -327,11 +339,20 @@ export default function ProfilePage() {
     const params = useParams();
     const username = params?.username;
     const [tab, setTab] = useState("home");
-    const [following, setFollowing] = useState(false);
     const width = useContext(WidthContext);
+    const { user } = useContext(UserContext);
     const isMobile = width < 768;
 
     const { profile, isLoading, error } = useUser(username);
+
+    const {
+        isFollowing: following,
+        followerCount,
+        toggle: toggleFollow,
+        isMutating,
+    } = useFollow(profile?.id);
+
+    const isOwnProfile = !!user && user.id === profile?.id;
 
     // Articles tab is focused first; lists are prefetched right after.
     const articles = useArticleList(
@@ -354,7 +375,10 @@ export default function ProfilePage() {
                 <ProfilePanel
                     profile={profile}
                     following={following}
-                    onToggleFollow={() => setFollowing((f) => !f)}
+                    followerCount={followerCount}
+                    isMutating={isMutating}
+                    isOwnProfile={isOwnProfile}
+                    onToggleFollow={toggleFollow}
                 />
             }
             centerMaxWidth={700}
@@ -419,7 +443,7 @@ export default function ProfilePage() {
                                 color: "var(--color-light)",
                             }}
                         >
-                            {formatCount(profile.followersCount)} متابع
+                            {formatCount(followerCount)} متابع
                         </div>
                     </div>
                     <button
@@ -437,12 +461,12 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            {isMobile && (
+            {isMobile && !isOwnProfile && (
                 <div style={{ margin: "20px 0" }}>
-                    <RequireAuth>
+                    <RequireAuth onClick={toggleFollow} mode="login">
                         <Button
-                            onClick={() => setFollowing((f) => !f)}
                             variant={following ? "secondary" : "primary"}
+                            loading={isMutating}
                             style={{
                                 width: "100%",
                             }}
@@ -505,7 +529,7 @@ export default function ProfilePage() {
             />
 
             {tab === "about" ? (
-                <AboutTab profile={profile} />
+                <AboutTab profile={profile} followerCount={followerCount} />
             ) : tab === "lists" ? (
                 <div>
                     {lists.loading ? null : (

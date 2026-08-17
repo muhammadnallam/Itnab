@@ -4,13 +4,15 @@ import { ArrowLeft, Bookmark, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
+import ShareMenu from "@/components/article/ShareMenu";
+import { useSave } from "@/hooks/useSave";
 
-export default function ArticleHeader() {
+export default function ArticleHeader({ article }) {
     const [hidden, setHidden] = useState(false);
     const lastScrollY = useRef(0);
     const ticking = useRef(false);
     const router = useRouter();
-    const [saved, setSaved] = useState(false);
+    const { saved, toggle: toggleSave } = useSave(article?.id);
 
     useEffect(() => {
         lastScrollY.current = window.scrollY;
@@ -69,14 +71,16 @@ export default function ArticleHeader() {
                     style={{
                         cursor: "pointer",
                         transition: "color 0.15s",
+                        background: "none",
+                        border: "none",
+                        padding: 0,
                     }}
                 >
                     <Download size={24} />
                 </button>
-                <RequireAuth>
+                <RequireAuth onClick={toggleSave}>
                     <button
                         aria-label="save article"
-                        onClick={() => setSaved((s) => !s)}
                         className={
                             saved ? "text-accent" : "text-mid hover:text-accent"
                         }

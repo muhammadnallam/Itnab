@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import Avatar from "@/components/ui/Avatar";
@@ -8,9 +7,10 @@ import RequireAuth from "@/components/RequireAuth";
 import { Bookmark, Ellipsis } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
 import { getArticle } from "@/lib/api/article";
+import { useSave } from "@/hooks/useSave";
 
 const ArticleCard = ({ article, isMobile }) => {
-    const [saved, setSaved] = useState(false);
+    const { saved, toggle: toggleSave } = useSave(article?.id);
     const qc = useQueryClient();
 
     const prefetchArticle = () => {
@@ -93,7 +93,7 @@ const ArticleCard = ({ article, isMobile }) => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <RequireAuth onClick={() => setSaved((s) => !s)} mode="login">
+                    <RequireAuth onClick={toggleSave} mode="login">
                         <button
                             className={`cursor-pointer pl-1 ${
                                 saved ? "text-accent" : "text-mid hover:text-ink"

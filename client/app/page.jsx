@@ -113,7 +113,7 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                             استكشف المواضيع
                         </h4>
                         <button
-                            className="text-accent hover:text-accent-hover"
+                            className="text-mid hover:text-ink"
                             style={{
                                 background: "none",
                                 border: "none",

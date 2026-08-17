@@ -43,7 +43,7 @@ export default async function ArticlePage({ params }) {
 
     return (
         <main className="article-page overflow-x-hidden">
-            <ArticleHeader />
+            <ArticleHeader article={article} />
             <HydrationBoundary state={dehydrate(queryClient)}>
                 <ArticleView slug={slug} article={article} html={html} />
             </HydrationBoundary>

@@ -7,5 +7,6 @@ export const queryKeys = {
     articleList: (params = {}) => ["articles", params],
     comments: (articleId) => ["comments", articleId],
     likes: (articleId) => ["likes", articleId],
+    save: (articleId) => ["save", articleId],
     lists: (authorId) => ["lists", authorId],
 };

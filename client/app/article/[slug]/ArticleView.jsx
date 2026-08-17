@@ -1,20 +1,40 @@
 "use client";
 
 import { useArticle } from "@/hooks/useArticle";
-import { Bookmark, MessageSquare, MoreHorizontal, Share, ThumbsDown, ThumbsUp } from "lucide-react";
+import { useLikes } from "@/hooks/useLikes";
+import { useSave } from "@/hooks/useSave";
+import { useView } from "@/hooks/useView";
+import RequireAuth from "@/components/RequireAuth";
+import ShareMenu from "@/components/article/ShareMenu";
+import {
+    Bookmark,
+    MessageSquare,
+    MoreHorizontal,
+    Share,
+    ThumbsDown,
+    ThumbsUp,
+} from "lucide-react";
 
 function formatDate(dateStr) {
     const d = new Date(dateStr);
     return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
 }
 
+const formatCount = (n) => {
+    if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + "k";
+    return String(n);
+};
+
 export default function ArticleView({ slug, article: initialArticle, html }) {
     const { article: cached } = useArticle(slug);
     const article = cached ?? initialArticle;
+    const likes = useLikes(article?.id);
+    const save = useSave(article?.id);
+    useView(article?.id);
 
     if (!article) return null;
 
-    const saved = false;
+    const saved = save.saved;
 
     return (
         <>
@@ -48,14 +68,23 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
             <article>
                 <div className="flex items-center justify-between border-b border-border pb-4 mb-10">
                     <div className="flex items-center gap-5 text-sm font-medium">
-                        <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                            <Bookmark
-                                size={19}
-                                strokeWidth={1.75}
-                                fill={saved ? "currentColor" : "none"}
-                            />
-                            حفظ{" "}
-                        </button>
+                        <RequireAuth onClick={save.toggle}>
+                            <button
+                                className={`flex items-center gap-1.5 ${
+                                    saved
+                                        ? "text-accent"
+                                        : "text-mid hover:text-ink"
+                                }`}
+                                style={{ background: "none", cursor: "pointer" }}
+                            >
+                                <Bookmark
+                                    size={19}
+                                    strokeWidth={1.75}
+                                    fill={saved ? "currentColor" : "none"}
+                                />
+                                حفظ{" "}
+                            </button>
+                        </RequireAuth>
                     </div>
                     <span className="text-sm tracking-widetext-ink">
                         {formatDate(article.createdAt)}
@@ -74,46 +103,92 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                                 fill={saved ? "currentColor" : "none"}
                             />
                         </button>
-                        <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                            <Bookmark
-                                size={19}
-                                strokeWidth={1.75}
-                                fill={saved ? "currentColor" : "none"}
-                            />
-                        </button>
-                        <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                            <Share
-                                size={19}
-                                strokeWidth={1.75}
-                                fill={saved ? "currentColor" : "none"}
-                            />
-                        </button>
+                        <RequireAuth onClick={save.toggle}>
+                            <button
+                                className={`flex items-center gap-1.5 ${
+                                    saved
+                                        ? "text-accent"
+                                        : "text-mid hover:text-ink"
+                                }`}
+                                style={{ background: "none", cursor: "pointer" }}
+                            >
+                                <Bookmark
+                                    size={19}
+                                    strokeWidth={1.75}
+                                    fill={saved ? "currentColor" : "none"}
+                                />
+                            </button>
+                        </RequireAuth>
+                        <ShareMenu articleId={article.id}>
+                            <button className="flex items-center gap-1.5 text-mid hover:text-ink">
+                                <Share
+                                    size={19}
+                                    strokeWidth={1.75}
+                                />
+                            </button>
+                        </ShareMenu>
                     </div>
                     <div className="flex items-center gap-5 text-xs font-medium">
                         <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                            512
                             <MessageSquare
                                 size={19}
                                 strokeWidth={1.75}
-                                fill={saved ? "currentColor" : "none"}
                             />
                         </button>
-                        <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                            2k
-                            <ThumbsDown
-                                size={19}
-                                strokeWidth={1.75}
-                                fill={saved ? "currentColor" : "none"}
-                            />
-                        </button>
-                        <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                            14k
-                            <ThumbsUp
-                                size={19}
-                                strokeWidth={1.75}
-                                fill={saved ? "currentColor" : "none"}
-                            />
-                        </button>
+                        <RequireAuth
+                            onClick={
+                                likes.type === "DISLIKE"
+                                    ? likes.clear
+                                    : likes.dislike
+                            }
+                        >
+                            <button
+                                className={`flex items-center gap-1.5 ${
+                                    likes.type === "DISLIKE"
+                                        ? "text-accent"
+                                        : "text-mid hover:text-ink"
+                                }`}
+                                style={{ background: "none", cursor: "pointer" }}
+                            >
+                                {formatCount(likes.dislikeCount)}
+                                <ThumbsDown
+                                    size={19}
+                                    strokeWidth={1.75}
+                                    fill={
+                                        likes.type === "DISLIKE"
+                                            ? "currentColor"
+                                            : "none"
+                                    }
+                                />
+                            </button>
+                        </RequireAuth>
+                        <RequireAuth
+                            onClick={
+                                likes.type === "LIKE"
+                                    ? likes.clear
+                                    : likes.like
+                            }
+                        >
+                            <button
+                                className={`flex items-center gap-1.5 ${
+                                    likes.type === "LIKE"
+                                        ? "text-accent"
+                                        : "text-mid hover:text-ink"
+                                }`}
+                                style={{ background: "none", cursor: "pointer" }}
+                            >
+                                {formatCount(likes.likeCount)}
+                                <ThumbsUp
+                                    size={19}
+                                    strokeWidth={1.75}
+                                    fill={
+                                        likes.type === "LIKE"
+                                            ? "currentColor"
+                                            : "none"
+                                    }
+                                />
+                            </button>
+                        </RequireAuth>
                     </div>
                 </div>
             </article>
