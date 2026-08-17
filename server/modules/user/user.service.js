@@ -1,9 +1,6 @@
 import prisma from "../../lib/prisma.js";
 import { auth } from "../../lib/auth.js";
-import {
-    ValidationError,
-    handlePrismaError,
-} from "../../lib/errors.js";
+import { ValidationError, handlePrismaError } from "../../lib/errors.js";
 
 export async function getProfile(username) {
     let user;
@@ -19,11 +16,11 @@ export async function getProfile(username) {
                 bannerUrl: true,
                 preferences: true,
                 socialLinks: true,
+        followerCount: true,
+        followingCount: true,
                 _count: {
                     select: {
                         articles: true,
-                        followers: true,
-                        following: true,
                     },
                 },
             },
@@ -32,12 +29,12 @@ export async function getProfile(username) {
         handlePrismaError(err, { notFoundMsg: "المستخدم غير موجود" });
     }
 
-    const { _count, ...userData } = user;
+  const { _count, followerCount, followingCount, ...userData } = user;
     return {
         ...userData,
         articlesCount: _count.articles,
-        followersCount: _count.followers,
-        followingCount: _count.following,
+    followersCount: followerCount,
+    followingCount,
     };
 }
 
@@ -111,9 +108,7 @@ export async function updatePassword(
         });
     } catch (err) {
         const message =
-            err.body?.message ||
-            err.message ||
-            "حدث خطأ أثناء تحديث كلمة المرور";
+      err.body?.message || err.message || "حدث خطأ أثناء تحديث كلمة المرور";
         throw new ValidationError(message);
     }
 }

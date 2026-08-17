@@ -2,10 +2,7 @@ import normalizeArabic from "@itnab/normalize";
 import extractText from "../../lib/extractText.js";
 import prisma from "../../lib/prisma.js";
 import { nanoid } from "nanoid";
-import {
-    AuthorizationError,
-    handlePrismaError,
-} from "../../lib/errors.js";
+import { AuthorizationError, handlePrismaError } from "../../lib/errors.js";
 
 async function slugify(title) {
     let slug = normalizeArabic(title)
@@ -28,8 +25,7 @@ async function slugify(title) {
 export async function createArticle(validatedContent, articleData, userId) {
     const { seoTitle, seoDescription, tag, sendEmail, coverImage, wordCount } =
         articleData;
-    const title =
-        validatedContent.content?.[0]?.content?.[0]?.text?.trim() || "";
+  const title = validatedContent.content?.[0]?.content?.[0]?.text?.trim() || "";
     const subtitle =
         validatedContent.content?.[1]?.content?.[0]?.text?.trim() || "";
     const slug = await slugify(title);
@@ -67,7 +63,7 @@ export async function createArticle(validatedContent, articleData, userId) {
 export async function getArticle({ slug, id }) {
     try {
         return await prisma.article.findUniqueOrThrow({
-            where: slug ? { slug } : { id },
+      where: slug ? { slug, deletedAt: null } : { id, deletedAt: null },
             include: {
                 author: {
                     select: { name: true, image: true },
@@ -92,8 +88,7 @@ export async function updateArticle(
 
     const { seoTitle, seoDescription, tag, sendEmail, coverImage, wordCount } =
         articleData;
-    const title =
-        validatedContent.content?.[0]?.content?.[0]?.text?.trim() || "";
+  const title = validatedContent.content?.[0]?.content?.[0]?.text?.trim() || "";
     const subtitle =
         validatedContent.content?.[1]?.content?.[0]?.text?.trim() || "";
     const searchVector = normalizeArabic(extractText(validatedContent));
@@ -129,8 +124,9 @@ export async function deleteArticle(articleId, userId) {
     }
 
     try {
-        await prisma.article.delete({
+    await prisma.article.update({
             where: { id: articleId },
+      data: { deletedAt: new Date() },
         });
     } catch (e) {
         handlePrismaError(e, { notFoundMsg: "المقال غير موجود" });

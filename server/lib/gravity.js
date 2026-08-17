@@ -45,40 +45,32 @@ export function computeScore({
         : (engagementRate / denominator) * coldStartMultiplier;
 }
 
-async function getInteractionCount(model) {
-    const rows = await model.groupBy({
-        by: ["articleId"],
-        _count: { _all: true },
-    });
-    const map = {};
-    for (const row of rows) map[row.articleId] = row._count._all;
-    return map;
-}
-
 export async function recomputeScores() {
-    const counts = await Promise.all([
-        getInteractionCount(prisma.like),
-        getInteractionCount(prisma.bookmark),
-        getInteractionCount(prisma.share),
-        getInteractionCount(prisma.view),
-    ]);
-    const [likes, bookmarks, shares, views] = counts;
-
     const articles = await prisma.article.findMany({
-        select: { id: true, createdAt: true },
+    where: { deletedAt: null },
+    select: {
+      id: true,
+      createdAt: true,
+      likeCount: true,
+      dislikeCount: true,
+      savedCount: true,
+      shareCount: true,
+      viewCount: true,
+    },
     });
 
     const now = Date.now();
     let updatedCount = 0;
     for (const article of articles) {
         const ageHours = (now - article.createdAt.getTime()) / HOUR;
-        // TODO: wire the comments count once a Comment model is implemented
+    // Dislikes get a negative weight (clamped so the score can't go negative).
+    const likes = Math.max(0, article.likeCount - article.dislikeCount);
         const score = computeScore({
-            views: views[article.id] || 0,
-            likes: likes[article.id] || 0,
+      views: article.viewCount,
+      likes,
             comments: 0,
-            shares: shares[article.id] || 0,
-            bookmarks: bookmarks[article.id] || 0,
+      shares: article.shareCount,
+      bookmarks: article.savedCount,
             ageHours,
         });
 
@@ -99,9 +91,7 @@ let isRunning = false;
 export function startGravityCron() {
     cron.schedule(CRON_EXPRESSION, async () => {
         if (isRunning) {
-            console.warn(
-                "[gravity] Skipping run: previous run still in progress",
-            );
+      console.warn("[gravity] Skipping run: previous run still in progress");
             return;
         }
         isRunning = true;

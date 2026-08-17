@@ -11,6 +11,17 @@ datasource db {
 // UUID is chosen over CUID2 to leverage the native support and database optimization.
 // Additionally, the platform manages articles URLs with slugs not with IDs (CUID2's main benefit).
 
+enum ReactionType {
+    LIKE
+    DISLIKE
+}
+
+enum DeviceType {
+    DESKTOP
+    MOBILE
+    OTHER
+}
+
 model User {
   id          String   @id @default(uuid()) @db.Uuid
   email       String   @unique
@@ -20,6 +31,8 @@ model User {
   bannerUrl   String?
   preferences    Json?
   socialLinks    Json?
+  followerCount    Int      @default(0)
+  followingCount   Int      @default(0)
   createdAt   DateTime @default(now())
 
   articles      Article[]
@@ -54,13 +67,21 @@ model Article {
   searchVector   String?
   readTime       Int
   score          Float    @default(0)
+
+  likeCount      Int      @default(0)
+  dislikeCount   Int      @default(0)
+  savedCount     Int      @default(0)
+  shareCount     Int      @default(0)
+  viewCount      Int      @default(0)
+  
+  deletedAt      DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   authorId String @db.Uuid
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  lists     List[]
+  savedArticles SavedArticle[]
   likes     Like[]
   bookmarks Bookmark[]
   shares    Share[]
@@ -70,13 +91,14 @@ model Article {
 model List {
   id        String   @id @default(uuid()) @db.Uuid
   name      String
+  isDefault Boolean   @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   authorId String @db.Uuid
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  articles Article[]
+  savedArticles SavedArticle[]
 
   @@map("list")
 }
@@ -100,6 +122,7 @@ model Like {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  type      ReactionType @default(LIKE)
 
   @@id([userId, articleId])
 }
@@ -115,28 +138,51 @@ model Bookmark {
 }
 
 model Share {
-  userId    String   @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @db.Uuid
+  guestId   String?
   articleId String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  platform  String   @default("copy")
   createdAt DateTime @default(now())
 
-  @@id([userId, articleId])
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  article Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId])
 }
 
 // Logged in views are counted once per user (@@unique), unlike unlimited guest views.
 
 model View {
   id        String   @id @default(uuid()) @db.Uuid
-  userId    String?  @db.Uuid // Optional for counting guests views
+  userId     String?    @db.Uuid
+  guestId    String?
   articleId String   @db.Uuid
+  deviceType DeviceType @default(OTHER)
+  country    String?
+  browser    String?
+  os         String?
+  referrer   String?
+  createdAt  DateTime   @default(now())
+
   user      User?    @relation("userViews", fields: [userId], references: [id])
   article   Article  @relation("articleViews", fields: [articleId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  // TODO: Add device type, browser, and location for analytics.
 
   @@unique([userId, articleId])
+  @@unique([guestId, articleId])
+  @@index([articleId])
+}
+
+model SavedArticle {
+  listId    String   @db.Uuid
+  articleId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  list    List    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([listId, articleId])
+  @@index([articleId])
 }
 
 // TODO: model Comment (Manage threaded comments, nesting replies).

@@ -43,7 +43,9 @@ async function assertAuthorExists(authorId) {
 export async function getFeed({ sort, author, page, pageSize }) {
     if (author) await assertAuthorExists(author);
 
-    const where = author ? { authorId: author } : {};
+  const where = author
+    ? { authorId: author, deletedAt: null }
+    : { deletedAt: null };
     const orderBy = sort === "new" ? { createdAt: "desc" } : { score: "desc" };
 
     const cacheable = sort === "top" && !author;
@@ -86,7 +88,7 @@ export async function getUserLists({ author, page, pageSize }) {
                 createdAt: true,
                 updatedAt: true,
                 _count: {
-                    select: { articles: true },
+          select: { savedArticles: true },
                 },
             },
             skip: (page - 1) * pageSize,
