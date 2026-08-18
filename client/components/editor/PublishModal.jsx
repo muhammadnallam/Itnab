@@ -285,6 +285,7 @@ export default function PublishModal({
                     alert(err.message || "حدث خطأ أثناء حفظ المقال");
                 } finally {
                     setLoading(false);
+                    localStorage.removeItem("editor-content");
                 }
             }}
         >
