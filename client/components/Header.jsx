@@ -86,7 +86,7 @@ export default function Header({ onToggleSidebar, isMobile }) {
                         gap: 8,
                         background: "var(--color-bg)",
                         border: "1px solid var(--color-border)",
-                        borderRadius: 99,
+                        borderRadius: "var(--border-radius)",
                         padding: "8px 16px",
                         flex: 1,
                         maxWidth: 540,

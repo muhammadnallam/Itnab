@@ -7,6 +7,7 @@ import {
     Inbox,
     Bookmark,
     UserRound,
+    Search,
 } from "lucide-react";
 import { UserContext } from "@/context/UserContext";
 import RequireAuth from "@/components/RequireAuth";
@@ -18,6 +19,7 @@ const MobileBottomNav = () => {
     const items = [
         { icon: House, label: "الرئيسية", link: "/" },
         { icon: Inbox, label: "الاشتراكات", link: "/subscriptions", protected: true },
+        { icon: Search, label: "استكشف", link: "/explore", protected: false },
         { icon: Bookmark, label: "المكتبة", link: "/library", protected: true },
         { icon: UserRound, label: "أنت", link: profileLink },
     ];

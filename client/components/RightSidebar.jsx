@@ -6,9 +6,8 @@ import {
     House,
     Inbox,
     Bookmark,
-    ChartColumn,
     UserRound,
-    Ellipsis,
+    Search,
 } from "lucide-react";
 import { UserContext } from "@/context/UserContext";
 import RequireAuth from "@/components/RequireAuth";
@@ -16,8 +15,8 @@ import RequireAuth from "@/components/RequireAuth";
 const BASE_NAV_ITEMS = [
     { icon: House, label: "الرئيسية", link: "/" },
     { icon: Inbox, label: "الاشتراكات", link: "/subscriptions", protected: true },
+    { icon: Search, label: "استكشف", link: "/explore", protected: false },
     { icon: Bookmark, label: "مكتبتي", link: "/library", protected: true },
-    { icon: ChartColumn, label: "الإحصائيات", link: "/analytics", protected: true },
 ];
 
 const RightSidebar = ({ isOpen, isActive } = {}) => {

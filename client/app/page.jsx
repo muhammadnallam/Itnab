@@ -2,7 +2,7 @@
 
 import { useState, useContext } from "react";
 import { TAGS } from "@itnab/constants";
-import { WRITERS } from "@/data/dummybData";
+import { WRITERS } from "@/data/dummyData";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import Avatar from "@/components/ui/Avatar";
