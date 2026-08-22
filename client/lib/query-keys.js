@@ -9,4 +9,6 @@ export const queryKeys = {
     likes: (articleId) => ["likes", articleId],
     save: (articleId) => ["save", articleId],
     lists: (authorId) => ["lists", authorId],
+    userSaves: (userId) => ["userSaves", userId],
+    userViews: (userId) => ["userViews", userId],
 };

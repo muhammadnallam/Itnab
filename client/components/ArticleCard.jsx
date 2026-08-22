@@ -27,6 +27,22 @@ function mapArticles(data, mapper) {
     return data;
 }
 
+function filterArticle(data, articleId) {
+    if (!data) return data;
+    if (Array.isArray(data.pages)) {
+        return {
+            ...data,
+            pages: data.pages.map((page) => ({
+                ...page,
+                items: page.items?.filter((a) => a.id !== articleId),
+            })),
+        };
+    }
+    return data;
+}
+
+const LIBRARY_KEYS = ["userSaves", "userViews"];
+
 const ArticleCard = ({ article, isMobile }) => {
     const id = article?.id;
     const saved = article?.saved ?? false;
@@ -36,7 +52,7 @@ const ArticleCard = ({ article, isMobile }) => {
         mutationFn: () => (saved ? unsaveArticle(id) : saveArticle(id)),
         onMutate: async () => {
             await qc.cancelQueries({ queryKey: queryKeys.allArticles() });
-            const previous = qc.getQueriesData({
+            const previousArticles = qc.getQueriesData({
                 queryKey: queryKeys.allArticles(),
             });
             qc.setQueriesData(
@@ -46,7 +62,29 @@ const ArticleCard = ({ article, isMobile }) => {
                         a.id === id ? { ...a, saved: !saved } : a,
                     ),
             );
-            return { previous };
+
+            const previousLibrary = [];
+            for (const prefix of LIBRARY_KEYS) {
+                await qc.cancelQueries({ queryKey: [prefix] });
+                const prev = qc.getQueriesData({ queryKey: [prefix] });
+                previousLibrary.push(...prev);
+
+                if (prefix === "userSaves" && saved) {
+                    qc.setQueriesData({ queryKey: [prefix] }, (data) =>
+                        filterArticle(data, id),
+                    );
+                } else {
+                    qc.setQueriesData(
+                        { queryKey: [prefix] },
+                        (data) =>
+                            mapArticles(data, (a) =>
+                                a.id === id ? { ...a, saved: !saved } : a,
+                            ),
+                    );
+                }
+            }
+
+            return { previous: [...previousArticles, ...previousLibrary] };
         },
         onError: (err, _vars, context) => {
             context.previous.forEach(([queryKey, data]) =>

@@ -122,3 +122,91 @@ export async function deleteUserAccount(userId) {
         handlePrismaError(err, { notFoundMsg: "المستخدم غير موجود" });
     }
 }
+
+function buildMeta(total, page, pageSize) {
+    const hasMore = page * pageSize < total;
+    return {
+        page,
+        pageSize,
+        total,
+        hasMore,
+        nextPage: hasMore ? page + 1 : null,
+    };
+}
+
+const ARTICLE_METADATA_SELECT = {
+    id: true,
+    slug: true,
+    title: true,
+    subtitle: true,
+    topic: true,
+    coverImage: true,
+    readTime: true,
+    score: true,
+    createdAt: true,
+    author: {
+        select: {
+            name: true,
+            username: true,
+            avatarUrl: true,
+        },
+    },
+};
+
+export async function getUserSaves(userId, { page, pageSize }) {
+    const where = { userId };
+    const [bookmarks, total] = await Promise.all([
+        prisma.bookmark.findMany({
+            where,
+            orderBy: { createdAt: "desc" },
+            select: {
+                createdAt: true,
+                article: { select: ARTICLE_METADATA_SELECT },
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.bookmark.count({ where }),
+    ]);
+
+    const articles = bookmarks.map((b) => ({
+        ...b.article,
+        saved: true,
+    }));
+
+    return { articles, ...buildMeta(total, page, pageSize) };
+}
+
+export async function getUserViews(userId, { page, pageSize }) {
+    const where = { userId };
+    const [views, total] = await Promise.all([
+        prisma.view.findMany({
+            where,
+            orderBy: { createdAt: "desc" },
+            select: {
+                createdAt: true,
+                article: { select: ARTICLE_METADATA_SELECT },
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.view.count({ where }),
+    ]);
+
+    const articleIds = views.map((v) => v.article.id);
+    const bookmarks = articleIds.length
+        ? await prisma.bookmark.findMany({
+              where: { userId, articleId: { in: articleIds } },
+              select: { articleId: true },
+          }
+)
+        : [];
+    const savedSet = new Set(bookmarks.map((b) => b.articleId));
+
+    const articles = views.map((v) => ({
+        ...v.article,
+        saved: savedSet.has(v.article.id),
+    }));
+
+    return { articles, ...buildMeta(total, page, pageSize) };
+}
