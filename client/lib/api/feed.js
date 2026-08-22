@@ -55,7 +55,7 @@ export function parseList(l, ownerName) {
 
 async function fetchFeed(path, params) {
     const query = new URLSearchParams(params).toString();
-    return fetcher(`/api/feed/${path}?${query}`);
+    return fetcher(`/api/feed/${path}?${query}`, { credentials: "include" });
 }
 
 export async function getFeedArticles({
