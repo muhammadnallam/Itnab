@@ -21,12 +21,6 @@ export async function signUpEmail(email, password, name) {
     return data;
 }
 
-export async function signInGoogle() {
-    // const { error } = await authClient.signIn.social({ provider: "google" });
-    // if (error) throw new Error(error.message || "فشل تسجيل الدخول عبر Google");
-    throw new Error("التسجيل عبر Google غير متاح حاليًا");
-}
-
 export async function signOut() {
     await authClient.signOut();
 }
