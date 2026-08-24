@@ -56,9 +56,13 @@ export const unsaveArticle = (articleId) =>
 export const shareArticle = (articleId, platform) =>
     fetcher(`/api/articles/${articleId}/share`, {
         method: "POST",
+        credentials: "include",
         headers: JSON_HEADERS,
         body: JSON.stringify({ platform }),
     });
 
-export const recordArticleView = (articleId) =>
-    fetcher(`/api/articles/${articleId}/view`, { method: "POST" });
+export const recordView = (articleId) =>
+    fetcher(`/api/articles/${articleId}/view`, {
+        method: "POST",
+        credentials: "include",
+    });

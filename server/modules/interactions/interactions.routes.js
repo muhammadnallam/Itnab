@@ -155,6 +155,7 @@ router.delete(
 router.post(
     "/articles/:articleId/share",
     shareLimiter,
+    optionalAuth,
     asyncErrorHandler(async (req, res) => {
         assertUuid(req.params.articleId);
         const parsed = platformSchema.safeParse(req.body);
@@ -176,6 +177,7 @@ router.post(
 router.post(
     "/articles/:articleId/view",
     viewLimiter,
+    optionalAuth,
     asyncErrorHandler(async (req, res) => {
         assertUuid(req.params.articleId);
         const ip = getClientIp(req);
@@ -198,6 +200,7 @@ router.post(
                 referrer,
             }),
         );
+        console.log(`Recorded view for article ${req.params.articleId} by user ${req.user?.id ?? "guest"}`);
     }),
 );
 
