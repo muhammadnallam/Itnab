@@ -27,7 +27,6 @@ model User {
   email       String   @unique
   username    String   @unique
   bio         String?
-  avatarUrl   String?
   bannerUrl   String?
   preferences    Json?
   socialLinks    Json?

@@ -5,6 +5,7 @@ import { useAuthModal } from "@/context/AuthModalContext";
 import { signOut } from "@/lib/api/auth";
 import { UserRound, Settings, LogOut, Sun, Monitor, Moon } from "lucide-react";
 import { redirect } from "next/navigation";
+import Avatar from "./ui/Avatar";
 
 const navItems = {
     authed: [{ icon: Settings, label: "الإعدادات", href: "/settings" }],
@@ -16,6 +17,12 @@ const themeOptions = [
     { value: "dark", label: "داكن", icon: Moon },
     { value: "system", label: "النظام", icon: Monitor },
 ];
+
+const getInitials = (name) => {
+    if (!name) return "?";
+    const parts = name.trim().split(/\s+/);
+    return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
+};
 
 const UserDropdown = ({ open, onClose }) => {
     const menuRef = useRef(null);
@@ -103,23 +110,11 @@ const UserDropdown = ({ open, onClose }) => {
                                 padding: "8px 12px",
                             }}
                         >
-                            <div
-                                style={{
-                                    width: 36,
-                                    height: 36,
-                                    borderRadius: "50%",
-                                    flexShrink: 0,
-                                    background: "var(--color-accent)",
-                                    color: "var(--color-white)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontSize: 13,
-                                    fontWeight: 500,
-                                }}
-                            >
-                                من
-                            </div>
+                            <Avatar
+                                size={32}
+                                img={user?.image}
+                                initials={user?.name ? getInitials(user.name) : "?"}
+                            />
                             <div style={{ minWidth: 0 }}>
                                 <p
                                     style={{

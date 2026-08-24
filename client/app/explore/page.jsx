@@ -151,7 +151,7 @@ const SuggestionsPanel = ({
                                 }}
                             >
                                 <Avatar
-                                    img={item.avatarUrl}
+                                    img={item.image}
                                     initials={getInitials(item.name)}
                                     size={64}
                                 />

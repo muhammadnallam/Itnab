@@ -134,7 +134,7 @@ const TabAccount = ({
     const [name, setName] = useState(profile.name || "");
     const [username, setUsername] = useState(profile.username || "");
     const [bio, setBio] = useState(profile.bio || "");
-    const [avatar, setAvatar] = useState(profile.avatarUrl || null);
+    const [avatar, setAvatar] = useState(profile.image || null);
     const [banner, setBanner] = useState(profile.bannerUrl || null);
     const [website, setWebsite] = useState(profile.socialLinks?.website || "");
     const [youtube, setYoutube] = useState(profile.socialLinks?.youtube || "");
@@ -177,15 +177,16 @@ const TabAccount = ({
         setProfileError(errors);
         if (Object.keys(errors).length > 0) return;
         try {
-            let avatarUrl = avatar;
+            let image = avatar;
             if (avatar && typeof avatar !== "string")
-                avatarUrl = await upload(avatar, "avatars");
+                image = await upload(avatar, "avatars");
 
             let bannerUrl = banner;
             if (banner && typeof banner !== "string")
                 bannerUrl = await upload(banner, "banners");
 
-            await updateProfile({ name, username, bio, avatarUrl, bannerUrl });
+            const updated = await updateProfile({ name, username, bio, image, bannerUrl });
+            setUser((prev) => (prev ? { ...prev, image: updated.image } : prev));
         } catch (err) {
             setProfileError({
                 apiError: err.message || "حدث خطأ أثناء تحديث الملف الشخصي",

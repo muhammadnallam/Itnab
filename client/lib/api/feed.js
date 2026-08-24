@@ -34,7 +34,7 @@ export function parseArticle(a) {
         readTime: a.readTime,
         author: a.author?.name || "",
         authorInitials: getInitials(a.author?.name),
-        authorAvatarUrl: a.author?.avatarUrl,
+        authorImage: a.author?.image,
         date: formatArabicDate(a.createdAt),
         saved: a.saved ?? false,
     };
@@ -46,7 +46,7 @@ export function parseList(l, ownerName) {
         name: l.name,
         ownerName,
         ownerInitials: getInitials(ownerName),
-        authorAvatarUrl: l.owner?.avatarUrl,
+        authorImage: l.owner?.image,
         date: formatArabicDate(l.createdAt),
         storyCount: l._count?.articles ?? 0,
         images: [],

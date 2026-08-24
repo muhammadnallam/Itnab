@@ -16,7 +16,7 @@ export const BrandBadge = () => (
             borderRadius: "var(--border-radius)",
             padding: 8,
             background: "var(--color-bg)",
-            border: "1px solid var(--color-accent)",
+            border: "1px solid var(--color-border)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -36,8 +36,7 @@ const linkBtnStyle = {
     cursor: "pointer",
     fontSize: 13,
     fontWeight: 700,
-    color: "var(--color-ink)",
-    textDecoration: "underline",
+    color: "var(--color-accent)",
 };
 
 const iconBtnStyle = {

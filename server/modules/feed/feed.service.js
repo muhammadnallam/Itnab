@@ -16,7 +16,7 @@ export const ARTICLE_METADATA_SELECT = {
         select: {
             name: true,
             username: true,
-            avatarUrl: true,
+            image: true,
         },
     },
 };

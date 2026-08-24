@@ -94,7 +94,7 @@ const ProfilePanel = ({
     >
         <div style={{ display: "flex", justifyContent: "center" }}>
             <Avatar
-                img={profile.avatarUrl}
+                img={profile.image}
                 initials={getInitials(profile.name)}
                 size={80}
             />
@@ -421,7 +421,7 @@ export default function ProfilePage() {
                     }}
                 >
                     <Avatar
-                        img={profile.avatarUrl}
+                        img={profile.image}
                         initials={getInitials(profile.name)}
                         size={52}
                         bg="var(--color-accent)"

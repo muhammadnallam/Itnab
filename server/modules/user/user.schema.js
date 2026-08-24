@@ -11,7 +11,7 @@ export const profileSchema = z.object({
         )
         .optional(),
     bio: z.string().nullable().optional(),
-    avatarUrl: z.string().nullable().optional(),
+    image: z.string().nullable().optional(),
     bannerUrl: z.string().nullable().optional(),
 });
 

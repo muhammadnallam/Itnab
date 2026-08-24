@@ -7,6 +7,12 @@ import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const getInitials = (name) => {
+    if (!name) return "?";
+    const parts = name.trim().split(/\s+/);
+    return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
+};
+
 export default function Header({ onToggleSidebar, isMobile }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const { user } = useContext(UserContext);
@@ -144,7 +150,8 @@ export default function Header({ onToggleSidebar, isMobile }) {
 
                 <div style={{ position: "relative" }}>
                     <Avatar
-                        initials="من"
+                        img={user?.image}
+                        initials={user?.name ? getInitials(user.name) : "?"}
                         size={34}
                         bg="var(--color-accent)"
                         onClick={() => setMenuOpen((v) => !v)}

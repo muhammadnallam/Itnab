@@ -87,7 +87,7 @@ const ArticleCardVertical = ({ article, isMobile }) => {
             <div className="flex items-center gap-2 mb-2.5 text-sm">
                 <Avatar
                     initials={article.authorInitials}
-                    img={article.authorAvatarUrl}
+                    img={article.authorImage}
                     size={24}
                     bg="var(--color-accent)"
                 />
