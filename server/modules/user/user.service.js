@@ -182,9 +182,9 @@ export async function getUserViews(userId, { page, pageSize }) {
     const [views, total] = await Promise.all([
         prisma.view.findMany({
             where,
-            orderBy: { createdAt: "desc" },
+            orderBy: { lastReadDate: "desc" },
             select: {
-                createdAt: true,
+                lastReadDate: true,
                 article: { select: ARTICLE_METADATA_SELECT },
             },
             skip: (page - 1) * pageSize,

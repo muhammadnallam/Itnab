@@ -418,18 +418,28 @@ export async function recordView(
 ) {
   assertUuid(articleId, "معرف المقال غير صالح");
 
+  const where = userId
+    ? { userId_articleId: { userId, articleId } }
+    : { guestId_articleId: { guestId, articleId } };
+
+  const article = await prisma.article.findFirst({
+    where: { id: articleId, deletedAt: null },
+    select: { id: true, authorId: true, viewCount: true },
+  });
+  if (!article) throw new NotFoundError("المقال غير موجود");
+
+  if (userId && userId === article.authorId) {
+    return { viewCount: article.viewCount };
+  }
+
+  const existing = await prisma.view.findUnique({ where, select: { id: true } });
+  if (existing) {
+    await prisma.view.update({ where, data: { lastReadDate: new Date() } });
+    return { viewCount: article.viewCount };
+  }
+
   try {
     await prisma.$transaction(async (tx) => {
-      const article = await tx.article.findFirst({
-        where: { id: articleId, deletedAt: null },
-        select: { id: true, authorId: true },
-      });
-      if (!article) throw new NotFoundError("المقال غير موجود");
-
-      if (userId && userId === article.authorId) {
-        return;
-      }
-
       await tx.view.create({
         data: {
           ...(userId ? { userId } : { guestId }),
@@ -439,6 +449,7 @@ export async function recordView(
           browser,
           os,
           referrer,
+          lastReadDate: new Date(),
         },
       });
       await tx.article.update({
@@ -447,12 +458,16 @@ export async function recordView(
       });
     });
   } catch (e) {
-    if (!isP2002(e)) throw e;
+    if (isP2002(e)) {
+      await prisma.view.update({ where, data: { lastReadDate: new Date() } });
+    } else {
+      throw e;
+    }
   }
 
-  const article = await prisma.article.findUnique({
+  const updated = await prisma.article.findUnique({
     where: { id: articleId },
     select: { viewCount: true },
   });
-  return { viewCount: article.viewCount };
+  return { viewCount: updated.viewCount };
 }

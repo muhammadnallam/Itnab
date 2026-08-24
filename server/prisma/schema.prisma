@@ -163,6 +163,7 @@ model View {
   os         String?
   referrer   String?
   createdAt  DateTime   @default(now())
+  lastReadDate DateTime @default(now())
 
   user      User?    @relation("userViews", fields: [userId], references: [id])
   article   Article  @relation("articleViews", fields: [articleId], references: [id], onDelete: Cascade)
