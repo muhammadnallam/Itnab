@@ -14,6 +14,7 @@ import {
     ThumbsDown,
     ThumbsUp,
 } from "lucide-react";
+import Link from "next/link";
 
 function formatDate(dateStr) {
     const d = new Date(dateStr);
@@ -51,9 +52,12 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                 </p>
                 <p className="mb-8 md:mb-10">
                     من{" "}
-                    <a href="#" className="underline hover:text-accent">
+                    <Link
+                        href={`/@${article.author?.username}`}
+                        className="underline hover:text-accent"
+                    >
                         {article.author?.name}
-                    </a>
+                    </Link>
                 </p>
             </main>
             <div className="relative left-1/2 -translate-x-1/2 w-screen">
@@ -75,7 +79,10 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                                         ? "text-accent"
                                         : "text-mid hover:text-ink"
                                 }`}
-                                style={{ background: "none", cursor: "pointer" }}
+                                style={{
+                                    background: "none",
+                                    cursor: "pointer",
+                                }}
                             >
                                 <Bookmark
                                     size={19}
@@ -110,7 +117,10 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                                         ? "text-accent"
                                         : "text-mid hover:text-ink"
                                 }`}
-                                style={{ background: "none", cursor: "pointer" }}
+                                style={{
+                                    background: "none",
+                                    cursor: "pointer",
+                                }}
                             >
                                 <Bookmark
                                     size={19}
@@ -121,19 +131,13 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                         </RequireAuth>
                         <ShareMenu articleId={article.id}>
                             <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                                <Share
-                                    size={19}
-                                    strokeWidth={1.75}
-                                />
+                                <Share size={19} strokeWidth={1.75} />
                             </button>
                         </ShareMenu>
                     </div>
                     <div className="flex items-center gap-5 text-xs font-medium">
                         <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                            <MessageSquare
-                                size={19}
-                                strokeWidth={1.75}
-                            />
+                            <MessageSquare size={19} strokeWidth={1.75} />
                         </button>
                         <RequireAuth
                             onClick={
@@ -148,7 +152,10 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                                         ? "text-accent"
                                         : "text-mid hover:text-ink"
                                 }`}
-                                style={{ background: "none", cursor: "pointer" }}
+                                style={{
+                                    background: "none",
+                                    cursor: "pointer",
+                                }}
                             >
                                 {formatCount(likes.dislikeCount)}
                                 <ThumbsDown
@@ -164,9 +171,7 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                         </RequireAuth>
                         <RequireAuth
                             onClick={
-                                likes.type === "LIKE"
-                                    ? likes.clear
-                                    : likes.like
+                                likes.type === "LIKE" ? likes.clear : likes.like
                             }
                         >
                             <button
@@ -175,7 +180,10 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                                         ? "text-accent"
                                         : "text-mid hover:text-ink"
                                 }`}
-                                style={{ background: "none", cursor: "pointer" }}
+                                style={{
+                                    background: "none",
+                                    cursor: "pointer",
+                                }}
                             >
                                 {formatCount(likes.likeCount)}
                                 <ThumbsUp

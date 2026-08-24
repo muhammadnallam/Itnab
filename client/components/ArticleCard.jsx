@@ -8,6 +8,7 @@ import { Bookmark, Ellipsis } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
 import { saveArticle, unsaveArticle } from "@/lib/api/interactions";
 import { reportError } from "@/lib/notify";
+import Link from "next/link";
 
 const UUID_RE =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -55,12 +56,10 @@ const ArticleCard = ({ article, isMobile }) => {
             const previousArticles = qc.getQueriesData({
                 queryKey: queryKeys.allArticles(),
             });
-            qc.setQueriesData(
-                { queryKey: queryKeys.allArticles() },
-                (data) =>
-                    mapArticles(data, (a) =>
-                        a.id === id ? { ...a, saved: !saved } : a,
-                    ),
+            qc.setQueriesData({ queryKey: queryKeys.allArticles() }, (data) =>
+                mapArticles(data, (a) =>
+                    a.id === id ? { ...a, saved: !saved } : a,
+                ),
             );
 
             const previousLibrary = [];
@@ -74,12 +73,10 @@ const ArticleCard = ({ article, isMobile }) => {
                         filterArticle(data, id),
                     );
                 } else {
-                    qc.setQueriesData(
-                        { queryKey: [prefix] },
-                        (data) =>
-                            mapArticles(data, (a) =>
-                                a.id === id ? { ...a, saved: !saved } : a,
-                            ),
+                    qc.setQueriesData({ queryKey: [prefix] }, (data) =>
+                        mapArticles(data, (a) =>
+                            a.id === id ? { ...a, saved: !saved } : a,
+                        ),
                     );
                 }
             }
@@ -109,13 +106,17 @@ const ArticleCard = ({ article, isMobile }) => {
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="flex items-center gap-2 mb-2.5 text-sm">
-                        <Avatar
-                            initials={article.authorInitials}
-                            img={article.authorImage}
-                            size={24}
-                            bg="var(--color-accent)"
-                        />
-                        <span className="font-medium">{article.author}</span>
+                        <Link href={`/@${article.authorUsername}`} className="flex items-center gap-2">
+                            <Avatar
+                                initials={article.authorInitials}
+                                img={article.authorImage}
+                                size={24}
+                                bg="var(--color-accent)"
+                            />
+                            <span className="font-medium hover:underline">
+                                {article.author}
+                            </span>
+                        </Link>
                         <span className="font-bold">·</span>
                         <span className="text-(--color-light)">
                             {article.date}
@@ -173,7 +174,9 @@ const ArticleCard = ({ article, isMobile }) => {
                     <RequireAuth onClick={toggleSave} mode="login">
                         <button
                             className={`cursor-pointer pl-1 ${
-                                saved ? "text-accent" : "text-mid hover:text-ink"
+                                saved
+                                    ? "text-accent"
+                                    : "text-mid hover:text-ink"
                             }`}
                             style={{ transition: "color 0.15s" }}
                         >

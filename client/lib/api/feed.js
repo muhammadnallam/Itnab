@@ -33,6 +33,7 @@ export function parseArticle(a) {
         topic: a.topic,
         readTime: a.readTime,
         author: a.author?.name || "",
+        authorUsername: a.author?.username,
         authorInitials: getInitials(a.author?.name),
         authorImage: a.author?.image,
         date: formatArabicDate(a.createdAt),
