@@ -2,16 +2,20 @@
 
 import { useState, useContext, useEffect } from "react";
 import { notFound, useParams } from "next/navigation";
+
 import { MoreHorizontal, Copy, Globe, Link2 } from "lucide-react";
+import AppLayout from "@/components/AppLayout";
+import Tabs from "@/components/ui/Tabs";
+import ArticleCard from "@/components/ArticleCard";
+import ListCard from "@/components/ListCard";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
-import Tabs from "@/components/ui/Tabs";
-import AppLayout from "@/components/AppLayout";
-import ArticleCard from "@/components/ArticleCard";
+import RequireAuth from "@/components/RequireAuth";
+
 import { WidthContext } from "@/context/ScreenContext";
 import { UserContext } from "@/context/UserContext";
-import ListCard from "@/components/ListCard";
-import RequireAuth from "@/components/RequireAuth";
+
+
 import { useArticleList } from "@/hooks/useArticleList";
 import { useUserLists } from "@/hooks/useUserLists";
 import { useUser } from "@/hooks/useUser";
@@ -24,58 +28,56 @@ const PROFILE_TABS = [
     { id: "about", label: "حول" },
 ];
 
+const PROFILE_LINKS = [
+    { key: "copy", label: "Copy", icon: Copy },
+    { key: "website", label: "website", icon: Globe },
+    { key: "link", label: "Link", icon: Link2, iconClassName: "-rotate-45" },
+];
+
+const ICON_BUTTON_CLASS =
+    "flex items-center justify-center w-10 h-10 rounded-full border border-border text-mid hover:bg-bg cursor-pointer transition-colors";
+
 const formatCount = (n) => {
     if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + " ألف";
     return String(n);
 };
-
-const AboutTab = ({ profile, followerCount }) => (
-    <div style={{ padding: "24px 0" }}>
-        <h3
-            style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: "var(--color-ink)",
-                marginBottom: 12,
-            }}
-        >
-            {profile.name}
-        </h3>
-        <p
-            style={{
-                fontSize: 15,
-                color: "var(--color-light)",
-                lineHeight: 1.8,
-                marginBottom: 20,
-            }}
-        >
-            {profile.bio}
-        </p>
-        <div
-            style={{
-                display: "flex",
-                gap: 24,
-                fontSize: 14,
-                color: "var(--color-ink)",
-            }}
-        >
-            <span>
-                <strong>{formatCount(followerCount)}</strong>{" "}
-                <span style={{ color: "var(--color-light)" }}>متابع</span>
-            </span>
-            <span>
-                <strong>{formatCount(profile.followingCount)}</strong>{" "}
-                <span style={{ color: "var(--color-light)" }}>يتابع</span>
-            </span>
-        </div>
-    </div>
-);
 
 const getInitials = (name) => {
     if (!name) return "?";
     const parts = name.trim().split(/\s+/);
     return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
 };
+
+const FollowButton = ({ following, isMutating, onToggle }) => (
+    <RequireAuth onClick={onToggle} mode="login">
+        <Button
+            variant={following ? "secondary" : "primary"}
+            loading={isMutating}
+            style={{ width: "100%" }}
+        >
+            {following ? "إلغاء المتابعة" : "متابعة"}
+        </Button>
+    </RequireAuth>
+);
+
+const AboutTab = ({ profile, followerCount }) => (
+    <div className="py-6">
+        <h3 className="text-lg font-bold text-ink mb-3">{profile.name}</h3>
+        <p className="text-[15px] text-light leading-[1.8] mb-5">
+            {profile.bio}
+        </p>
+        <div className="flex gap-6 text-sm text-ink">
+            <span>
+                <strong>{formatCount(followerCount)}</strong>{" "}
+                <span className="text-light">متابع</span>
+            </span>
+            <span>
+                <strong>{formatCount(profile.followingCount)}</strong>{" "}
+                <span className="text-light">يتابع</span>
+            </span>
+        </div>
+    </div>
+);
 
 const ProfilePanel = ({
     profile,
@@ -84,256 +86,85 @@ const ProfilePanel = ({
     isMutating,
     isOwnProfile,
     onToggleFollow,
-}) => (
-    <div
-        className="card"
-        style={{
-            width: "100%",
-            padding: 28,
-        }}
-    >
-        <div style={{ display: "flex", justifyContent: "center" }}>
-            <Avatar
-                img={profile.image}
-                initials={getInitials(profile.name)}
-                size={80}
-            />
-        </div>
+}) => {
+    const stats = [
+        { label: "يتابع", value: formatCount(profile.followingCount) },
+        { label: "متابع", value: formatCount(followerCount) },
+        { label: "مقالات", value: profile.articlesCount },
+    ];
 
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                marginTop: 16,
-            }}
-        >
-            <h1
-                style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    color: "var(--color-ink)",
-                    margin: 0,
-                }}
-            >
+    return (
+        <div className="card w-full p-7">
+            <div className="flex justify-center">
+                <Avatar
+                    img={profile.image}
+                    initials={getInitials(profile.name)}
+                    size={80}
+                />
+            </div>
+
+            <h1 className="text-xl font-bold text-ink text-center mt-4">
                 {profile.name}
             </h1>
-        </div>
 
-        <p
-            style={{
-                textAlign: "center",
-                direction: "ltr",
-                color: "var(--color-mid)",
-                fontSize: 14,
-                marginTop: 4,
-            }}
-        >
-            @{profile.username}
-        </p>
+            <p className="text-center text-mid text-sm mt-1" dir="ltr">
+                @{profile.username}
+            </p>
 
-        <p
-            style={{
-                textAlign: "center",
-                color: "var(--color-light)",
-                fontSize: 14,
-                lineHeight: 1.7,
-                marginTop: 12,
-                padding: "0 4px",
-            }}
-        >
-            {profile.bio}
-        </p>
+            <p className="text-center text-light text-sm leading-[1.7] mt-3 px-1">
+                {profile.bio}
+            </p>
 
-        <div
-            dir="ltr"
-            style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                marginTop: 20,
-            }}
-        >
-            <button
-                aria-label="Copy"
-                className="text-mid hover:bg-bg"
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 40,
-                    height: 40,
-                    borderRadius: "50%",
-                    border: "1px solid var(--color-border)",
-                    cursor: "pointer",
-                    transition: "background 0.15s",
-                }}
-            >
-                <Copy size={16} strokeWidth={2} />
-            </button>
-            <button
-                aria-label="website"
-                className="text-mid hover:bg-bg"
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 40,
-                    height: 40,
-                    borderRadius: "50%",
-                    border: "1px solid var(--color-border)",
-                    cursor: "pointer",
-                    transition: "background 0.15s",
-                }}
-            >
-                <Globe size={16} strokeWidth={2} />
-            </button>
-            <button
-                aria-label="Link"
-                className="text-mid hover:bg-bg"
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 40,
-                    height: 40,
-                    borderRadius: "50%",
-                    border: "1px solid var(--color-border)",
-                    cursor: "pointer",
-                    transition: "background 0.15s",
-                }}
-            >
-                <Link2
-                    size={16}
-                    strokeWidth={2}
-                    style={{ transform: "rotate(-45deg)" }}
-                />
-            </button>
-        </div>
-
-        <div
-            dir="ltr"
-            style={{
-                display: "flex",
-                alignItems: "stretch",
-                justifyContent: "center",
-                marginTop: 20,
-            }}
-        >
             <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    padding: "0 20px",
-                }}
+                dir="ltr"
+                className="flex items-center justify-center gap-2 mt-5"
             >
-                <span
-                    style={{
-                        fontSize: 16,
-                        color: "var(--color-ink)",
-                    }}
-                >
-                    {formatCount(profile.followingCount)}
-                </span>
-                <span
-                    dir="rtl"
-                    style={{
-                        fontSize: 12,
-                        color: "var(--color-mid)",
-                        marginTop: 2,
-                    }}
-                >
-                    يتابع
-                </span>
+                {PROFILE_LINKS.map(
+                    ({ key, label, icon: Icon, iconClassName }) => (
+                        <button
+                            key={key}
+                            aria-label={label}
+                            className={ICON_BUTTON_CLASS}
+                        >
+                            <Icon
+                                size={16}
+                                strokeWidth={2}
+                                className={iconClassName}
+                            />
+                        </button>
+                    ),
+                )}
             </div>
-            <div
-                style={{
-                    width: 1,
-                    background: "var(--color-border)",
-                }}
-            />
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    padding: "0 20px",
-                }}
-            >
-                <span
-                    style={{
-                        fontSize: 16,
-                        color: "var(--color-ink)",
-                    }}
-                >
-                    {formatCount(followerCount)}
-                </span>
-                <span
-                    dir="rtl"
-                    style={{
-                        fontSize: 12,
-                        color: "var(--color-mid)",
-                        marginTop: 2,
-                    }}
-                >
-                    متابع
-                </span>
-            </div>
-            <div
-                style={{
-                    width: 1,
-                    background: "var(--color-border)",
-                }}
-            />
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    padding: "0 20px",
-                }}
-            >
-                <span
-                    style={{
-                        fontSize: 16,
-                        color: "var(--color-ink)",
-                    }}
-                >
-                    {profile.articlesCount}
-                </span>
-                <span
-                    dir="rtl"
-                    style={{
-                        fontSize: 12,
-                        color: "var(--color-mid)",
-                        marginTop: 2,
-                    }}
-                >
-                    مقالات
-                </span>
-            </div>
-        </div>
 
-        {!isOwnProfile && (
-            <div style={{ marginTop: 20 }}>
-                <RequireAuth onClick={onToggleFollow} mode="login">
-                    <Button
-                        variant={following ? "secondary" : "primary"}
-                        loading={isMutating}
-                        style={{
-                            width: "100%",
-                        }}
+            <div dir="ltr" className="flex items-stretch justify-center mt-5">
+                {stats.flatMap((stat, i) => [
+                    i > 0 && (
+                        <div key={`divider-${i}`} className="w-px bg-border" />
+                    ),
+                    <div
+                        key={stat.label}
+                        className="flex flex-col items-center px-5"
                     >
-                        {following ? "إلغاء المتابعة" : "متابعة"}
-                    </Button>
-                </RequireAuth>
+                        <span className="text-base text-ink">{stat.value}</span>
+                        <span dir="rtl" className="text-xs text-mid mt-0.5">
+                            {stat.label}
+                        </span>
+                    </div>,
+                ])}
             </div>
-        )}
-    </div>
-);
+
+            {!isOwnProfile && (
+                <div className="mt-5">
+                    <FollowButton
+                        following={following}
+                        isMutating={isMutating}
+                        onToggle={onToggleFollow}
+                    />
+                </div>
+            )}
+        </div>
+    );
+};
 
 export default function ProfilePage() {
     const params = useParams();
@@ -385,130 +216,57 @@ export default function ProfilePage() {
             fullWidthContent={
                 profile.bannerUrl && (
                     <div
-                        style={{
-                            width: "1000px",
-                            maxWidth: "100%",
-                            margin: "0 auto",
-                            height: isMobile ? 130 : 200,
-                            overflow: "hidden",
-                            background: "var(--color-surface-subtle)",
-                        }}
+                        className={`w-[1000px] max-w-full mx-auto overflow-hidden bg-surface-subtle ${
+                            isMobile ? "h-[130px]" : "h-[200px]"
+                        }`}
                     >
-                        {profile.bannerUrl && (
-                            <img
-                                src={profile.bannerUrl}
-                                alt=""
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    display: "block",
-                                }}
-                            />
-                        )}
+                        <img
+                            src={profile.bannerUrl}
+                            alt=""
+                            className="w-full h-full object-cover block"
+                        />
                     </div>
                 )
             }
         >
             {isMobile && (
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                        marginTop: 16,
-                        marginBottom: 4,
-                    }}
-                >
+                <div className="flex items-center gap-3 mt-4 mb-1">
                     <Avatar
                         img={profile.image}
                         initials={getInitials(profile.name)}
                         size={52}
                         bg="var(--color-accent)"
                     />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                            style={{
-                                fontSize: 17,
-                                fontWeight: 700,
-                                color: "var(--color-ink)",
-                                lineHeight: 1.2,
-                            }}
-                        >
+                    <div className="flex-1 min-w-0">
+                        <div className="text-[17px] font-bold text-ink leading-[1.2]">
                             {profile.name}
                         </div>
-                        <div
-                            style={{
-                                fontSize: 13,
-                                color: "var(--color-light)",
-                            }}
-                        >
+                        <div className="text-[13px] text-light">
                             {formatCount(followerCount)} متابع
                         </div>
                     </div>
-                    <button
-                        style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: "var(--color-light)",
-                            display: "flex",
-                            padding: 4,
-                        }}
-                    >
+                    <button className="bg-transparent border-none cursor-pointer text-light flex p-1">
                         <MoreHorizontal size={20} />
                     </button>
                 </div>
             )}
 
             {isMobile && !isOwnProfile && (
-                <div style={{ margin: "20px 0" }}>
-                    <RequireAuth onClick={toggleFollow} mode="login">
-                        <Button
-                            variant={following ? "secondary" : "primary"}
-                            loading={isMutating}
-                            style={{
-                                width: "100%",
-                            }}
-                        >
-                            {following ? "إلغاء المتابعة" : "متابعة"}
-                        </Button>
-                    </RequireAuth>
+                <div className="my-5">
+                    <FollowButton
+                        following={following}
+                        isMutating={isMutating}
+                        onToggle={toggleFollow}
+                    />
                 </div>
             )}
 
             {!isMobile && (
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        justifyContent: "space-between",
-                        marginTop: 40,
-                        marginBottom: 40,
-                    }}
-                >
-                    <h1
-                        style={{
-                            fontSize: 32,
-                            fontWeight: 700,
-                            color: "var(--color-ink)",
-                            margin: 0,
-                            lineHeight: 1.15,
-                        }}
-                    >
+                <div className="flex items-start justify-between mt-10 mb-10">
+                    <h1 className="text-[32px] font-bold text-ink m-0 leading-[1.15]">
                         {profile.name}
                     </h1>
-                    <button
-                        style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: "var(--color-light)",
-                            display: "flex",
-                            padding: 4,
-                            marginTop: 6,
-                        }}
-                    >
+                    <button className="bg-transparent border-none cursor-pointer text-light flex p-1 mt-1.5">
                         <MoreHorizontal size={20} />
                     </button>
                 </div>
@@ -532,7 +290,7 @@ export default function ProfilePage() {
                 <AboutTab profile={profile} followerCount={followerCount} />
             ) : tab === "lists" ? (
                 <div>
-                    {lists.loading ? null : (
+                    {!lists.loading && (
                         <>
                             {lists.items.map((l) => (
                                 <ListCard
@@ -542,7 +300,7 @@ export default function ProfilePage() {
                                 />
                             ))}
                             {lists.hasMore && (
-                                <div style={{ padding: "16px 0" }}>
+                                <div className="py-4">
                                     <Button
                                         onClick={lists.loadMore}
                                         loading={lists.loadingMore}
@@ -566,7 +324,7 @@ export default function ProfilePage() {
                         />
                     ))}
                     {articles.hasMore && (
-                        <div style={{ padding: "16px 0" }}>
+                        <div className="py-4">
                             <Button
                                 onClick={articles.loadMore}
                                 loading={articles.loadingMore}
@@ -579,13 +337,7 @@ export default function ProfilePage() {
                     )}
                 </>
             ) : (
-                <div
-                    style={{
-                        padding: "24px 0",
-                        color: "var(--color-mid)",
-                        textAlign: "center",
-                    }}
-                >
+                <div className="py-6 text-mid text-center">
                     لا توجد مقالات بعد
                 </div>
             )}
