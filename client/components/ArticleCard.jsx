@@ -4,11 +4,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Avatar from "@/components/ui/Avatar";
 import RequireAuth from "@/components/RequireAuth";
-import { Bookmark, Ellipsis } from "lucide-react";
+import { Bookmark, Ellipsis, Pencil, Trash2, Share2 } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
 import { saveArticle, unsaveArticle } from "@/lib/api/interactions";
 import { reportError } from "@/lib/notify";
 import Link from "next/link";
+
+import MoreMenu from "@/components/MoreMenu";
+import { BookmarkPlus } from "lucide-react";
 
 const UUID_RE =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -106,7 +109,10 @@ const ArticleCard = ({ article, isMobile }) => {
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="flex items-center gap-2 mb-2.5 text-sm">
-                        <Link href={`/@${article.authorUsername}`} className="flex items-center gap-2">
+                        <Link
+                            href={`/@${article.authorUsername}`}
+                            className="flex items-center gap-2"
+                        >
                             <Avatar
                                 initials={article.authorInitials}
                                 img={article.authorImage}
@@ -188,14 +194,38 @@ const ArticleCard = ({ article, isMobile }) => {
                         </button>
                     </RequireAuth>
 
-                    <button
-                        className="cursor-pointer text-mid ml-1 hover:text-ink"
-                        style={{
-                            transition: "color 0.15s",
-                        }}
+                    <MoreMenu
+                        options={[
+                            {
+                                icon: Pencil,
+                                label: "تعديل المقال",
+                                type: "normal",
+                                onClick: () => {},
+                            },
+                            { separator: true },
+                            {
+                                icon: Share2,
+                                label: "مشاركة المقال",
+                                type: "normal",
+                                onClick: () => {},
+                            },
+                            {
+                                icon: BookmarkPlus,
+                                label: "حفظ إلى قائمة",
+                                type: "normal",
+                                onClick: () => {},
+                            },
+                            { separator: true },
+                            {
+                                icon: Trash2,
+                                label: "حذف المقال",
+                                type: "red",
+                                onClick: () => {},
+                            },
+                        ]}
                     >
-                        <Ellipsis size={19} />
-                    </button>
+                            <Ellipsis size={19} />
+                    </MoreMenu>
                 </div>
             </div>
         </article>

@@ -3,7 +3,16 @@
 import { useState, useContext, useEffect } from "react";
 import { notFound, useParams } from "next/navigation";
 
-import { MoreHorizontal, Copy, Globe, Link2 } from "lucide-react";
+import {
+    MoreHorizontal,
+    Copy,
+    Globe,
+    Link2,
+    Pencil,
+    Share2,
+    Trash2,
+    CircleAlert,
+} from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import Tabs from "@/components/ui/Tabs";
 import ArticleCard from "@/components/ArticleCard";
@@ -11,10 +20,10 @@ import ListCard from "@/components/ListCard";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import RequireAuth from "@/components/RequireAuth";
+import MoreMenu from "@/components/MoreMenu";
 
 import { WidthContext } from "@/context/ScreenContext";
 import { UserContext } from "@/context/UserContext";
-
 
 import { useArticleList } from "@/hooks/useArticleList";
 import { useUserLists } from "@/hooks/useUserLists";
@@ -36,6 +45,34 @@ const PROFILE_LINKS = [
 
 const ICON_BUTTON_CLASS =
     "flex items-center justify-center w-10 h-10 rounded-full border border-border text-mid hover:bg-bg cursor-pointer transition-colors";
+
+const MENU_OPTIONS = [
+    {
+        icon: Pencil,
+        label: "تعديل الملف الشخصي",
+        type: "normal",
+        onClick: () => {},
+    },
+    {
+        icon: Share2,
+        label: "مشاركة الملف الشخصي",
+        type: "normal",
+        onClick: () => {},
+    },
+    { separator: true },
+    {
+        icon: Trash2,
+        label: "حذف الملف الشخصي",
+        type: "red",
+        onClick: () => {},
+    },
+    {
+        icon: CircleAlert,
+        label: "إبلاغ عن المؤلف",
+        type: "red",
+        onClick: () => {},
+    },
+];
 
 const formatCount = (n) => {
     if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + " ألف";
@@ -216,8 +253,8 @@ export default function ProfilePage() {
             fullWidthContent={
                 profile.bannerUrl && (
                     <div
-                        className={`w-[1000px] max-w-full mx-auto overflow-hidden bg-surface-subtle ${
-                            isMobile ? "h-[130px]" : "h-[200px]"
+                        className={`w-250 max-w-full mx-auto overflow-hidden bg-surface-subtle ${
+                            isMobile ? "h-32.5" : "h-50"
                         }`}
                     >
                         <img
@@ -245,9 +282,11 @@ export default function ProfilePage() {
                             {formatCount(followerCount)} متابع
                         </div>
                     </div>
-                    <button className="bg-transparent border-none cursor-pointer text-light flex p-1">
-                        <MoreHorizontal size={20} />
-                    </button>
+                    <MoreMenu options={MENU_OPTIONS}>
+                        <span className="text-light flex p-1">
+                            <MoreHorizontal size={20} />
+                        </span>
+                    </MoreMenu>
                 </div>
             )}
 
@@ -266,9 +305,11 @@ export default function ProfilePage() {
                     <h1 className="text-[32px] font-bold text-ink m-0 leading-[1.15]">
                         {profile.name}
                     </h1>
-                    <button className="bg-transparent border-none cursor-pointer text-light flex p-1 mt-1.5">
-                        <MoreHorizontal size={20} />
-                    </button>
+                    <MoreMenu options={MENU_OPTIONS}>
+                        <span className="flex p-1 mt-1.5">
+                            <MoreHorizontal size={20} />
+                        </span>
+                    </MoreMenu>
                 </div>
             )}
 
