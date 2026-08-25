@@ -4,8 +4,9 @@ import { useArticle } from "@/hooks/useArticle";
 import { useLikes } from "@/hooks/useLikes";
 import { useSave } from "@/hooks/useSave";
 import { useView } from "@/hooks/useView";
+import { useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
-import ShareMenu from "@/components/article/ShareMenu";
+import ShareModal from "@/components/ShareModal";
 import {
     Bookmark,
     MessageSquare,
@@ -32,6 +33,7 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
     const likes = useLikes(article?.id);
     const save = useSave(article?.id);
     useView(article?.id);
+    const [shareOpen, setShareOpen] = useState(false);
 
     if (!article) return null;
 
@@ -129,11 +131,12 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                                 />
                             </button>
                         </RequireAuth>
-                        <ShareMenu articleId={article.id}>
-                            <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                                <Share size={19} strokeWidth={1.75} />
-                            </button>
-                        </ShareMenu>
+                        <button
+                            onClick={() => setShareOpen(true)}
+                            className="flex items-center gap-1.5 text-mid hover:text-ink"
+                        >
+                            <Share size={19} strokeWidth={1.75} />
+                        </button>
                     </div>
                     <div className="flex items-center gap-5 text-xs font-medium">
                         <button className="flex items-center gap-1.5 text-mid hover:text-ink">
@@ -200,6 +203,15 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                     </div>
                 </div>
             </article>
+
+            <ShareModal
+                open={shareOpen}
+                onClose={() => setShareOpen(false)}
+                articleId={article.id}
+                url={typeof window !== "undefined" ? window.location.href : ""}
+                heading="مشاركة المقال"
+                subheading="القراءة أكثر إفادةً عندما نشاركها مع الآخرين"
+            />
         </>
     );
 }

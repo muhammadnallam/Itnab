@@ -4,7 +4,6 @@ import { ArrowLeft, Bookmark, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import ShareMenu from "@/components/article/ShareMenu";
 import { useSave } from "@/hooks/useSave";
 
 export default function ArticleHeader({ article }) {

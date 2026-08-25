@@ -34,6 +34,7 @@ export function parseArticle(a) {
         readTime: a.readTime,
         author: a.author?.name || "",
         authorUsername: a.author?.username,
+        authorId: a.author?.id,
         authorInitials: getInitials(a.author?.name),
         authorImage: a.author?.image,
         date: formatArabicDate(a.createdAt),
@@ -49,7 +50,8 @@ export function parseList(l, ownerName) {
         ownerInitials: getInitials(ownerName),
         authorImage: l.owner?.image,
         date: formatArabicDate(l.createdAt),
-        storyCount: l._count?.articles ?? 0,
+        storyCount: l._count?.savedArticles ?? 0,
+        containsArticle: l.containsArticle ?? false,
         images: [],
     };
 }
@@ -90,11 +92,28 @@ export function getAuthorArticles(author, opts) {
     return getFeedArticles({ sort: "new", author, ...opts });
 }
 
-export async function getUserLists(author, { page = 1, limit = 20 } = {}) {
-    const json = await fetchFeed("lists", { author, page, limit });
+export async function getUserLists(
+    author,
+    { page = 1, limit = 20, articleId } = {},
+) {
+    const json = await fetchFeed("lists", {
+        ...(author ? { author } : {}),
+        ...(articleId ? { articleId } : {}),
+        page,
+        limit,
+    });
     return {
         items: json.lists || [],
         hasMore: json.hasMore,
         nextPage: json.nextPage,
     };
+}
+
+export async function createList(name) {
+    return fetcher("/api/feed/lists", {
+        credentials: "include",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+    });
 }

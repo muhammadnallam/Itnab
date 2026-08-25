@@ -14,6 +14,7 @@ export const ARTICLE_METADATA_SELECT = {
     createdAt: true,
     author: {
         select: {
+            id: true,
             name: true,
             username: true,
             image: true,
@@ -88,10 +89,8 @@ export async function getFeed({ sort, author, page, pageSize, userId }) {
     return result;
 }
 
-export async function getUserLists({ author, page, pageSize }) {
-    if (!author) {
-        throw new ValidationError("معرف المؤلف مطلوب");
-    }
+export async function getUserLists({ author, articleId, page, pageSize }) {
+    if (!author) throw new ValidationError("معرف المؤلف مطلوب");
     await assertAuthorExists(author);
 
     const where = { authorId: author };
@@ -114,5 +113,34 @@ export async function getUserLists({ author, page, pageSize }) {
         prisma.list.count({ where }),
     ]);
 
-    return { lists, ...buildMeta(total, page, pageSize) };
+    let annotated = lists;
+    if (articleId && lists.length > 0) {
+        const saved = await prisma.savedArticle.findMany({
+            where: {
+                articleId,
+                listId: { in: lists.map((l) => l.id) },
+            },
+            select: { listId: true },
+        });
+        const savedSet = new Set(saved.map((s) => s.listId));
+        annotated = lists.map((l) => ({
+            ...l,
+            containsArticle: savedSet.has(l.id),
+        }));
+    }
+
+    return { lists: annotated, ...buildMeta(total, page, pageSize) };
+}
+
+export async function createUserList({ userId, name }) {
+    return prisma.list.create({
+        data: { name, authorId: userId, isDefault: false },
+        select: {
+            id: true,
+            name: true,
+            createdAt: true,
+            updatedAt: true,
+            _count: { select: { savedArticles: true } },
+        },
+    });
 }

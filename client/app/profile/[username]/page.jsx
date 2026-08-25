@@ -26,7 +26,7 @@ import { WidthContext } from "@/context/ScreenContext";
 import { UserContext } from "@/context/UserContext";
 
 import { useArticleList } from "@/hooks/useArticleList";
-import { useUserLists } from "@/hooks/useUserLists";
+import { useLists } from "@/hooks/useLists";
 import { useUser } from "@/hooks/useUser";
 import { useFollow } from "@/hooks/useFollow";
 import { parseList } from "@/lib/api/feed";
@@ -45,34 +45,6 @@ const PROFILE_LINKS = [
 
 const ICON_BUTTON_CLASS =
     "flex items-center justify-center w-10 h-10 rounded-full border border-border text-mid hover:bg-bg cursor-pointer transition-colors";
-
-const MENU_OPTIONS = [
-    {
-        icon: Pencil,
-        label: "تعديل الملف الشخصي",
-        type: "normal",
-        onClick: () => {},
-    },
-    {
-        icon: Share2,
-        label: "مشاركة الملف الشخصي",
-        type: "normal",
-        onClick: () => {},
-    },
-    { separator: true },
-    {
-        icon: Trash2,
-        label: "حذف الملف الشخصي",
-        type: "red",
-        onClick: () => {},
-    },
-    {
-        icon: CircleAlert,
-        label: "إبلاغ عن المؤلف",
-        type: "red",
-        onClick: () => {},
-    },
-];
 
 const formatCount = (n) => {
     if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + " ألف";
@@ -203,12 +175,13 @@ const ProfilePanel = ({
     );
 };
 
+
 export default function ProfilePage() {
     const params = useParams();
     const username = params?.username;
     const [tab, setTab] = useState("home");
     const width = useContext(WidthContext);
-    const { user } = useContext(UserContext);
+    const { user, loading: userLoading } = useContext(UserContext);
     const isMobile = width < 768;
 
     const { profile, isLoading, error } = useUser(username);
@@ -222,12 +195,48 @@ export default function ProfilePage() {
 
     const isOwnProfile = !!user && user.id === profile?.id;
 
+    const handleShare = () => {
+        const url = `${window.location.origin}/profile/${profile.username}`;
+        if (navigator.share) {
+            navigator.share({ url }).catch(() => {});
+        } else {
+            navigator.clipboard?.writeText(url);
+        }
+    };
+
+    const handleCopy = () => {
+        const url = `${window.location.origin}/profile/${profile.username}`;
+        navigator.clipboard?.writeText(url);
+    };
+
+    const ownerOptions = [
+        { icon: Pencil, label: "تعديل الملف الشخصي", onClick: () => {} },
+        { separator: true },
+        { icon: Share2, label: "مشاركة الملف الشخصي", onClick: handleShare },
+        { icon: Copy, label: "نسخ رابط الملف الشخصي", onClick: handleCopy },
+        { separator: true },
+        { icon: Trash2, label: "حذف الملف الشخصي", type: "red", onClick: () => {} },
+    ];
+
+    const guestOptions = [
+        { icon: Share2, label: "مشاركة الملف الشخصي", onClick: handleShare },
+        { icon: Copy, label: "نسخ رابط الملف الشخصي", onClick: handleCopy },
+        { separator: true },
+        { icon: CircleAlert, label: "إبلاغ عن المؤلف", type: "red", onClick: () => {} },
+    ];
+
+    const menuOptions = userLoading
+        ? []
+        : isOwnProfile
+          ? ownerOptions
+          : guestOptions;
+
     // Articles tab is focused first; lists are prefetched right after.
     const articles = useArticleList(
         { sort: "new", author: profile?.id },
         { enabled: Boolean(profile) },
     );
-    const lists = useUserLists(profile?.id, { enabled: Boolean(profile) });
+    const lists = useLists({ author: profile?.id, enabled: Boolean(profile) });
 
     useEffect(() => {
         setTab("home");
@@ -282,7 +291,7 @@ export default function ProfilePage() {
                             {formatCount(followerCount)} متابع
                         </div>
                     </div>
-                    <MoreMenu options={MENU_OPTIONS}>
+                    <MoreMenu options={menuOptions}>
                         <span className="text-light flex p-1">
                             <MoreHorizontal size={20} />
                         </span>
@@ -305,7 +314,7 @@ export default function ProfilePage() {
                     <h1 className="text-[32px] font-bold text-ink m-0 leading-[1.15]">
                         {profile.name}
                     </h1>
-                    <MoreMenu options={MENU_OPTIONS}>
+                    <MoreMenu options={menuOptions}>
                         <span className="flex p-1 mt-1.5">
                             <MoreHorizontal size={20} />
                         </span>

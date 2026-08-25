@@ -8,7 +8,7 @@ export const queryKeys = {
     comments: (articleId) => ["comments", articleId],
     likes: (articleId) => ["likes", articleId],
     save: (articleId) => ["save", articleId],
-    lists: (authorId) => ["lists", authorId],
+    lists: (authorId, articleId) => ["lists", authorId, articleId ?? null],
     userSaves: (userId) => ["userSaves", userId],
     userViews: (userId) => ["userViews", userId],
 };

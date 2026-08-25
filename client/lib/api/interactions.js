@@ -37,20 +37,20 @@ export const deleteReaction = (articleId) =>
 export const getSaveState = (articleId) =>
     fetcher(`/api/articles/${articleId}/save`, { credentials: "include" });
 
-export const saveArticle = (articleId) =>
+export const saveArticle = (articleId, { listId } = {}) =>
     fetcher(`/api/articles/${articleId}/save`, {
         credentials: "include",
         method: "PUT",
         headers: JSON_HEADERS,
-        body: JSON.stringify({}),
+        body: JSON.stringify(listId ? { listId } : {}),
     });
 
-export const unsaveArticle = (articleId) =>
+export const unsaveArticle = (articleId, { listId } = {}) =>
     fetcher(`/api/articles/${articleId}/save`, {
         credentials: "include",
         method: "DELETE",
         headers: JSON_HEADERS,
-        body: JSON.stringify({}),
+        body: JSON.stringify(listId ? { listId } : {}),
     });
 
 export const shareArticle = (articleId, platform) =>
