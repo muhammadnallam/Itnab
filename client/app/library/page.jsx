@@ -3,6 +3,7 @@ import { useState, useContext } from "react";
 import Tabs from "@/components/ui/Tabs";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
+import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
 import Button from "@/components/ui/Button";
 import { WidthContext } from "@/context/ScreenContext";
 import { UserContext } from "@/context/UserContext";
@@ -44,11 +45,16 @@ export default function Library() {
                 active={activeTab}
                 setActive={setActiveTab}
                 tabList={TABS}
-                loading={isFunctionalTab && feed?.loading}
-                loadingMessage="جاري التحميل..."
+                loading={false}
             />
 
-            {isFunctionalTab && !feed?.loading && (
+            {isFunctionalTab && feed?.loading ? (
+                <>
+                    {[1, 2, 3].map((i) => (
+                        <ArticleCardSkeleton key={i} />
+                    ))}
+                </>
+            ) : isFunctionalTab && !feed?.loading && (
                 <>
                     {feed.items.length === 0 ? (
                         <div

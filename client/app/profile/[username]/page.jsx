@@ -18,6 +18,7 @@ import { X, YouTube } from "@/components/ui/icons";
 import AppLayout from "@/components/AppLayout";
 import Tabs from "@/components/ui/Tabs";
 import ArticleCard from "@/components/ArticleCard";
+import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
 import ListCard from "@/components/ListCard";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
@@ -249,7 +250,87 @@ export default function ProfilePage() {
 
     if (error) notFound();
 
-    if (isLoading || !profile) return null;
+    const banner = profile && (
+        <div
+            className={`w-250 max-w-full mx-auto overflow-hidden bg-surface-subtle ${
+                isMobile ? "h-32.5" : "h-50"
+            }`}
+        >
+            <img
+                src={profile.bannerUrl}
+                alt=""
+                className="w-full h-full object-cover block"
+            />
+        </div>
+    );
+
+    if (isLoading || !profile) {
+        return (
+            <AppLayout
+                leftPanel={
+                    <div className="card w-full p-7">
+                        <div className="flex justify-center">
+                            <div
+                                style={{
+                                    width: 80,
+                                    height: 80,
+                                    borderRadius: "50%",
+                                    background: "var(--color-tag-bg)",
+                                    animation:
+                                        "pulse 1.5s ease-in-out infinite",
+                                }}
+                            />
+                        </div>
+                        <div
+                            style={{
+                                width: "60%",
+                                height: 18,
+                                borderRadius: 4,
+                                background: "var(--color-tag-bg)",
+                                margin: "16px auto 0",
+                                animation:
+                                    "pulse 1.5s ease-in-out infinite",
+                            }}
+                        />
+                        <div
+                            style={{
+                                width: "40%",
+                                height: 12,
+                                borderRadius: 4,
+                                background: "var(--color-tag-bg)",
+                                margin: "8px auto 0",
+                                animation:
+                                    "pulse 1.5s ease-in-out infinite",
+                            }}
+                        />
+                        <div
+                            style={{
+                                width: "100%",
+                                height: 36,
+                                borderRadius: "var(--border-radius)",
+                                background: "var(--color-tag-bg)",
+                                marginTop: 20,
+                                animation:
+                                    "pulse 1.5s ease-in-out infinite",
+                            }}
+                        />
+                    </div>
+                }
+                centerMaxWidth={700}
+                fullWidthContent={banner}
+            >
+                <Tabs
+                    active={tab}
+                    setActive={setTab}
+                    tabList={PROFILE_TABS}
+                    loading={false}
+                />
+                {[1, 2, 3].map((i) => (
+                    <ArticleCardSkeleton key={i} isMobile={isMobile} />
+                ))}
+            </AppLayout>
+        );
+    }
 
     return (
         <AppLayout
@@ -264,21 +345,7 @@ export default function ProfilePage() {
                 />
             }
             centerMaxWidth={700}
-            fullWidthContent={
-                profile.bannerUrl && (
-                    <div
-                        className={`w-250 max-w-full mx-auto overflow-hidden bg-surface-subtle ${
-                            isMobile ? "h-32.5" : "h-50"
-                        }`}
-                    >
-                        <img
-                            src={profile.bannerUrl}
-                            alt=""
-                            className="w-full h-full object-cover block"
-                        />
-                    </div>
-                )
-            }
+            fullWidthContent={banner}
         >
             {isMobile && (
                 <div className="flex items-center gap-3 mt-4 mb-1">
@@ -331,21 +398,20 @@ export default function ProfilePage() {
                 active={tab}
                 setActive={setTab}
                 tabList={PROFILE_TABS}
-                loading={
-                    tab === "about"
-                        ? false
-                        : tab === "lists"
-                          ? lists.loading
-                          : articles.loading
-                }
-                loadingMessage="جاري التحميل..."
+                loading={false}
             />
 
             {tab === "about" ? (
                 <AboutTab profile={profile} followerCount={followerCount} />
             ) : tab === "lists" ? (
                 <div>
-                    {!lists.loading && (
+                    {lists.loading ? (
+                        <>
+                            {[1, 2, 3].map((i) => (
+                                <ArticleCardSkeleton key={i} isMobile={isMobile} />
+                            ))}
+                        </>
+                    ) : (
                         <>
                             {lists.items.map((l) => (
                                 <ListCard
@@ -369,7 +435,13 @@ export default function ProfilePage() {
                         </>
                     )}
                 </div>
-            ) : articles.loading ? null : articles.items.length ? (
+            ) : articles.loading ? (
+                <>
+                    {[1, 2, 3].map((i) => (
+                        <ArticleCardSkeleton key={i} isMobile={isMobile} />
+                    ))}
+                </>
+            ) : articles.items.length ? (
                 <>
                     {articles.items.map((a) => (
                         <ArticleCard

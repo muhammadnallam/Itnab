@@ -5,6 +5,7 @@ import { TAGS } from "@itnab/constants";
 import { WRITERS } from "@/data/dummyData";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
+import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
 import Avatar from "@/components/ui/Avatar";
 import Tabs from "@/components/ui/Tabs";
 import RequireAuth from "@/components/RequireAuth";
@@ -16,8 +17,9 @@ import { useArticleList } from "@/hooks/useArticleList";
 
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const [subs, setSubs] = useState(WRITERS.map((w) => w.sub));
-    const { user } = useContext(UserContext);
+    const { user, loading } = useContext(UserContext);
 
+    if (loading) return null;
     if (!user) {
         return (
             <div
@@ -254,10 +256,15 @@ export default function App() {
                     active={tab}
                     setActive={setTab}
                     tabList={tabList}
-                    loading={feed.loading}
-                    loadingMessage="جاري التحميل..."
+                    loading={false}
                 />
-                {feed.loading ? null : (
+                {feed.loading ? (
+                    <>
+                        {[1, 2, 3].map((i) => (
+                            <ArticleCardSkeleton key={i} isMobile={isMobile} />
+                        ))}
+                    </>
+                ) : (
                     <>
                         {feed.items.map((a) => (
                             <ArticleCard
