@@ -28,7 +28,7 @@ import { deleteArticle } from "@/lib/api/article";
 import { useFollow } from "@/hooks/useFollow";
 import { UserContext } from "@/context/UserContext";
 import { useAuthModal } from "@/context/AuthModalContext";
-import { reportError } from "@/lib/notify";
+import { toast } from "sonner";
 import Link from "next/link";
 
 const UUID_RE =
@@ -97,7 +97,9 @@ const ArticleCard = ({ article, isMobile }) => {
 
     const handleCopy = () => {
         if (typeof navigator !== "undefined" && navigator.clipboard) {
-            navigator.clipboard.writeText(articleUrl());
+            navigator.clipboard.writeText(articleUrl()).then(() => {
+                toast.success("تم نسخ الرابط");
+            });
         }
     };
 
@@ -135,8 +137,9 @@ const ArticleCard = ({ article, isMobile }) => {
                 qc.invalidateQueries({ queryKey: [prefix] });
             }
             setRemoveOpen(false);
+            toast.success("تم حذف المقال");
         } catch (err) {
-            reportError(err);
+            toast.error(err?.message || "حدث خطأ أثناء حذف المقال");
         } finally {
             setRemoving(false);
         }
@@ -185,7 +188,7 @@ const ArticleCard = ({ article, isMobile }) => {
           : guestOptions;
 
     const mutation = useMutation({
-        mutationFn: () => (saved ? unsaveArticle(id) : saveArticle(id)),
+        mutationFn: (save) => (save ? saveArticle(id) : unsaveArticle(id)),
         onMutate: async () => {
             await qc.cancelQueries({ queryKey: queryKeys.allArticles() });
             const previousArticles = qc.getQueriesData({
@@ -218,17 +221,20 @@ const ArticleCard = ({ article, isMobile }) => {
 
             return { previous: [...previousArticles, ...previousLibrary] };
         },
+        onSuccess: (save) => {
+            toast.success(save ? "تم حفظ المقال" : "تم إزالة الحفظ");
+        },
         onError: (err, _vars, context) => {
             context.previous.forEach(([queryKey, data]) =>
                 qc.setQueryData(queryKey, data),
             );
-            reportError(err);
+            toast.error(err?.message || "حدث خطأ أثناء تنفيذ العملية");
         },
     });
 
     const toggleSave = () => {
         if (!UUID_RE.test(id ?? "")) return;
-        mutation.mutate();
+        mutation.mutate(!saved);
     };
 
     return (

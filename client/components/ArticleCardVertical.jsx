@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
 import { saveArticle, unsaveArticle } from "@/lib/api/interactions";
-import { reportError } from "@/lib/notify";
+import { toast } from "sonner";
 
 const UUID_RE =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -36,7 +36,7 @@ const ArticleCardVertical = ({ article, isMobile }) => {
     const qc = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: () => (saved ? unsaveArticle(id) : saveArticle(id)),
+        mutationFn: (save) => (save ? saveArticle(id) : unsaveArticle(id)),
         onMutate: async () => {
             await qc.cancelQueries({ queryKey: queryKeys.allArticles() });
             const previous = qc.getQueriesData({
@@ -49,17 +49,20 @@ const ArticleCardVertical = ({ article, isMobile }) => {
             );
             return { previous };
         },
+        onSuccess: (save) => {
+            toast.success(save ? "تم حفظ المقال" : "تم إزالة الحفظ");
+        },
         onError: (err, _vars, context) => {
             context.previous.forEach(([queryKey, data]) =>
                 qc.setQueryData(queryKey, data),
             );
-            reportError(err);
+            toast.error(err?.message || "حدث خطأ أثناء تنفيذ العملية");
         },
     });
 
     const toggleSave = () => {
         if (!UUID_RE.test(id ?? "")) return;
-        mutation.mutate();
+        mutation.mutate(!saved);
     };
 
     return (

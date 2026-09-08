@@ -7,7 +7,8 @@ import ConfirmModal from "@/components/ConfirmModal";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
 import { useDebouncedCallback } from "use-debounce";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit";
@@ -159,6 +160,7 @@ const MobileToolbarContent = ({ type, onBack }) => (
 
 export function Editor({ articleContent, articleData, mode } = {}) {
     const isUpdate = mode === "update";
+    const router = useRouter();
     const isMobile = useIsBreakpoint();
     const { remove } = useArticle(articleData?.slug);
     const [mobileView, setMobileView] = useState("main");
@@ -328,9 +330,10 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     onConfirm={async () => {
                         try {
                             await remove.mutateAsync(articleData.id);
-                            redirect("/");
+                            toast.success("تم حذف المقال");
+                            router.push("/");
                         } catch (err) {
-                            alert(err.message);
+                            toast.error(err?.message || "حدث خطأ أثناء حذف المقال");
                         }
                     }}
                     onCancel={() => setConfirmModal(false)}

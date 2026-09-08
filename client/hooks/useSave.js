@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
-import { reportError } from "@/lib/notify";
+import { toast } from "sonner";
 import {
     getSaveState,
     saveArticle,
@@ -32,9 +32,12 @@ export function useSave(articleId) {
             }));
             return { prev };
         },
+        onSuccess: (save) => {
+            toast.success(save ? "تم حفظ المقال" : "تم إزالة الحفظ");
+        },
         onError: (err, save, context) => {
             qc.setQueryData(key, context.prev);
-            reportError(err);
+            toast.error(err?.message || "حدث خطأ أثناء تنفيذ العملية");
         },
         onSettled: () => {
             qc.invalidateQueries({ queryKey: key });

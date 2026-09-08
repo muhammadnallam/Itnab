@@ -4,15 +4,14 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Toggle from "@/components/ui/Toggle";
 import Avatar from "@/components/ui/Avatar";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import ImagePicker from "@/components/ImagePicker";
 import { ArrowUpRight, Globe, Pencil } from "lucide-react";
 import { useState, useContext, useRef } from "react";
-import {
-    validatePasswordFields,
-    validateProfileFields,
-} from "@/lib/handlers";
+import { validatePasswordFields, validateProfileFields } from "@/lib/handlers";
 import Tabs from "@/components/ui/Tabs";
-import ApiMessage from "@/components/ui/ApiMessage";
+
 import { UserContext } from "@/context/UserContext";
 import { signOut } from "@/lib/api/auth";
 import { upload } from "@/lib/api/upload";
@@ -20,32 +19,7 @@ import { redirect } from "next/navigation";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useUser } from "@/hooks/useUser";
 import { Trash } from "lucide-react";
-
-const X = (props) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 640 640"
-        width={19}
-        height={19}
-        fill="var(--color-mid)"
-        {...props}
-    >
-        <path d="M453.2 112L523.8 112L369.6 288.2L551 528L409 528L297.7 382.6L170.5 528L99.8 528L264.7 339.5L90.8 112L236.4 112L336.9 244.9L453.2 112zM428.4 485.8L467.5 485.8L215.1 152L173.1 152L428.4 485.8z" />
-    </svg>
-);
-
-const YouTube = (props) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 640 640"
-        width={19}
-        height={19}
-        fill="var(--color-mid)"
-        {...props}
-    >
-        <path d="M581.7 188.1C575.5 164.4 556.9 145.8 533.4 139.5C490.9 128 320.1 128 320.1 128C320.1 128 149.3 128 106.7 139.5C83.2 145.8 64.7 164.4 58.4 188.1C47 231 47 320.4 47 320.4C47 320.4 47 409.8 58.4 452.7C64.7 476.3 83.2 494.2 106.7 500.5C149.3 512 320.1 512 320.1 512C320.1 512 490.9 512 533.5 500.5C557 494.2 575.5 476.3 581.8 452.7C593.2 409.8 593.2 320.4 593.2 320.4C593.2 320.4 593.2 231 581.8 188.1zM264.2 401.6L264.2 239.2L406.9 320.4L264.2 401.6z" />
-    </svg>
-);
+import { X, YouTube } from "@/components/ui/icons";
 
 const SettingRow = ({
     label,
@@ -140,11 +114,11 @@ const TabAccount = ({
     const [youtube, setYoutube] = useState(profile.socialLinks?.youtube || "");
     const [xAccount, setXAccount] = useState(profile.socialLinks?.x || "");
     const [profileError, setProfileError] = useState({});
-    const [linksErrors, setLinksErrors] = useState({});
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleteError, setDeleteError] = useState(null);
     const { setUser } = useContext(UserContext);
     const avatarInputRef = useRef(null);
+    const router = useRouter();
 
     const avatarDisplay =
         avatar && typeof avatar !== "string"
@@ -185,25 +159,35 @@ const TabAccount = ({
             if (banner && typeof banner !== "string")
                 bannerUrl = await upload(banner, "banners");
 
-            const updated = await updateProfile({ name, username, bio, image, bannerUrl });
-            setUser((prev) => (prev ? { ...prev, image: updated.image } : prev));
-        } catch (err) {
-            setProfileError({
-                apiError: err.message || "حدث خطأ أثناء تحديث الملف الشخصي",
+            const updated = await updateProfile({
+                name,
+                username,
+                bio,
+                image,
+                bannerUrl,
             });
+            setUser((prev) =>
+                prev ? { ...prev, image: updated.image } : prev,
+            );
+            toast.success("تم تحديث الملف الشخصي", {
+                action: {
+                    label: "عرض الملف الشخصي",
+                    onClick: () => router.push(`/profile/${profile.username}`),
+                },
+            });
+        } catch (err) {
+            toast.error(err?.message || "حدث خطأ أثناء تحديث الملف الشخصي");
         }
     };
 
     const handleLinksSubmit = async () => {
-        setLinksErrors({});
         try {
             await updateSocialLinks({
                 socialLinks: { website, youtube, x: xAccount },
             });
+            toast.success("تم تحديث الروابط");
         } catch (err) {
-            setLinksErrors({
-                apiError: err.message || "حدث خطأ أثناء تحديث الروابط",
-            });
+            toast.error(err?.message || "حدث خطأ أثناء تحديث الروابط");
         }
     };
 
@@ -223,9 +207,6 @@ const TabAccount = ({
     return (
         <div>
             <SectionHead title="الملف الشخصي" mt={32} />
-            <ApiMessage style={{ marginTop: 16 }}>
-                {profileError.apiError}
-            </ApiMessage>
             <div
                 style={{
                     display: "flex",
@@ -387,9 +368,6 @@ const TabAccount = ({
                 تحديث حسابك
             </Button>
             <SectionHead title="الروابط" />
-            {linksErrors.apiError && (
-                <p className="api-error">{linksErrors.apiError}</p>
-            )}
             <div
                 style={{
                     display: "flex",
@@ -403,7 +381,6 @@ const TabAccount = ({
                     value={website}
                     onChange={(e) => {
                         setWebsite(e.target.value);
-                        setLinksErrors((p) => ({ ...p, website: "" }));
                     }}
                     rightIcon={<Globe color="var(--color-mid)" size={19} />}
                 />
@@ -412,7 +389,6 @@ const TabAccount = ({
                     value={youtube}
                     onChange={(e) => {
                         setYoutube(e.target.value);
-                        setLinksErrors((p) => ({ ...p, youtube: "" }));
                     }}
                     rightIcon={<YouTube />}
                 />
@@ -421,7 +397,6 @@ const TabAccount = ({
                     value={xAccount}
                     onChange={(e) => {
                         setXAccount(e.target.value);
-                        setLinksErrors((p) => ({ ...p, x: "" }));
                     }}
                     rightIcon={<X />}
                 />
@@ -652,12 +627,10 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
     const [newPass, setNewPass] = useState("");
     const [confirmPass, setConfirmPass] = useState("");
     const [errors, setErrors] = useState({});
-    const [passwordUpdated, setPasswordUpdated] = useState(false);
     const { setUser } = useContext(UserContext);
 
     const handlePasswordClick = async () => {
         setErrors({});
-        setPasswordUpdated(false);
         const errs = validatePasswordFields({
             currentPassword: currentPass,
             newPassword: newPass,
@@ -673,13 +646,11 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                 newPassword: newPass,
             });
         } catch (err) {
-            setErrors({
-                apiError: err.message || "حدث خطأ أثناء تحديث كلمة المرور",
-            });
+            toast.error(err?.message || "حدث خطأ أثناء تحديث كلمة المرور");
             return;
         }
 
-        setPasswordUpdated(true);
+        toast.success("تم تحديث كلمة المرور");
         await signOut();
         setUser(null);
         return redirect("/");
@@ -690,26 +661,6 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
             <SectionHead title="كلمة المرور" mt={32} />
 
             <div style={{ maxWidth: 400, marginTop: 16 }}>
-                {errors.apiError && (
-                    <p className="api-error">{errors.apiError}</p>
-                )}
-
-                {passwordUpdated && (
-                    <p
-                        style={{
-                            margin: "0 0 16px",
-                            padding: "8px 12px",
-                            fontSize: 13,
-                            color: "var(--color-accent)",
-                            background: "var(--color-accent-light)",
-                            borderRadius: "var(--border-radius)",
-                            textAlign: "center",
-                        }}
-                    >
-                        تم تحديث كلمة المرور بنجاح
-                    </p>
-                )}
-
                 <div style={{ marginBottom: 14 }}>
                     <label
                         style={{
@@ -779,7 +730,10 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                         error={errors.confirmPass}
                     />
                 </div>
-                <Button onClick={handlePasswordClick} loading={isUpdatingPassword}>
+                <Button
+                    onClick={handlePasswordClick}
+                    loading={isUpdatingPassword}
+                >
                     تحديث كلمة المرور
                 </Button>
             </div>
@@ -837,6 +791,7 @@ const HelpPanel = () => (
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("account");
     const { user } = useContext(UserContext);
+    const router = useRouter();
     const {
         profile,
         isLoading,
@@ -882,9 +837,7 @@ export default function SettingsPage() {
     const activePanel = TABS.find((t) => t.id === activeTab)?.panel;
 
     return (
-        <AppLayout
-            leftPanel={<HelpPanel />}
-        >
+        <AppLayout leftPanel={<HelpPanel />}>
             <>
                 <div>
                     <div

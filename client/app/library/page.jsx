@@ -30,7 +30,12 @@ export default function Library() {
     const saves = useUserSaves(user?.id);
     const views = useUserViews(user?.id);
 
-    const feed = activeTab === "articles" ? saves : activeTab === "history" ? views : null;
+    const feed =
+        activeTab === "articles"
+            ? saves
+            : activeTab === "history"
+              ? views
+              : null;
     const isFunctionalTab = activeTab === "articles" || activeTab === "history";
 
     return (

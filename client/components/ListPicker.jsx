@@ -3,7 +3,7 @@
 import { useState, useContext } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
-import { reportError } from "@/lib/notify";
+import { toast } from "sonner";
 import { UserContext } from "@/context/UserContext";
 import { useLists, useCreateList, useSaveToList, useUnsaveFromList } from "@/hooks/useLists";
 
@@ -23,11 +23,13 @@ const ListPicker = ({ open, onClose, articleId }) => {
         try {
             if (containsArticle) {
                 await unsaveFromList.mutateAsync(listId);
+                toast.success("تم إزالة المقال من القائمة");
             } else {
                 await saveToList.mutateAsync(listId);
+                toast.success("تم حفظ المقال في القائمة");
             }
         } catch (err) {
-            reportError(err);
+            toast.error(err?.message || "حدث خطأ أثناء تنفيذ العملية");
         }
     };
 
@@ -38,8 +40,9 @@ const ListPicker = ({ open, onClose, articleId }) => {
             const list = await createList.mutateAsync(name);
             await saveToList.mutateAsync(list.id);
             setNewName("");
+            toast.success("تم إنشاء القائمة وحفظ المقال");
         } catch (err) {
-            reportError(err);
+            toast.error(err?.message || "حدث خطأ أثناء تنفيذ العملية");
         }
     };
 

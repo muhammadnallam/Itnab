@@ -5,6 +5,7 @@ import ScreenProvider from "@/context/ScreenContext";
 import AuthModalProvider from "@/context/AuthModalContext";
 import SidebarProvider from "@/context/SidebarContext";
 import QueryProvider from "@/providers/QueryProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const wordmarkFont = localFont({
     src: [
@@ -51,6 +52,7 @@ export default function RootLayout({ children }) {
                         </SidebarProvider>
                     </ScreenProvider>
                 </QueryProvider>
+                <Toaster />
             </body>
         </html>
     );

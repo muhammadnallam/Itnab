@@ -215,7 +215,7 @@ export default function ExplorePage() {
     const isMobile = width < 768;
 
     return (
-        <AppLayout centerMaxWidth={740}>
+        <AppLayout>
             <div
                 style={{
                     display: "flex",
@@ -307,7 +307,7 @@ export default function ExplorePage() {
             ></div>
 
             <h4 className="font-bold text-xl mb-4 mt-4">مقالات للقراءة</h4>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
                 {ARTICLES.slice(0, 6).map((article) => {
                     return (
                         <ArticleCardVertical

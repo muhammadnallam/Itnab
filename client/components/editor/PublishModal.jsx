@@ -10,6 +10,7 @@ import {
 } from "@/lib/handlers";
 import { useArticle } from "@/hooks/useArticle";
 import { queryKeys } from "@/lib/query-keys";
+import { toast } from "sonner";
 
 function Input({ label, error, children }) {
     return (
@@ -272,17 +273,19 @@ export default function PublishModal({
                             : prepared,
                     );
                     if (isUpdate) {
+                        toast.success("تم تحديث المقال");
                         qc.invalidateQueries({
                             queryKey: queryKeys.article(articleData?.slug),
                         });
                         router.refresh();
                         router.push(`/article/${articleData?.slug}`);
                     } else {
+                        toast.success("تم نشر المقال");
                         router.push(`/article/${result.slug}`);
                     }
                     onClose();
                 } catch (err) {
-                    alert(err.message || "حدث خطأ أثناء حفظ المقال");
+                    toast.error(err?.message || "حدث خطأ أثناء حفظ المقال");
                 } finally {
                     setLoading(false);
                     localStorage.removeItem("editor-content");

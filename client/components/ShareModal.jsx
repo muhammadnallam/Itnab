@@ -5,6 +5,7 @@ import { Copy, Check } from "lucide-react";
 import { openShare } from "@/lib/share";
 import { useShare } from "@/hooks/useShare";
 import Modal from "@/components/ui/Modal";
+import { toast } from "sonner";
 
 const SOCIAL_PLATFORMS = [
     {
@@ -47,6 +48,7 @@ const ShareModal = ({ open, onClose, articleId, url, heading, subheading }) => {
         if (!navigator.clipboard?.writeText) return;
         navigator.clipboard.writeText(url).then(() => {
             setCopied(true);
+            toast.success("تم نسخ الرابط");
             setTimeout(() => setCopied(false), 2000);
         });
     };

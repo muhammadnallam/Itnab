@@ -2,6 +2,7 @@
 
 import { useState, useContext, useEffect } from "react";
 import { notFound, useParams } from "next/navigation";
+import { toast } from "sonner";
 
 import {
     MoreHorizontal,
@@ -13,6 +14,7 @@ import {
     Trash2,
     CircleAlert,
 } from "lucide-react";
+import { X, YouTube } from "@/components/ui/icons";
 import AppLayout from "@/components/AppLayout";
 import Tabs from "@/components/ui/Tabs";
 import ArticleCard from "@/components/ArticleCard";
@@ -38,9 +40,9 @@ const PROFILE_TABS = [
 ];
 
 const PROFILE_LINKS = [
-    { key: "copy", label: "Copy", icon: Copy },
     { key: "website", label: "website", icon: Globe },
-    { key: "link", label: "Link", icon: Link2, iconClassName: "-rotate-45" },
+    { key: "link", label: "Link", icon: YouTube },
+    { key: "copy", label: "Copy", icon: X },
 ];
 
 const ICON_BUTTON_CLASS =
@@ -129,7 +131,7 @@ const ProfilePanel = ({
                 className="flex items-center justify-center gap-2 mt-5"
             >
                 {PROFILE_LINKS.map(
-                    ({ key, label, icon: Icon, iconClassName }) => (
+                    ({ key, label, icon: Icon }) => (
                         <button
                             key={key}
                             aria-label={label}
@@ -138,7 +140,6 @@ const ProfilePanel = ({
                             <Icon
                                 size={16}
                                 strokeWidth={2}
-                                className={iconClassName}
                             />
                         </button>
                     ),
@@ -200,13 +201,17 @@ export default function ProfilePage() {
         if (navigator.share) {
             navigator.share({ url }).catch(() => {});
         } else {
-            navigator.clipboard?.writeText(url);
+            navigator.clipboard?.writeText(url).then(() => {
+                toast.success("تم نسخ الرابط");
+            });
         }
     };
 
     const handleCopy = () => {
         const url = `${window.location.origin}/profile/${profile.username}`;
-        navigator.clipboard?.writeText(url);
+        navigator.clipboard?.writeText(url).then(() => {
+            toast.success("تم نسخ الرابط");
+        });
     };
 
     const ownerOptions = [
