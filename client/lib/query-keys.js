@@ -13,4 +13,6 @@ export const queryKeys = {
     userViews: (userId) => ["userViews", userId],
     exploreRecommendations: () => ["explore", "recommendations"],
     search: (q) => ["search", q],
+    subscriptionFeed: () => ["articles", { filter: "subscriptions" }],
+    following: (userId) => ["following", userId],
 };

@@ -41,18 +41,39 @@ async function assertAuthorExists(authorId) {
     if (!author) throw new NotFoundError("الكاتب غير موجود");
 }
 
-export async function getFeed({ sort, author, topic, page, pageSize, userId }) {
+export async function getFeed({ sort, author, topic, filter, page, pageSize, userId }) {
     if (author) await assertAuthorExists(author);
 
     const where = { deletedAt: null };
-    if (author) where.authorId = author;
-    if (topic) where.topic = topic;
+    if (filter === "subscriptions") {
+        if (!userId) {
+            where.authorId = "__none__";
+        } else {
+            const follows = await prisma.follow.findMany({
+                where: { followerId: userId },
+                select: { followingId: true },
+            });
+            const followingIds = follows.map((f) => f.followingId);
+            if (followingIds.length === 0) {
+                return { articles: [], ...buildMeta(0, page, pageSize) };
+            }
+            where.authorId = { in: followingIds };
+        }
+    } else {
+        if (author) where.authorId = author;
+        if (topic) where.topic = topic;
+    }
 
-    const orderBy = topic
-        ? { createdAt: "desc" }
-        : sort === "new" ? { createdAt: "desc" } : { score: "desc" };
+    const orderBy =
+        filter === "subscriptions"
+            ? { createdAt: "desc" }
+            : topic
+              ? { createdAt: "desc" }
+              : sort === "new"
+                ? { createdAt: "desc" }
+                : { score: "desc" };
 
-    const cacheable = sort === "top" && !author;
+    const cacheable = sort === "top" && !author && !filter;
     const cacheKey = `top:${page}:${pageSize}`;
     let result = cacheable ? getFeedCache(cacheKey) : null;
     if (!result) {

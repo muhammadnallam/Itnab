@@ -1,10 +1,15 @@
 "use client";
 import Link from "next/link";
+import { useContext } from "react";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
+import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
 import Avatar from "@/components/ui/Avatar";
 import Slider from "@/components/ui/Slider";
-import { ARTICLES, WRITERS } from "@/data/dummyData";
+import Button from "@/components/ui/Button";
+import { UserContext } from "@/context/UserContext";
+import { useFollowing } from "@/hooks/useFollowing";
+import { useSubscriptionFeed } from "@/hooks/useSubscriptionFeed";
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint";
 
 const WritersSlider = ({
@@ -35,8 +40,8 @@ const WritersSlider = ({
             <Slider gap={0} trackStyle={{ paddingBottom: 2 }}>
                 {writers.map((writer) => (
                     <Link
-                        key={writer.username}
-                        href={`/@${writer.username}`}
+                        key={writer.id}
+                        href={`/profile/${writer.username}`}
                         style={{ textDecoration: "none", flexShrink: 0 }}
                     >
                         <div
@@ -49,7 +54,8 @@ const WritersSlider = ({
                             }}
                         >
                             <Avatar
-                                initials={writer.avatar}
+                                src={writer.image}
+                                initials={writer.name?.[0]}
                                 size={avatarSize}
                                 bg="var(--color-accent)"
                             />
@@ -76,28 +82,82 @@ const WritersSlider = ({
 
 export default function SubscriptionsPage() {
     const isMobile = useIsBreakpoint("max", 768);
+    const { user } = useContext(UserContext);
+    const following = useFollowing(user?.id, { enabled: !!user });
+    const feed = useSubscriptionFeed({ enabled: !!user });
+
+    const hasFollows = !following.loading && following.writers.length > 0;
 
     return (
         <AppLayout>
-            <WritersSlider writers={WRITERS} />
-            <div
-                style={{
-                    marginTop: 32,
-                    marginBottom: 16,
-                    borderBottom: "1px solid var(--color-border)",
-                }}
-            />
-            <div style={{ marginTop: 8 }}>
-                {ARTICLES.map((article) => {
-                    return (
+            {hasFollows && <WritersSlider writers={following.writers} />}
+            {hasFollows && (
+                <div
+                    style={{
+                        marginTop: 32,
+                        marginBottom: 16,
+                        borderBottom: "1px solid var(--color-border)",
+                    }}
+                />
+            )}
+
+            {feed.loading ? (
+                <div style={{ marginTop: hasFollows ? 8 : 0 }}>
+                    {[1, 2, 3].map((i) => (
+                        <ArticleCardSkeleton key={i} isMobile={isMobile} />
+                    ))}
+                </div>
+            ) : !hasFollows ? (
+                <div
+                    style={{
+                        textAlign: "center",
+                        padding: "48px 0",
+                        color: "var(--color-mid)",
+                    }}
+                >
+                    تابع كتّاباً لبناء خلاصتك الخاصة
+                    <div style={{ marginTop: 12 }}>
+                        <Link
+                            href="/explore"
+                            className="text-accent hover:underline"
+                        >
+                            استكشاف الكتّاب
+                        </Link>
+                    </div>
+                </div>
+            ) : feed.items.length === 0 ? (
+                <div
+                    style={{
+                        textAlign: "center",
+                        padding: "48px 0",
+                        color: "var(--color-mid)",
+                    }}
+                >
+                    لا توجد مقالات بعد من اشتراكاتك
+                </div>
+            ) : (
+                <div style={{ marginTop: 8 }}>
+                    {feed.items.map((a) => (
                         <ArticleCard
-                            key={article.id}
-                            article={article}
+                            key={a.id}
+                            article={a}
                             isMobile={isMobile}
                         />
-                    );
-                })}
-            </div>
+                    ))}
+                    {feed.hasMore && (
+                        <div className="py-4">
+                            <Button
+                                onClick={feed.loadMore}
+                                loading={feed.loadingMore}
+                                variant="secondary"
+                                style={{ width: "100%" }}
+                            >
+                                عرض المزيد
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            )}
         </AppLayout>
     );
 }

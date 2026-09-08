@@ -56,15 +56,16 @@ export function parseList(l, ownerName) {
     };
 }
 
-async function fetchFeed(path, params) {
+async function fetchFeed(path, params, signal) {
     const query = new URLSearchParams(params).toString();
-    return fetcher(`/api/feed/${path}?${query}`, { credentials: "include" });
+    return fetcher(`/api/feed/${path}?${query}`, { credentials: "include", signal });
 }
 
 export async function getFeedArticles({
     sort = "top",
     author,
     topic,
+    filter,
     page = 1,
     limit = 20,
 } = {}) {
@@ -74,6 +75,7 @@ export async function getFeedArticles({
         limit,
         ...(author ? { author } : {}),
         ...(topic ? { topic } : {}),
+        ...(filter ? { filter } : {}),
     });
     return {
         items: (json.articles || []).map(parseArticle),
@@ -96,6 +98,15 @@ export function getAuthorArticles(author, opts) {
 
 export function getTagArticles(tag, opts) {
     return getFeedArticles({ sort: "new", topic: tag, ...opts });
+}
+
+export async function getSubscriptionArticles({ page = 1, limit = 20, signal } = {}) {
+    const json = await fetchFeed("articles", { filter: "subscriptions", page, limit }, signal);
+    return {
+        items: (json.articles || []).map(parseArticle),
+        hasMore: json.hasMore,
+        nextPage: json.nextPage,
+    };
 }
 
 export async function getUserLists(

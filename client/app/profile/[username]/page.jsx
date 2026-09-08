@@ -250,7 +250,7 @@ export default function ProfilePage() {
 
     if (error) notFound();
 
-    const banner = profile && (
+    const banner = profile?.bannerUrl?.trim() ? (
         <div
             className={`w-250 max-w-full mx-auto overflow-hidden bg-surface-subtle ${
                 isMobile ? "h-32.5" : "h-50"
@@ -262,7 +262,7 @@ export default function ProfilePage() {
                 className="w-full h-full object-cover block"
             />
         </div>
-    );
+    ) : null;
 
     if (isLoading || !profile) {
         return (

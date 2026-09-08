@@ -62,3 +62,15 @@ export async function getUserViews(userId, { page = 1, limit = 20 } = {}) {
         nextPage: json.nextPage,
     };
 }
+
+export async function getFollowing(userId, { page = 1, limit = 50 } = {}) {
+    const json = await fetcher(
+        `/api/user/${userId}/following?page=${page}&limit=${limit}`,
+        { credentials: "include" },
+    );
+    return {
+        items: json.writers || [],
+        hasMore: json.hasMore,
+        nextPage: json.nextPage,
+    };
+}

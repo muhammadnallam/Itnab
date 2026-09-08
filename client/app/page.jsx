@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useContext } from "react";
+import Link from "next/link";
 import { TAGS } from "@itnab/constants";
 import { WRITERS } from "@/data/dummyData";
 import AppLayout from "@/components/AppLayout";
@@ -114,7 +115,8 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                         >
                             استكشف المواضيع
                         </h4>
-                        <button
+                        <Link
+                            href="/explore"
                             className="text-mid hover:text-ink"
                             style={{
                                 background: "none",
@@ -125,12 +127,12 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                             }}
                         >
                             عرض الكل
-                        </button>
+                        </Link>
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                         {TAGS.map((tag) => (
                             <a
-                                href={`/tag/${tag}`}
+                                href={`/explore/?tag=${tag}`}
                                 key={tag}
                                 style={{
                                     background: "var(--color-tag-bg)",

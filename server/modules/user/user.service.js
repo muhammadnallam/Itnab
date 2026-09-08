@@ -123,6 +123,32 @@ export async function deleteUserAccount(userId) {
     }
 }
 
+export async function getFollowing(userId, { page, pageSize }) {
+    const where = { followerId: userId };
+    const [follows, total] = await Promise.all([
+        prisma.follow.findMany({
+            where,
+            orderBy: { createdAt: "desc" },
+            select: {
+                following: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        image: true,
+                    },
+                },
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.follow.count({ where }),
+    ]);
+
+    const writers = follows.map((f) => f.following);
+    return { writers, ...buildMeta(total, page, pageSize) };
+}
+
 function buildMeta(total, page, pageSize) {
     const hasMore = page * pageSize < total;
     return {

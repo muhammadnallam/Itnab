@@ -16,11 +16,12 @@ router.get(
         if (!parsed.success) {
             throw new ValidationError(parsed.error.issues[0].message);
         }
-        const { sort, page, limit, author, topic } = parsed.data;
+        const { sort, page, limit, author, topic, filter } = parsed.data;
         const result = await getFeed({
             sort,
             author,
             topic,
+            filter,
             page,
             pageSize: limit,
             userId: req.user?.id,

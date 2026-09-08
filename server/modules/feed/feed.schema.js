@@ -7,6 +7,7 @@ export const feedQuerySchema = z.object({
     limit: z.coerce.number().int().min(1).max(50).default(20),
     author: z.string().uuid("معرف المؤلف غير صالح").optional(),
     topic: z.enum(TAGS).optional(),
+    filter: z.enum(["subscriptions"]).optional(),
 });
 
 export const listsQuerySchema = z.object({
