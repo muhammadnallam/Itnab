@@ -49,7 +49,7 @@ const ArticleCardVertical = ({ article, isMobile }) => {
             );
             return { previous };
         },
-        onSuccess: (save) => {
+        onSuccess: (_data, save) => {
             toast.success(save ? "تم حفظ المقال" : "تم إزالة الحفظ");
         },
         onError: (err, _vars, context) => {

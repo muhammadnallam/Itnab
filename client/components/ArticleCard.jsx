@@ -221,7 +221,7 @@ const ArticleCard = ({ article, isMobile }) => {
 
             return { previous: [...previousArticles, ...previousLibrary] };
         },
-        onSuccess: (save) => {
+        onSuccess: (_data, save) => {
             toast.success(save ? "تم حفظ المقال" : "تم إزالة الحفظ");
         },
         onError: (err, _vars, context) => {

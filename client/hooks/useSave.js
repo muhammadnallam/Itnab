@@ -32,7 +32,7 @@ export function useSave(articleId) {
             }));
             return { prev };
         },
-        onSuccess: (save) => {
+        onSuccess: (_data, save) => {
             toast.success(save ? "تم حفظ المقال" : "تم إزالة الحفظ");
         },
         onError: (err, save, context) => {
