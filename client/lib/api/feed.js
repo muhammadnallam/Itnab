@@ -64,6 +64,7 @@ async function fetchFeed(path, params) {
 export async function getFeedArticles({
     sort = "top",
     author,
+    topic,
     page = 1,
     limit = 20,
 } = {}) {
@@ -72,6 +73,7 @@ export async function getFeedArticles({
         page,
         limit,
         ...(author ? { author } : {}),
+        ...(topic ? { topic } : {}),
     });
     return {
         items: (json.articles || []).map(parseArticle),
@@ -90,6 +92,10 @@ export function getNewestArticles(opts) {
 
 export function getAuthorArticles(author, opts) {
     return getFeedArticles({ sort: "new", author, ...opts });
+}
+
+export function getTagArticles(tag, opts) {
+    return getFeedArticles({ sort: "new", topic: tag, ...opts });
 }
 
 export async function getUserLists(

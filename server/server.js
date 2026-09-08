@@ -7,6 +7,8 @@ import uploadRouter from "./modules/upload/upload.routes.js";
 import userRouter from "./modules/user/user.routes.js";
 import feedRouter from "./modules/feed/feed.routes.js";
 import interactionsRouter from "./modules/interactions/interactions.routes.js";
+import exploreRouter from "./modules/explore/explore.routes.js";
+import searchRouter from "./modules/search/search.routes.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import { startGravityCron } from "./lib/gravity.js";
@@ -43,6 +45,9 @@ app.use("/api/user", userRouter);
 app.use("/api/feed", feedRouter);
 
 app.use("/api", interactionsRouter);
+
+app.use("/api/explore", exploreRouter);
+app.use("/api/search", searchRouter);
 
 app.use((err, req, res, next) => {
     if (err.status) {

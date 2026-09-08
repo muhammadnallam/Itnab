@@ -4,7 +4,7 @@ import { Bell, Search, Menu, SquarePen } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import UserDropdown from "@/components/UserDropdown";
 import { UserContext } from "@/context/UserContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
 const getInitials = (name) => {
@@ -15,8 +15,11 @@ const getInitials = (name) => {
 
 export default function Header({ onToggleSidebar, isMobile }) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [headerSearch, setHeaderSearch] = useState("");
     const { user } = useContext(UserContext);
     const router = useRouter();
+    const pathname = usePathname();
+    const isExplore = pathname === "/explore";
 
     return (
         <header
@@ -69,6 +72,7 @@ export default function Header({ onToggleSidebar, isMobile }) {
                 </Link>
                 {isMobile && (
                     <button
+                        onClick={() => router.push("/explore")}
                         className="text-mid hover:text-ink"
                         style={{
                             background: "none",
@@ -84,7 +88,7 @@ export default function Header({ onToggleSidebar, isMobile }) {
                 )}
             </div>
 
-            {!isMobile && (
+            {!isMobile && !isExplore && (
                 <div
                     style={{
                         display: "flex",
@@ -101,6 +105,16 @@ export default function Header({ onToggleSidebar, isMobile }) {
                     <Search size={18} />
                     <input
                         placeholder="بحث"
+                        value={headerSearch}
+                        onChange={(e) => setHeaderSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && headerSearch.trim()) {
+                                router.push(
+                                    `/explore?q=${encodeURIComponent(headerSearch.trim())}&tab=articles`,
+                                );
+                                setHeaderSearch("");
+                            }
+                        }}
                         style={{
                             background: "none",
                             border: "none",

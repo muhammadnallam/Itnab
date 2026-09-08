@@ -50,6 +50,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  @@index([name])
   @@map("user")
 }
 
@@ -85,6 +86,8 @@ model Article {
   bookmarks Bookmark[]
   shares    Share[]
   views     View[]       @relation("articleViews")
+
+  @@index([topic, createdAt(sort: "desc")])
 }
 
 model List {

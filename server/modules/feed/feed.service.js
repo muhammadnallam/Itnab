@@ -41,13 +41,16 @@ async function assertAuthorExists(authorId) {
     if (!author) throw new NotFoundError("الكاتب غير موجود");
 }
 
-export async function getFeed({ sort, author, page, pageSize, userId }) {
+export async function getFeed({ sort, author, topic, page, pageSize, userId }) {
     if (author) await assertAuthorExists(author);
 
-    const where = author
-        ? { authorId: author, deletedAt: null }
-        : { deletedAt: null };
-    const orderBy = sort === "new" ? { createdAt: "desc" } : { score: "desc" };
+    const where = { deletedAt: null };
+    if (author) where.authorId = author;
+    if (topic) where.topic = topic;
+
+    const orderBy = topic
+        ? { createdAt: "desc" }
+        : sort === "new" ? { createdAt: "desc" } : { score: "desc" };
 
     const cacheable = sort === "top" && !author;
     const cacheKey = `top:${page}:${pageSize}`;

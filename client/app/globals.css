@@ -65,36 +65,25 @@
     --color-navy: #1b2d4f;
 
     --color-surface: #fdfcfa;
+    --color-dark-surface: #2a2a2a;
     --color-white: #fdfcfa;
-    --color-bg: #f5f3ec;
+    --color-bg: oklch(0.96 0.0124 91.52);
+
     --color-ink: #1a1714;
     --color-light-txt: #b7b8c2;
     --color-mid: #6b6b6b;
     --color-light: #4a4540;
     --color-tag-bg: #f2ede9;
-    --color-dark-surface: #2a2a2a;
     --color-border: #c8c0b4;
 
     --color-error: #d32f2f;
     --color-success: #2e7d5e;
-
     --color-error-light: #fce8e6;
+
     --color-disabled-bg: #f0f0f4;
     --color-disabled-txt: #b9bac4;
 
     --color-text-dusk: #4a4540;
-    /* New Emerald Theme */
-    /*
-    --color-background: #f5f0e8;
-    
-    --color-text-ash: #8c8580;
-    
-    --color-gold-light: #c9a55a;
-    --color-warning: #b7791f;
-    
-    --color-border: #c8c0b4;
-    --color-subtle: #e2ddd6;
-    --color-border-focus: #0a4d3a; */
 }
 
 @media (prefers-color-scheme: dark) {
