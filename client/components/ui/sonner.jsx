@@ -49,6 +49,7 @@ const Toaster = ({
       toastOptions={{
         classNames: {
           toast: "cn-toast",
+          actionButton: "!bg-[var(--color-accent)] !text-white !font-medium",
         },
       }}
       {...props} />
