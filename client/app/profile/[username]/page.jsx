@@ -25,6 +25,7 @@ import Button from "@/components/ui/Button";
 import RequireAuth from "@/components/RequireAuth";
 import MoreMenu from "@/components/MoreMenu";
 import FollowListModal from "@/app/profile/[username]/FollowListModal";
+import ShareModal from "@/components/ShareModal";
 
 import { WidthContext } from "@/context/ScreenContext";
 import { UserContext } from "@/context/UserContext";
@@ -205,17 +206,9 @@ export default function ProfilePage() {
     const isOwnProfile = !!user && user.id === profile?.id;
 
     const [followModal, setFollowModal] = useState(null);
+    const [shareOpen, setShareOpen] = useState(false);
 
-    const handleShare = () => {
-        const url = `${window.location.origin}/profile/${profile.username}`;
-        if (navigator.share) {
-            navigator.share({ url }).catch(() => {});
-        } else {
-            navigator.clipboard?.writeText(url).then(() => {
-                toast.success("تم نسخ الرابط");
-            });
-        }
-    };
+    const handleShare = () => setShareOpen(true);
 
     const handleCopy = () => {
         const url = `${window.location.origin}/profile/${profile.username}`;
@@ -495,6 +488,13 @@ export default function ProfilePage() {
                 onClose={() => setFollowModal(null)}
                 type={followModal}
                 userId={profile?.id}
+            />
+            <ShareModal
+                open={shareOpen}
+                onClose={() => setShareOpen(false)}
+                url={profile ? `${window.location.origin}/profile/${profile.username}` : ""}
+                heading="مشاركة الملف الشخصي"
+                subheading="شارك هذا الملف الشخصي مع الآخرين"
             />
         </AppLayout>
     );

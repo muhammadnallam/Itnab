@@ -68,7 +68,7 @@ const ShareModal = ({ open, onClose, articleId, url, heading, subheading }) => {
                 {subheading}
             </p>
 
-            <p className="text-xs font-semibold mb-2">أنسخ رابط المقال</p>
+            <p className="text-xs font-semibold mb-2">أنسخ الرابط</p>
             <div className="flex items-center gap-2 rounded-lg border border-border bg-bg px-3 py-2.5 mb-6">
                 <span className="flex-1 min-w-0 text-sm truncate dir">
                     {url}

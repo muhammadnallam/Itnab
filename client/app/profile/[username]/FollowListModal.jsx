@@ -74,7 +74,7 @@ function UserRow({ user }) {
                             transition: "background 0.15s",
                         }}
                     >
-                        {isFollowing ? "إلغاء المتابعة" : "متابعة"}
+                        {isFollowing ? "متابَع" : "اشترك"}
                     </button>
                 </RequireAuth>
             )}
