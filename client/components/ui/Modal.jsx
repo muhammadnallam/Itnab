@@ -41,6 +41,21 @@ export default function Modal({ open, onClose, style, header, footer, onSubmit, 
                     ) : (
                         header
                     )}
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="text-mid hover:text-ink"
+                        style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            display: "flex",
+                            padding: 4,
+                            transition: "color 0.15s",
+                        }}
+                    >
+                        <X size={18} />
+                    </button>
                 </div>
             )}
             <div
