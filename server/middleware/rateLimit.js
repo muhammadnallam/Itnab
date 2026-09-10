@@ -10,6 +10,14 @@ export const viewLimiter = rateLimit({
   message: MESSAGE,
 });
 
+export const commentLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: MESSAGE,
+});
+
 export const shareLimiter = rateLimit({
   windowMs: 60 * 1000,
   limit: 20,

@@ -42,7 +42,9 @@ model User {
   bookmarks     Bookmark[]
   shares        Share[]
   views         View[]     @relation("userViews")
-  
+  comments      Comment[]
+  commentLikes  CommentLike[]
+
   name          String
   emailVerified Boolean    @default(false)
   image         String?
@@ -73,6 +75,7 @@ model Article {
   savedCount     Int      @default(0)
   shareCount     Int      @default(0)
   viewCount      Int      @default(0)
+  commentCount   Int      @default(0)
   
   deletedAt      DateTime?
   createdAt      DateTime @default(now())
@@ -86,8 +89,9 @@ model Article {
   bookmarks Bookmark[]
   shares    Share[]
   views     View[]       @relation("articleViews")
+  comments  Comment[]
 
-  @@index([topic, createdAt(sort: "desc")])
+  @@index([topic, createdAt(sort: Desc)])
 }
 
 model List {
@@ -188,7 +192,46 @@ model SavedArticle {
   @@index([articleId])
 }
 
-// TODO: model Comment (Manage threaded comments, nesting replies).
+// Manage threaded comments with nesting replies (max depth 3).
+
+model Comment {
+  id         String    @id @default(uuid()) @db.Uuid
+  content    String
+  depth      Int       @default(1) // 1 = top-level, max 3
+  likeCount  Int       @default(0)
+  replyCount Int       @default(0) // top-level: total thread replies; replies: direct children
+  isEdited   Boolean   @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  articleId String  @db.Uuid
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  authorId  String  @db.Uuid
+  author    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentId  String?  @db.Uuid
+  parent    Comment? @relation("commentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("commentReplies")
+  rootId    String?  @db.Uuid // null for top-level; depth-1 ancestor otherwise
+  root      Comment? @relation("commentThread", fields: [rootId], references: [id], onDelete: Cascade)
+  threadComments Comment[] @relation("commentThread")
+  likes     CommentLike[]
+
+  @@index([articleId, depth])
+  @@index([rootId])
+  @@index([parentId])
+}
+
+model CommentLike {
+  userId    String   @db.Uuid
+  commentId String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, commentId])
+  @@index([commentId])
+}
 
 model Session {
   id        String   @id @default(uuid()) @db.Uuid

@@ -67,7 +67,7 @@ export async function getArticle({ slug, id }) {
             where: slug ? { slug, deletedAt: null } : { id, deletedAt: null },
             include: {
                 author: {
-                    select: { name: true, username: true, image: true },
+                    select: { id: true, name: true, username: true, image: true },
                 },
             },
         });

@@ -56,6 +56,7 @@ export async function recomputeScores() {
       savedCount: true,
       shareCount: true,
       viewCount: true,
+      commentCount: true,
     },
     });
 
@@ -68,7 +69,7 @@ export async function recomputeScores() {
         const score = computeScore({
       views: article.viewCount,
       likes,
-            comments: 0,
+            comments: article.commentCount,
       shares: article.shareCount,
       bookmarks: article.savedCount,
             ageHours,

@@ -119,7 +119,7 @@ export default function SubscriptionsPage() {
                     <div style={{ marginTop: 12 }}>
                         <Link
                             href="/explore"
-                            className="text-accent hover:underline"
+                            className="text-accent hover:underline text-sm"
                         >
                             استكشاف الكتّاب
                         </Link>

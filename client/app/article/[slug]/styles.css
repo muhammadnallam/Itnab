@@ -105,7 +105,7 @@ article {
 
 @media (min-width: 768px) {
     article {
-        padding: 56px 24px 120px;
+        padding: 56px 0 120px;
     }
 }
 

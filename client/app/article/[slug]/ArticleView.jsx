@@ -4,7 +4,7 @@ import { useArticle } from "@/hooks/useArticle";
 import { useLikes } from "@/hooks/useLikes";
 import { useSave } from "@/hooks/useSave";
 import { useView } from "@/hooks/useView";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import RequireAuth from "@/components/RequireAuth";
 import ShareModal from "@/components/ShareModal";
 import {
@@ -16,6 +16,7 @@ import {
     ThumbsUp,
 } from "lucide-react";
 import Link from "next/link";
+import CommentsSection from "@/components/comments/CommentsSection";
 
 function formatDate(dateStr) {
     const d = new Date(dateStr);
@@ -34,6 +35,7 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
     const save = useSave(article?.id);
     useView(article?.id);
     const [shareOpen, setShareOpen] = useState(false);
+    const commentsRef = useRef(null);
 
     if (!article) return null;
 
@@ -139,7 +141,15 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                         </button>
                     </div>
                     <div className="flex items-center gap-5 text-xs font-medium">
-                        <button className="flex items-center gap-1.5 text-mid hover:text-ink">
+                        <button
+                            onClick={() =>
+                                commentsRef.current?.scrollIntoView({
+                                    behavior: "smooth",
+                                })
+                            }
+                            className="flex items-center gap-1.5 text-mid hover:text-ink"
+                        >
+                            {formatCount(article.commentCount ?? 0)}
                             <MessageSquare size={19} strokeWidth={1.75} />
                         </button>
                         <RequireAuth
@@ -203,6 +213,12 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                     </div>
                 </div>
             </article>
+
+            <CommentsSection
+                articleId={article.id}
+                authorId={article.author?.id}
+                sectionRef={commentsRef}
+            />
 
             <ShareModal
                 open={shareOpen}

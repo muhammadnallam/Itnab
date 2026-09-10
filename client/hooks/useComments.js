@@ -1,36 +1,37 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetcher } from "@/lib/fetcher";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
+import { getComments } from "@/lib/api/comments";
 
 export function useComments(articleId) {
-    const qc = useQueryClient();
-    const key = queryKeys.comments(articleId);
-
-    const { data, isLoading, error } = useQuery({
-        queryKey: key,
-        queryFn: () => fetcher(`/api/articles/${articleId}/comments`),
+    const {
+        data,
+        hasNextPage,
+        fetchNextPage,
+        isFetchingNextPage,
+        isLoading,
+        error,
+    } = useInfiniteQuery({
+        queryKey: queryKeys.comments(articleId),
+        queryFn: ({ pageParam = 1 }) =>
+            getComments(articleId, { page: pageParam }),
+        getNextPageParam: (last) => last.nextPage ?? undefined,
         enabled: !!articleId,
     });
 
-    const addComment = useMutation({
-        mutationFn: (content) =>
-            fetcher(`/api/articles/${articleId}/comments`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ content }),
-            }),
-        onSettled: () => {
-            qc.invalidateQueries({ queryKey: key });
-        },
-    });
+    const pages = data?.pages ?? [];
+    const comments = pages.flatMap((p) => p.comments ?? []);
+    const total = pages.length ? pages[pages.length - 1].total : 0;
 
     return {
-        comments: data ?? [],
+        pages,
+        comments,
+        total,
+        hasNextPage,
+        fetchNextPage,
+        isFetchingNextPage,
         isLoading,
         error,
-        addComment: addComment.mutateAsync,
-        isAdding: addComment.isPending,
     };
 }
