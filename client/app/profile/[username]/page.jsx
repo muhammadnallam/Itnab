@@ -24,6 +24,7 @@ import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import RequireAuth from "@/components/RequireAuth";
 import MoreMenu from "@/components/MoreMenu";
+import FollowListModal from "@/app/profile/[username]/FollowListModal";
 
 import { WidthContext } from "@/context/ScreenContext";
 import { UserContext } from "@/context/UserContext";
@@ -98,10 +99,12 @@ const ProfilePanel = ({
     isMutating,
     isOwnProfile,
     onToggleFollow,
+    onFollowersClick,
+    onFollowingClick,
 }) => {
     const stats = [
-        { label: "يتابع", value: formatCount(profile.followingCount) },
-        { label: "متابع", value: formatCount(followerCount) },
+        { label: "يتابع", value: formatCount(profile.followingCount), onClick: profile.followingCount > 0 ? onFollowingClick : null },
+        { label: "متابع", value: formatCount(followerCount), onClick: followerCount > 0 ? onFollowersClick : null },
         { label: "مقالات", value: profile.articlesCount },
     ];
 
@@ -155,6 +158,10 @@ const ProfilePanel = ({
                     <div
                         key={stat.label}
                         className="flex flex-col items-center px-5"
+                        onClick={stat.onClick}
+                        style={{
+                            cursor: stat.onClick ? "pointer" : "default",
+                        }}
                     >
                         <span className="text-base text-ink">{stat.value}</span>
                         <span dir="rtl" className="text-xs text-mid mt-0.5">
@@ -196,6 +203,8 @@ export default function ProfilePage() {
     } = useFollow(profile?.id);
 
     const isOwnProfile = !!user && user.id === profile?.id;
+
+    const [followModal, setFollowModal] = useState(null);
 
     const handleShare = () => {
         const url = `${window.location.origin}/profile/${profile.username}`;
@@ -342,6 +351,8 @@ export default function ProfilePage() {
                     isMutating={isMutating}
                     isOwnProfile={isOwnProfile}
                     onToggleFollow={toggleFollow}
+                    onFollowersClick={() => setFollowModal("followers")}
+                    onFollowingClick={() => setFollowModal("following")}
                 />
             }
             centerMaxWidth={700}
@@ -359,8 +370,19 @@ export default function ProfilePage() {
                         <div className="text-[17px] font-bold text-ink leading-[1.2]">
                             {profile.name}
                         </div>
-                        <div className="text-[13px] text-light">
-                            {formatCount(followerCount)} متابع
+                        <div className="flex gap-3 text-[13px] text-light">
+                            <span
+                                onClick={followerCount > 0 ? () => setFollowModal("followers") : undefined}
+                                style={{ cursor: followerCount > 0 ? "pointer" : "default" }}
+                            >
+                                {formatCount(followerCount)} متابع
+                            </span>
+                            <span
+                                onClick={profile.followingCount > 0 ? () => setFollowModal("following") : undefined}
+                                style={{ cursor: profile.followingCount > 0 ? "pointer" : "default" }}
+                            >
+                                {formatCount(profile.followingCount)} يتابع
+                            </span>
                         </div>
                     </div>
                     <MoreMenu options={menuOptions}>
@@ -468,6 +490,12 @@ export default function ProfilePage() {
                     لا توجد مقالات بعد
                 </div>
             )}
+            <FollowListModal
+                open={followModal !== null}
+                onClose={() => setFollowModal(null)}
+                type={followModal}
+                userId={profile?.id}
+            />
         </AppLayout>
     );
 }

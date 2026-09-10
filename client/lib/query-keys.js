@@ -16,4 +16,5 @@ export const queryKeys = {
     search: (q) => ["search", q],
     subscriptionFeed: () => ["articles", { filter: "subscriptions" }],
     following: (userId) => ["following", userId],
+    followers: (userId) => ["followers", userId],
 };

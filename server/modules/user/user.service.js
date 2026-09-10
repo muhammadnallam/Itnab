@@ -149,6 +149,32 @@ export async function getFollowing(userId, { page, pageSize }) {
     return { writers, ...buildMeta(total, page, pageSize) };
 }
 
+export async function getFollowers(userId, { page, pageSize }) {
+    const where = { followingId: userId };
+    const [follows, total] = await Promise.all([
+        prisma.follow.findMany({
+            where,
+            orderBy: { createdAt: "desc" },
+            select: {
+                follower: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        image: true,
+                    },
+                },
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.follow.count({ where }),
+    ]);
+
+    const writers = follows.map((f) => f.follower);
+    return { writers, ...buildMeta(total, page, pageSize) };
+}
+
 function buildMeta(total, page, pageSize) {
     const hasMore = page * pageSize < total;
     return {
