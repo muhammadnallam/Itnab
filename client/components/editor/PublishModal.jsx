@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { X } from "lucide-react";
 import { TAGS } from "@itnab/constants";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import {
     validateArticleFields,
@@ -37,124 +37,6 @@ function Input({ label, error, children }) {
                     {error}
                 </p>
             )}
-        </div>
-    );
-}
-
-function ModalFrame({ isOpen, onClose, title, footer, children, onSubmit }) {
-    if (!isOpen) return null;
-
-    const bodyAndFooter = (
-        <>
-            <div
-                style={{
-                    overflowY: "auto",
-                    scrollbarGutter: "stable",
-                    padding: 24,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 24,
-                }}
-            >
-                {children}
-            </div>
-            {footer && (
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                        padding: "16px 24px",
-                        borderTop: "1px solid var(--color-border)",
-                    }}
-                >
-                    {footer}
-                </div>
-            )}
-        </>
-    );
-
-    return (
-        <div
-            style={{
-                position: "fixed",
-                inset: 0,
-                background: "rgba(0,0,0,0.45)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 1000,
-                padding: 16,
-            }}
-            onClick={onClose}
-        >
-            <div
-                style={{
-                    background: "var(--color-white)",
-                    borderRadius: "var(--border-radius)",
-                    width: "100%",
-                    maxWidth: 520,
-                    maxHeight: "92vh",
-                    display: "flex",
-                    flexDirection: "column",
-                    overflow: "hidden",
-                    boxShadow: "0 25px 70px rgba(0,0,0,0.12)",
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: "20px 24px",
-                        borderBottom: "1px solid var(--color-border)",
-                    }}
-                >
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: 18,
-                            fontWeight: 600,
-                            color: "var(--color-ink)",
-                        }}
-                    >
-                        {title}
-                    </h2>
-                    <button
-                        style={{
-                            background: "none",
-                            border: "none",
-                            padding: 4,
-                            margin: -4,
-                            color: "var(--color-ink)",
-                            cursor: "pointer",
-                            display: "flex",
-                            borderRadius: 6,
-                            opacity: 0.5,
-                        }}
-                        onClick={onClose}
-                        aria-label="إغلاق"
-                    >
-                        <X size={20} />
-                    </button>
-                </div>
-                {onSubmit ? (
-                    <form
-                        onSubmit={onSubmit}
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            overflow: "hidden",
-                            flex: 1,
-                        }}
-                    >
-                        {bodyAndFooter}
-                    </form>
-                ) : (
-                    bodyAndFooter
-                )}
-            </div>
         </div>
     );
 }
@@ -224,10 +106,10 @@ export default function PublishModal({
     };
 
     return (
-        <ModalFrame
-            isOpen={isOpen}
+        <Modal
+            open={isOpen}
             onClose={onClose}
-            title={isUpdate ? "تعديل" : "نشر"}
+            header={isUpdate ? "تعديل" : "نشر"}
             footer={
                 <>
                     <Button loading={loading} type="submit">
@@ -451,6 +333,6 @@ export default function PublishModal({
                     </span>
                 </label>
             </div>
-        </ModalFrame>
+        </Modal>
     );
 }
