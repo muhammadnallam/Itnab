@@ -283,19 +283,11 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         },
     });
 
-    useEffect(() => {
-        if (!isMobile && mobileView !== "main") {
-            setMobileView("main");
-        }
-    }, [isMobile, mobileView]);
-
-    useEffect(() => {
-        if (editor) {
-            setStats({
-                words: editor.storage.characterCount.words(),
-            });
-        }
-    }, [editor]);
+    const prevIsMobileRef = useRef(isMobile);
+    if (prevIsMobileRef.current && !isMobile && mobileView !== "main") {
+        setMobileView("main");
+    }
+    prevIsMobileRef.current = isMobile;
 
     return (
         <div className="simple-editor-wrapper">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useRef } from "react";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -260,9 +260,11 @@ export default function ProfilePage() {
     );
     const lists = useLists({ author: profile?.id, enabled: Boolean(profile) });
 
-    useEffect(() => {
+    const prevUsernameRef = useRef(username);
+    if (username !== prevUsernameRef.current) {
+        prevUsernameRef.current = username;
         setTab("home");
-    }, [username]);
+    }
 
     if (error) notFound();
 

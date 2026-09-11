@@ -1,5 +1,5 @@
 "use client";
-import { forwardRef, useCallback, useEffect, useState } from "react";
+import { forwardRef, useCallback, useRef, useState } from "react";
 
 // --- Hooks ---
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint";
@@ -171,6 +171,12 @@ export const LinkPopover = forwardRef(
         const { editor } = useTiptapEditor(providedEditor);
         const [isOpen, setIsOpen] = useState(false);
 
+        const prevIsActiveRef = useRef(isActive);
+        if (autoOpenOnLinkActive && !prevIsActiveRef.current && isActive) {
+            setIsOpen(true);
+        }
+        prevIsActiveRef.current = isActive;
+
         const {
             isVisible,
             canSet,
@@ -209,12 +215,6 @@ export const LinkPopover = forwardRef(
             },
             [onClick, isOpen],
         );
-
-        useEffect(() => {
-            if (autoOpenOnLinkActive && isActive) {
-                setIsOpen(true);
-            }
-        }, [autoOpenOnLinkActive, isActive]);
 
         if (!isVisible) {
             return null;

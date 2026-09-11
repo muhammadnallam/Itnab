@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useRef, useContext } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { UserContext } from "@/context/UserContext";
 import Input from "./ui/Input";
@@ -232,9 +232,11 @@ export default function AuthModal({
 }) {
     const [mode, setMode] = useState(defaultMode);
 
-    useEffect(() => {
-        if (open) setMode(defaultMode);
-    }, [open, defaultMode]);
+    const prevOpenRef = useRef(open);
+    if (!prevOpenRef.current && open) {
+        setMode(defaultMode);
+    }
+    prevOpenRef.current = open;
 
     return (
         <Modal open={open} onClose={onClose}>
