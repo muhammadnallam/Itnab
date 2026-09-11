@@ -21,7 +21,7 @@ export function useThrottledCallback(fn, wait = 250, dependencies = [], options 
   const handler = useMemo(
     () => throttle(fn, wait, options),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    dependencies
+    [...dependencies]
   )
 
   useUnmount(() => {

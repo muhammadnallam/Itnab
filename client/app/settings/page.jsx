@@ -499,6 +499,34 @@ const TabPrivacy = () => {
     );
 };
 
+const NotifRow = ({
+    label,
+    email: e,
+    push: p,
+    onEmail,
+    onPush,
+    topBorder = true,
+}) => (
+    <div
+        style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 24,
+            padding: "16px 0",
+            borderTop: topBorder ? "1px solid var(--color-border)" : "none",
+        }}
+    >
+        <span style={{ fontSize: 14, color: "var(--color-ink)", flex: 1 }}>
+            {label}
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            <Toggle checked={e} onChange={onEmail} />
+            <Toggle checked={p} onChange={onPush} />
+        </div>
+    </div>
+);
+
 const TabNotifications = () => {
     const [push, setPush] = useState(false);
     const [newFollower, setNewFollower] = useState(true);
@@ -506,34 +534,6 @@ const TabNotifications = () => {
     const [claps, setClaps] = useState(false);
     const [digest, setDigest] = useState(true);
     const [updates, setUpdates] = useState(false);
-
-    const NotifRow = ({
-        label,
-        email: e,
-        push: p,
-        onEmail,
-        onPush,
-        topBorder = true,
-    }) => (
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 24,
-                padding: "16px 0",
-                borderTop: topBorder ? "1px solid var(--color-border)" : "none",
-            }}
-        >
-            <span style={{ fontSize: 14, color: "var(--color-ink)", flex: 1 }}>
-                {label}
-            </span>
-            <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-                <Toggle checked={e} onChange={onEmail} />
-                <Toggle checked={p} onChange={onPush} />
-            </div>
-        </div>
-    );
 
     return (
         <>
