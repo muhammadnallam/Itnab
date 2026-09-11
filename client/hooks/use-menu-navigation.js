@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
 /**
  * Hook that implements keyboard navigation for dropdown menus and command palettes.
@@ -138,9 +138,9 @@ export function useMenuNavigation(
     orientation,
   ])
 
-  const prevQueryRef = useRef(query);
-  if (query !== prevQueryRef.current) {
-    prevQueryRef.current = query;
+  const [prevQuery, setPrevQuery] = useState(query);
+  if (prevQuery !== query) {
+    setPrevQuery(query);
     if (query) {
       setSelectedIndex(autoSelectFirstItem ? 0 : -1)
     }

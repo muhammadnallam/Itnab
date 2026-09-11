@@ -189,7 +189,6 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     }, [saveContent]);
 
     // Intentional mount-only init: editor content should not swap when async props arrive late.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const initialContent = useMemo(() => {
         if (isUpdate && articleContent) {
             return articleContent;
@@ -219,6 +218,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                 { type: "articleDescription", content: [] },
             ],
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const editor = useEditor({
@@ -285,11 +285,13 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         },
     });
 
-    const prevIsMobileRef = useRef(isMobile);
-    if (prevIsMobileRef.current && !isMobile && mobileView !== "main") {
-        setMobileView("main");
+    const [prevIsMobile, setPrevIsMobile] = useState(isMobile);
+    if (prevIsMobile !== isMobile) {
+        setPrevIsMobile(isMobile);
+        if (!isMobile && mobileView !== "main") {
+            setMobileView("main");
+        }
     }
-    prevIsMobileRef.current = isMobile;
 
     return (
         <div className="simple-editor-wrapper">

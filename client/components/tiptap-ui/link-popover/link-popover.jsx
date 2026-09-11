@@ -171,11 +171,13 @@ export const LinkPopover = forwardRef(
         const { editor } = useTiptapEditor(providedEditor);
         const [isOpen, setIsOpen] = useState(false);
 
-        const prevIsActiveRef = useRef(isActive);
-        if (autoOpenOnLinkActive && !prevIsActiveRef.current && isActive) {
-            setIsOpen(true);
+        const [prevIsActive, setPrevIsActive] = useState(isActive);
+        if (prevIsActive !== isActive) {
+            setPrevIsActive(isActive);
+            if (autoOpenOnLinkActive && isActive) {
+                setIsOpen(true);
+            }
         }
-        prevIsActiveRef.current = isActive;
 
         const {
             isVisible,

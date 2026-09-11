@@ -17,11 +17,12 @@ const defaultOptions = {
  * @param options The throttle options
  */
 export function useThrottledCallback(fn, wait = 250, dependencies = [], options = defaultOptions) {
+  /* eslint-disable react-hooks/exhaustive-deps, react-hooks/use-memo */
   const handler = useMemo(
     () => throttle(fn, wait, options),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [...dependencies]
   )
+  /* eslint-enable react-hooks/exhaustive-deps, react-hooks/use-memo */
 
   useUnmount(() => {
     handler.cancel()
