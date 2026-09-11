@@ -17,4 +17,5 @@ export const queryKeys = {
     subscriptionFeed: () => ["articles", { filter: "subscriptions" }],
     following: (userId) => ["following", userId],
     followers: (userId) => ["followers", userId],
+    topAuthors: (limit) => ["topAuthors", limit],
 };

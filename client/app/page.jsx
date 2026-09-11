@@ -3,7 +3,6 @@
 import { useState, useContext } from "react";
 import Link from "next/link";
 import { TAGS } from "@itnab/constants";
-import { WRITERS } from "@/data/dummyData";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
@@ -15,10 +14,68 @@ import { WidthContext } from "@/context/ScreenContext";
 import { useAuthModal } from "@/context/AuthModalContext";
 import Button from "@/components/ui/Button";
 import { useArticleList } from "@/hooks/useArticleList";
+import { useTopAuthors } from "@/hooks/useTopAuthors";
+import { useFollow } from "@/hooks/useFollow";
+
+const AuthorRow = ({ author }) => {
+    const { user } = useContext(UserContext);
+    const { isFollowing, toggle } = useFollow(author.id);
+    return (
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 16,
+            }}
+        >
+            <Avatar
+                img={author.image}
+                initials={author.name?.slice(0, 2) || ""}
+                size={40}
+                bg="var(--color-accent)"
+            />
+            <span
+                style={{
+                    flex: 1,
+                    fontSize: 15,
+                    fontWeight: 500,
+                    lineHeight: 1.3,
+                }}
+            >
+                {author.name}
+            </span>
+            {user && (
+                <RequireAuth>
+                    <button
+                        onClick={toggle}
+                        className={
+                            isFollowing
+                                ? "bg-accent-light text-ink hover:bg-[#d0d0d0]"
+                                : "bg-accent text-white hover:bg-accent-hover"
+                        }
+                        style={{
+                            border: "none",
+                            borderRadius: 99,
+                            padding: "6px 16px",
+                            fontSize: 13,
+                            cursor: "pointer",
+                            fontWeight: 500,
+                            flexShrink: 0,
+                            transition: "background 0.15s",
+                        }}
+                    >
+                        {isFollowing ? "متابَع" : "اشترك"}
+                    </button>
+                </RequireAuth>
+            )}
+        </div>
+    );
+};
 
 const LeftPanel = ({ onLogin, onSignUp }) => {
-    const [subs, setSubs] = useState(WRITERS.map((w) => w.sub));
     const { user, loading } = useContext(UserContext);
+    const { authors, loading: authorsLoading } = useTopAuthors(5);
 
     if (loading) return null;
     if (!user) {
@@ -168,59 +225,46 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                             كتّاب مقترحون
                         </h4>
                     </div>
-                    {WRITERS.map((w, i) => (
-                        <div
-                            key={w.name}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 12,
-                                marginBottom: i < WRITERS.length - 1 ? 16 : 0,
-                            }}
-                        >
-                            <Avatar
-                                initials={w.avatar}
-                                size={40}
-                                bg="var(--color-accent)"
-                            />
-                            <span
-                                style={{
-                                    flex: 1,
-                                    fontSize: 15,
-                                    fontWeight: 500,
-                                    lineHeight: 1.3,
-                                }}
-                            >
-                                {w.name}
-                            </span>
-                            <RequireAuth>
-                                <button
-                                    onClick={() =>
-                                        setSubs((s) =>
-                                            s.map((v, j) => (j === i ? !v : v)),
-                                        )
-                                    }
-                                    className={
-                                        subs[i]
-                                            ? "bg-accent-light text-ink hover:bg-[#d0d0d0]"
-                                            : "bg-accent text-white hover:bg-accent-hover"
-                                    }
-                                    style={{
-                                        border: "none",
-                                        borderRadius: 99,
-                                        padding: "6px 16px",
-                                        fontSize: 13,
-                                        cursor: "pointer",
-                                        fontWeight: 500,
-                                        flexShrink: 0,
-                                        transition: "background 0.15s",
-                                    }}
-                                >
-                                    {subs[i] ? "متابَع" : "اشترك"}
-                                </button>
-                            </RequireAuth>
-                        </div>
-                    ))}
+                    {authorsLoading
+                        ? [1, 2, 3, 4, 5].map((i) => (
+                              <div
+                                  key={i}
+                                  style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 12,
+                                      marginBottom: i < 5 ? 16 : 0,
+                                  }}
+                              >
+                                  <div
+                                      style={{
+                                          width: 40,
+                                          height: 40,
+                                          borderRadius: "50%",
+                                          background: "var(--color-tag-bg)",
+                                      }}
+                                  />
+                                  <div
+                                      style={{
+                                          flex: 1,
+                                          height: 14,
+                                          borderRadius: 4,
+                                          background: "var(--color-tag-bg)",
+                                      }}
+                                  />
+                              </div>
+                          ))
+                        : authors.map((author, i) => (
+                              <div
+                                  key={author.id}
+                                  style={{
+                                      marginBottom:
+                                          i < authors.length - 1 ? 16 : 0,
+                                  }}
+                              >
+                                  <AuthorRow author={author} />
+                              </div>
+                          ))}
                 </div>
             </div>
         );

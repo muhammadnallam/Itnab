@@ -16,6 +16,7 @@ import ArticleCardVerticalSkeleton from "@/components/ArticleCardVerticalSkeleto
 import { WidthContext } from "@/context/ScreenContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useExploreRecommendations } from "@/hooks/useExploreRecommendations";
+import { useTopAuthors } from "@/hooks/useTopAuthors";
 import { useSearch } from "@/hooks/useSearch";
 import { useTagFeed } from "@/hooks/useTagFeed";
 
@@ -159,6 +160,7 @@ const AuthorCard = ({ author }) => (
 
 function RecommendationsView({ isMobile }) {
     const rec = useExploreRecommendations();
+    const { authors: topAuthors, loading: topAuthorsLoading } = useTopAuthors(10);
 
     if (rec.loading) {
         return (
@@ -271,7 +273,7 @@ function RecommendationsView({ isMobile }) {
                 ))
             )}
 
-            {rec.randomAuthors.length > 0 && (
+            {!topAuthorsLoading && topAuthors.length > 0 && (
                 <div style={{ marginTop: 32 }}>
                     <div
                         style={{
@@ -293,7 +295,7 @@ function RecommendationsView({ isMobile }) {
                     </div>
                     <div style={{ position: "relative", marginTop: 16 }}>
                         <Slider gap={12}>
-                            {rec.randomAuthors.map((author) => (
+                            {topAuthors.map((author) => (
                                 <AuthorCard key={author.id} author={author} />
                             ))}
                         </Slider>

@@ -32,6 +32,7 @@ model User {
   socialLinks    Json?
   followerCount    Int      @default(0)
   followingCount   Int      @default(0)
+  authorScore Float @default(0)
   createdAt   DateTime @default(now())
 
   articles      Article[]
@@ -52,6 +53,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  @@index([authorScore(sort: Desc)])
   @@index([name])
   @@map("user")
 }
