@@ -188,6 +188,8 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         };
     }, [saveContent]);
 
+    // Intentional mount-only init: editor content should not swap when async props arrive late.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const initialContent = useMemo(() => {
         if (isUpdate && articleContent) {
             return articleContent;
