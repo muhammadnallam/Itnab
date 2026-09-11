@@ -20,7 +20,7 @@ export async function getProfile(username) {
         followingCount: true,
                 _count: {
                     select: {
-                        articles: true,
+                        articles: { where: { deletedAt: null } },
                     },
                 },
             },
