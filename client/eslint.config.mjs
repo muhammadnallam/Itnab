@@ -11,6 +11,14 @@ const eslintConfig = defineConfig([
         "build/**",
         "next-env.d.ts",
     ]),
+    {
+        rules: {
+            // Project uses plain <img> for simplicity; next/image opt-in is not desired.
+            "@next/next/no-img-element": "off",
+            // Fonts are loaded per-page via App Router; _document rule is inapplicable.
+            "@next/next/no-page-custom-font": "off",
+        },
+    },
 ]);
 
 export default eslintConfig;
