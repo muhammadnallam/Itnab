@@ -9,6 +9,7 @@ import {
     updatePassword,
     deleteAccount,
 } from "@/lib/api/user";
+import { upload } from "@/lib/api/upload";
 
 export function useUser(username) {
     const qc = useQueryClient();
@@ -20,7 +21,19 @@ export function useUser(username) {
     });
 
     const updateProfileMutation = useMutation({
-        mutationFn: updateProfile,
+        mutationFn: async ({ avatar, banner, ...data }) => {
+            let image = avatar;
+            if (avatar && typeof avatar !== "string") {
+                image = await upload(avatar, "avatars");
+            }
+
+            let bannerUrl = banner;
+            if (banner && typeof banner !== "string") {
+                bannerUrl = await upload(banner, "banners");
+            }
+
+            return updateProfile({ ...data, image, bannerUrl });
+        },
         onSuccess: () => {
             if (username) {
                 qc.invalidateQueries({ queryKey: queryKeys.user(username) });

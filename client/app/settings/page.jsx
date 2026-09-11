@@ -14,7 +14,6 @@ import Tabs from "@/components/ui/Tabs";
 
 import { UserContext } from "@/context/UserContext";
 import { signOut } from "@/lib/api/auth";
-import { upload } from "@/lib/api/upload";
 import { redirect } from "next/navigation";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useUser } from "@/hooks/useUser";
@@ -151,20 +150,12 @@ const TabAccount = ({
         setProfileError(errors);
         if (Object.keys(errors).length > 0) return;
         try {
-            let image = avatar;
-            if (avatar && typeof avatar !== "string")
-                image = await upload(avatar, "avatars");
-
-            let bannerUrl = banner;
-            if (banner && typeof banner !== "string")
-                bannerUrl = await upload(banner, "banners");
-
             const updated = await updateProfile({
                 name,
                 username,
                 bio,
-                image,
-                bannerUrl,
+                avatar,
+                banner,
             });
             setUser((prev) =>
                 prev ? { ...prev, image: updated.image } : prev,
