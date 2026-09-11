@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, useContext, useEffect } from "react";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import {
     MoreHorizontal,
     Copy,
     Globe,
-    Link2,
     Pencil,
     Share2,
-    Trash2,
     CircleAlert,
 } from "lucide-react";
 import { X, YouTube } from "@/components/ui/icons";
@@ -42,10 +40,10 @@ const PROFILE_TABS = [
     { id: "about", label: "حول" },
 ];
 
-const PROFILE_LINKS = [
-    { key: "website", label: "website", icon: Globe },
-    { key: "link", label: "Link", icon: YouTube },
-    { key: "copy", label: "Copy", icon: X },
+const SOCIAL_LINKS = [
+    { key: "website", icon: Globe },
+    { key: "youtube", icon: YouTube },
+    { key: "x", icon: X },
 ];
 
 const ICON_BUTTON_CLASS =
@@ -90,6 +88,21 @@ const AboutTab = ({ profile, followerCount }) => (
                 <span className="text-light">يتابع</span>
             </span>
         </div>
+        {SOCIAL_LINKS.filter(({ key }) => profile.socialLinks?.[key]).length > 0 && (
+            <div dir="rtl" className="flex items-center gap-2 mt-5">
+                {SOCIAL_LINKS.filter(({ key }) => profile.socialLinks?.[key]).map(
+                    ({ key, icon: Icon }) => (
+                        <button
+                            key={key}
+                            onClick={() => window.open(profile.socialLinks[key], "_blank", "noopener")}
+                            className="flex items-center justify-center w-10 h-10 rounded-full border border-border text-mid hover:bg-bg cursor-pointer transition-colors"
+                        >
+                            <Icon size={16} strokeWidth={2} />
+                        </button>
+                    ),
+                )}
+            </div>
+        )}
     </div>
 );
 
@@ -131,25 +144,27 @@ const ProfilePanel = ({
                 {profile.bio}
             </p>
 
-            <div
-                dir="ltr"
-                className="flex items-center justify-center gap-2 mt-5"
-            >
-                {PROFILE_LINKS.map(
-                    ({ key, label, icon: Icon }) => (
-                        <button
-                            key={key}
-                            aria-label={label}
-                            className={ICON_BUTTON_CLASS}
-                        >
-                            <Icon
-                                size={16}
-                                strokeWidth={2}
-                            />
-                        </button>
-                    ),
-                )}
-            </div>
+            {SOCIAL_LINKS.filter(({ key }) => profile.socialLinks?.[key]).length > 0 && (
+                <div
+                    dir="ltr"
+                    className="flex items-center justify-center gap-2 mt-5"
+                >
+                    {SOCIAL_LINKS.filter(({ key }) => profile.socialLinks?.[key]).map(
+                        ({ key, icon: Icon }) => (
+                            <button
+                                key={key}
+                                onClick={() => window.open(profile.socialLinks[key], "_blank", "noopener")}
+                                className={ICON_BUTTON_CLASS}
+                            >
+                                <Icon
+                                    size={16}
+                                    strokeWidth={2}
+                                />
+                            </button>
+                        ),
+                    )}
+                </div>
+            )}
 
             <div dir="ltr" className="flex items-stretch justify-center mt-5">
                 {stats.flatMap((stat, i) => [
@@ -191,6 +206,7 @@ export default function ProfilePage() {
     const username = params?.username;
     const [tab, setTab] = useState("home");
     const width = useContext(WidthContext);
+    const router = useRouter();
     const { user, loading: userLoading } = useContext(UserContext);
     const isMobile = width < 768;
 
@@ -218,12 +234,10 @@ export default function ProfilePage() {
     };
 
     const ownerOptions = [
-        { icon: Pencil, label: "تعديل الملف الشخصي", onClick: () => {} },
+        { icon: Pencil, label: "تعديل الملف الشخصي", onClick: () => {router.push("/settings")} },
         { separator: true },
         { icon: Share2, label: "مشاركة الملف الشخصي", onClick: handleShare },
         { icon: Copy, label: "نسخ رابط الملف الشخصي", onClick: handleCopy },
-        { separator: true },
-        { icon: Trash2, label: "حذف الملف الشخصي", type: "red", onClick: () => {} },
     ];
 
     const guestOptions = [
