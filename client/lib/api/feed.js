@@ -48,11 +48,13 @@ export function parseList(l, ownerName) {
         name: l.name,
         ownerName,
         ownerInitials: getInitials(ownerName),
-        authorImage: l.owner?.image,
+        authorUsername: l.author?.username,
+        authorImage: l.author?.image,
         date: formatArabicDate(l.createdAt),
         storyCount: l._count?.savedArticles ?? 0,
         containsArticle: l.containsArticle ?? false,
-        images: [],
+        saved: l.saved ?? false,
+        images: l.images ?? [],
     };
 }
 
@@ -132,5 +134,39 @@ export async function createList(name) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
+    });
+}
+
+export async function getList(listId) {
+    return fetcher(`/api/feed/lists/${listId}`, { credentials: "include" });
+}
+
+export async function renameList(listId, name) {
+    return fetcher(`/api/feed/lists/${listId}`, {
+        credentials: "include",
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+    });
+}
+
+export async function deleteList(listId) {
+    return fetcher(`/api/feed/lists/${listId}`, {
+        credentials: "include",
+        method: "DELETE",
+    });
+}
+
+export async function saveList(listId) {
+    return fetcher(`/api/feed/lists/${listId}/save`, {
+        credentials: "include",
+        method: "PUT",
+    });
+}
+
+export async function unsaveList(listId) {
+    return fetcher(`/api/feed/lists/${listId}/save`, {
+        credentials: "include",
+        method: "DELETE",
     });
 }

@@ -1,14 +1,171 @@
-import { useState } from "react";
-import { Bookmark, Ellipsis } from "lucide-react";
+"use client";
+
+import { useState, useContext } from "react";
+import { useRouter } from "next/navigation";
+import {
+    Bookmark,
+    Ellipsis,
+    Pencil,
+    Trash2,
+    Share2,
+    Copy,
+    BookmarkPlus,
+} from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import RequireAuth from "@/components/RequireAuth";
+import ConfirmModal from "@/components/ConfirmModal";
+import ShareModal from "@/components/ShareModal";
+import MoreMenu from "@/components/MoreMenu";
+import Modal from "@/components/ui/Modal";
+import Button from "@/components/ui/Button";
+import { UserContext } from "@/context/UserContext";
+import { useAuthModal } from "@/context/AuthModalContext";
+import {
+    useRenameList,
+    useDeleteList,
+    useSaveList,
+    useUnsaveList,
+} from "@/hooks/useLists";
+import { toast } from "sonner";
+import Link from "next/link";
 
-export default function ListCard({ list, isMobile }) {
-    const [saved, setSaved] = useState(false);
+export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
+    const [saved, setSaved] = useState(list.saved);
+    const [removeOpen, setRemoveOpen] = useState(false);
+    const [removing, setRemoving] = useState(false);
+    const [renameOpen, setRenameOpen] = useState(false);
+    const [renameValue, setRenameValue] = useState(list.name);
+    const [shareOpen, setShareOpen] = useState(false);
 
-    /* The three images have descending widths to produce the depth illusion */
+    const { user, loading: userLoading } = useContext(UserContext);
+    const { openAuth } = useAuthModal();
+    const router = useRouter();
+
+    const renameMutation = useRenameList();
+    const deleteMutation = useDeleteList();
+    const saveListMutation = useSaveList();
+    const unsaveListMutation = useUnsaveList();
+
+    const isOwner =
+        isOwnerProp ??
+        (!userLoading &&
+            Boolean(user) &&
+            user.username === list.authorUsername);
+
     const imgWidths = isMobile ? [88, 60, 44] : [110, 76, 56];
     const cardHeight = isMobile ? 88 : 110;
+
+    const listUrl = () =>
+        typeof window !== "undefined"
+            ? `${window.location.origin}/list/${list.id}`
+            : "";
+
+    const handleEditName = () => {
+        setRenameValue(list.name);
+        setRenameOpen(true);
+    };
+
+    const handleRename = () => {
+        const trimmed = renameValue.trim();
+        if (!trimmed) return;
+        if (trimmed === list.name) {
+            setRenameOpen(false);
+            return;
+        }
+        renameMutation.mutate(
+            { listId: list.id, name: trimmed },
+            {
+                onSuccess: () => {
+                    setRenameOpen(false);
+                    toast.success("تم تعديل اسم القائمة");
+                },
+                onError: (err) => {
+                    toast.error(err?.message || "حدث خطأ أثناء تعديل الاسم");
+                },
+            },
+        );
+    };
+
+    const handleShare = () => setShareOpen(true);
+
+    const handleCopy = () => {
+        if (typeof navigator !== "undefined" && navigator.clipboard) {
+            navigator.clipboard.writeText(listUrl()).then(() => {
+                toast.success("تم نسخ الرابط");
+            });
+        }
+    };
+
+    const confirmRemove = async () => {
+        try {
+            setRemoving(true);
+            await deleteMutation.mutateAsync(list.id);
+            setRemoveOpen(false);
+            toast.success("تم حذف القائمة");
+        } catch (err) {
+            toast.error(err?.message || "حدث خطأ أثناء حذف القائمة");
+        } finally {
+            setRemoving(false);
+        }
+    };
+
+    const handleSaveList = () => {
+        if (!user) {
+            openAuth("login");
+            return;
+        }
+        if (saved) {
+            unsaveListMutation.mutate(list.id, {
+                onSuccess: () => {
+                    setSaved(false);
+                    toast.success("تم إزالة القائمة من المحفوظات");
+                },
+                onError: (err) => {
+                    toast.error(err?.message || "حدث خطأ");
+                },
+            });
+        } else {
+            saveListMutation.mutate(list.id, {
+                onSuccess: () => {
+                    setSaved(true);
+                    toast.success("تم حفظ القائمة");
+                },
+                onError: (err) => {
+                    toast.error(err?.message || "حدث خطأ");
+                },
+            });
+        }
+    };
+
+    const ownerOptions = [
+        { icon: Pencil, label: "تعديل اسم القائمة", onClick: handleEditName },
+        { separator: true },
+        { icon: Share2, label: "مشاركة القائمة", onClick: handleShare },
+        { icon: Copy, label: "نسخ رابط القائمة", onClick: handleCopy },
+        { separator: true },
+        {
+            icon: Trash2,
+            label: "حذف القائمة",
+            type: "red",
+            onClick: () => setRemoveOpen(true),
+        },
+    ];
+
+    const guestOptions = [
+        {
+            icon: BookmarkPlus,
+            label: saved ? "إزالة من المحفوظات" : "حفظ القائمة",
+            onClick: handleSaveList,
+        },
+        { icon: Share2, label: "مشاركة القائمة", onClick: handleShare },
+        { icon: Copy, label: "نسخ رابط القائمة", onClick: handleCopy },
+    ];
+
+    const options = userLoading
+        ? guestOptions
+        : isOwner
+          ? ownerOptions
+          : guestOptions;
 
     return (
         <article
@@ -21,7 +178,6 @@ export default function ListCard({ list, isMobile }) {
                 direction: "rtl",
             }}
         >
-            {/* ── Content pane ───────────────────────────────────────── */}
             <div
                 style={{
                     flex: 1,
@@ -29,10 +185,9 @@ export default function ListCard({ list, isMobile }) {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-around",
-                    paddingLeft: 16
+                    paddingLeft: 16,
                 }}
             >
-                {/* Owner row */}
                 <div
                     style={{
                         display: "flex",
@@ -41,23 +196,30 @@ export default function ListCard({ list, isMobile }) {
                         marginBottom: 10,
                     }}
                 >
-                    <Avatar
-                        initials={list.ownerAvatar}
-                        size={20}
-                        bg="var(--color-accent)"
-                    />
-                    <span
-                        style={{
-                            fontSize: 13,
-                            color: "var(--color-ink)",
-                            fontWeight: 500,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                        }}
+                    <Link
+                        href={`/@${list.authorUsername}`}
+                        className="flex items-center gap-2"
                     >
-                        {list.ownerName}
-                    </span>
+                        <Avatar
+                            img={list.authorImage}
+                            initials={list.ownerInitials}
+                            size={20}
+                            bg="var(--color-accent)"
+                        />
+                        <span
+                            style={{
+                                fontSize: 13,
+                                color: "var(--color-ink)",
+                                fontWeight: 500,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                            }}
+                            className="hover:underline"
+                        >
+                            {list.ownerName}
+                        </span>
+                    </Link>
                 </div>
 
                 {/* List title */}
@@ -80,21 +242,23 @@ export default function ListCard({ list, isMobile }) {
 
                 {/* Actions row */}
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    {/* Story count */}
+                    {/* Article count */}
                     <p
                         style={{
                             fontSize: 13,
                             color: "var(--color-light)",
                         }}
                     >
-                        {list.storyCount} قصة
+                        {list.storyCount} مقالة
                     </p>
                     <div className="flex-1"></div>
                     <RequireAuth>
                         <button
                             onClick={() => setSaved((s) => !s)}
                             className={`cursor-pointer pl-1 ${
-                                saved ? "text-accent" : "text-mid hover:text-accent"
+                                saved
+                                    ? "text-accent"
+                                    : "text-mid hover:text-accent"
                             }`}
                             style={{ transition: "color 0.15s" }}
                         >
@@ -106,14 +270,9 @@ export default function ListCard({ list, isMobile }) {
                         </button>
                     </RequireAuth>
 
-                    <button
-                        className="cursor-pointer text-mid ml-1 hover:text-ink"
-                        style={{
-                            transition: "color 0.15s",
-                        }}
-                    >
-                        <Ellipsis size={19} />
-                    </button>
+                    <MoreMenu options={options}>
+                        <Ellipsis size={19} style={{ marginLeft: 4 }} />
+                    </MoreMenu>
                 </div>
             </div>
 
@@ -139,16 +298,17 @@ export default function ListCard({ list, isMobile }) {
                                 width: w,
                                 height: "100%",
                                 flexShrink: 0,
-                                background: "var(--color-surface-subtle)",
-                                /* hairline separator between images */
+                                background: src
+                                    ? "var(--color-surface-subtle)"
+                                    : "var(--color-white)",
                                 borderRight:
                                     i > 0
-                                        ? "2px solid var(--color-white, #fff)"
+                                        ? "2px solid var(--color-border)"
                                         : "none",
                                 overflow: "hidden",
                             }}
                         >
-                            {src ? (
+                            {src && (
                                 <img
                                     src={src}
                                     alt=""
@@ -159,21 +319,88 @@ export default function ListCard({ list, isMobile }) {
                                         display: "block",
                                     }}
                                 />
-                            ) : (
-                                /* placeholder when fewer than 3 images */
-                                <div
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        background:
-                                            "var(--color-surface-subtle)",
-                                    }}
-                                />
                             )}
                         </div>
                     );
                 })}
             </div>
+
+            {/* ── Modals ──────────────────────────────────────────── */}
+            <ConfirmModal
+                isOpen={removeOpen}
+                icon={Trash2}
+                color="var(--color-error)"
+                icoBackground="var(--color-error-light)"
+                title="حذف القائمة"
+                description="هل أنت متأكد من حذف هذه القائمة؟ لا يمكن التراجع عن هذا الإجراء."
+                buttonText="حذف"
+                loading={removing}
+                onCancel={() => setRemoveOpen(false)}
+                onConfirm={confirmRemove}
+            />
+
+            <Modal open={renameOpen} onClose={() => setRenameOpen(false)}>
+                <h2
+                    style={{
+                        fontSize: 18,
+                        fontWeight: 700,
+                        color: "var(--color-ink)",
+                        margin: "0 0 16px",
+                    }}
+                >
+                    تعديل اسم القائمة
+                </h2>
+                <input
+                    type="text"
+                    value={renameValue}
+                    onChange={(e) => setRenameValue(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleRename()}
+                    maxLength={60}
+                    autoFocus
+                    style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        fontSize: 15,
+                        border: "1px solid var(--color-border)",
+                        borderRadius: "var(--border-radius)",
+                        outline: "none",
+                        boxSizing: "border-box",
+                    }}
+                />
+                <div
+                    style={{
+                        display: "flex",
+                        gap: 12,
+                        justifyContent: "center",
+                        marginTop: 20,
+                    }}
+                >
+                    <Button
+                        onClick={() => setRenameOpen(false)}
+                        variant="secondary"
+                        disabled={renameMutation.isPending}
+                        style={{ width: "50%" }}
+                    >
+                        إلغاء
+                    </Button>
+                    <Button
+                        onClick={handleRename}
+                        loading={renameMutation.isPending}
+                        style={{ width: "50%" }}
+                    >
+                        تحديث
+                    </Button>
+                </div>
+            </Modal>
+
+            <ShareModal
+                open={shareOpen}
+                onClose={() => setShareOpen(false)}
+                articleId={list.id}
+                url={listUrl()}
+                heading="مشاركة القائمة"
+                subheading="يمكنك مشاركة القائمة مع الآخرين"
+            />
         </article>
     );
 }

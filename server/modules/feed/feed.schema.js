@@ -20,3 +20,7 @@ export const listsQuerySchema = z.object({
 export const createListSchema = z.object({
     name: z.string().trim().min(1, "اسم القائمة مطلوب").max(60, "الاسم طويل جدًا"),
 });
+
+export const renameListSchema = z.object({
+    name: z.string().trim().min(1, "اسم القائمة مطلوب").max(60, "الاسم طويل جدًا"),
+});

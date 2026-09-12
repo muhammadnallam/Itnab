@@ -113,7 +113,7 @@ export async function getFeed({ sort, author, topic, filter, page, pageSize, use
     return result;
 }
 
-export async function getUserLists({ author, articleId, page, pageSize }) {
+export async function getUserLists({ author, articleId, page, pageSize, userId }) {
     if (!author) throw new ValidationError("معرف المؤلف مطلوب");
     await assertAuthorExists(author);
 
@@ -125,8 +125,26 @@ export async function getUserLists({ author, articleId, page, pageSize }) {
             select: {
                 id: true,
                 name: true,
+                authorId: true,
                 createdAt: true,
                 updatedAt: true,
+                author: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        image: true,
+                    },
+                },
+                savedArticles: {
+                    take: 3,
+                    orderBy: { createdAt: "desc" },
+                    select: {
+                        article: {
+                            select: { coverImage: true },
+                        },
+                    },
+                },
                 _count: {
                     select: { savedArticles: true },
                 },
@@ -137,21 +155,43 @@ export async function getUserLists({ author, articleId, page, pageSize }) {
         prisma.list.count({ where }),
     ]);
 
-    let annotated = lists;
-    if (articleId && lists.length > 0) {
+    let annotated = lists.map((l) => ({
+        ...l,
+        images: l.savedArticles.map((sa) => sa.article.coverImage).filter(Boolean),
+        savedArticles: undefined,
+    }));
+
+    if (articleId && annotated.length > 0) {
         const saved = await prisma.savedArticle.findMany({
             where: {
                 articleId,
-                listId: { in: lists.map((l) => l.id) },
+                listId: { in: annotated.map((l) => l.id) },
             },
             select: { listId: true },
         });
         const savedSet = new Set(saved.map((s) => s.listId));
-        annotated = lists.map((l) => ({
+        annotated = annotated.map((l) => ({
             ...l,
             containsArticle: savedSet.has(l.id),
         }));
     }
+
+    let savedListIds = new Set();
+    if (userId && annotated.length > 0) {
+        const userSaves = await prisma.savedList.findMany({
+            where: {
+                userId,
+                listId: { in: annotated.map((l) => l.id) },
+            },
+            select: { listId: true },
+        });
+        savedListIds = new Set(userSaves.map((s) => s.listId));
+    }
+
+    annotated = annotated.map((l) => ({
+        ...l,
+        saved: savedListIds.has(l.id),
+    }));
 
     return { lists: annotated, ...buildMeta(total, page, pageSize) };
 }
@@ -167,4 +207,106 @@ export async function createUserList({ userId, name }) {
             _count: { select: { savedArticles: true } },
         },
     });
+}
+
+export async function getList({ listId, userId }) {
+    const list = await prisma.list.findUnique({
+        where: { id: listId },
+        select: {
+            id: true,
+            name: true,
+            authorId: true,
+            createdAt: true,
+            updatedAt: true,
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true,
+                    image: true,
+                },
+            },
+            savedArticles: {
+                orderBy: { createdAt: "desc" },
+                select: {
+                    article: {
+                        select: ARTICLE_METADATA_SELECT,
+                    },
+                },
+            },
+            _count: { select: { savedArticles: true } },
+        },
+    });
+
+    if (!list) throw new NotFoundError("القائمة غير موجودة");
+
+    let saved = false;
+    if (userId) {
+        const entry = await prisma.savedList.findUnique({
+            where: { userId_listId: { userId, listId } },
+            select: { userId: true },
+        });
+        saved = !!entry;
+    }
+
+    return {
+        ...list,
+        articles: list.savedArticles.map((sa) => sa.article),
+        savedArticles: undefined,
+        saved,
+    };
+}
+
+export async function renameList({ listId, userId, name }) {
+    const list = await prisma.list.findUnique({
+        where: { id: listId },
+        select: { id: true, authorId: true },
+    });
+    if (!list) throw new NotFoundError("القائمة غير موجودة");
+    if (list.authorId !== userId) throw new NotFoundError("غير مصرح לך بتعديل هذه القائمة");
+
+    return prisma.list.update({
+        where: { id: listId },
+        data: { name },
+        select: {
+            id: true,
+            name: true,
+            updatedAt: true,
+        },
+    });
+}
+
+export async function deleteList({ listId, userId }) {
+    const list = await prisma.list.findUnique({
+        where: { id: listId },
+        select: { id: true, authorId: true, isDefault: true },
+    });
+    if (!list) throw new NotFoundError("القائمة غير موجودة");
+    if (list.authorId !== userId) throw new NotFoundError("غير مصرح لك بحذف هذه القائمة");
+    if (list.isDefault) throw new NotFoundError("لا يمكن حذف القائمة الافتراضية");
+
+    await prisma.list.delete({ where: { id: listId } });
+    return { success: true };
+}
+
+export async function saveList({ listId, userId }) {
+    const list = await prisma.list.findUnique({
+        where: { id: listId },
+        select: { id: true },
+    });
+    if (!list) throw new NotFoundError("القائمة غير موجودة");
+
+    await prisma.savedList.upsert({
+        where: { userId_listId: { userId, listId } },
+        create: { userId, listId },
+        update: {},
+    });
+    return { saved: true };
+}
+
+export async function unsaveList({ listId, userId }) {
+    await prisma.savedList.deleteMany({
+        where: { userId, listId },
+    });
+    return { saved: false };
 }

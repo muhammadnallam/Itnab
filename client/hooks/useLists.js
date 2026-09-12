@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
-import { getUserLists, createList } from "@/lib/api/feed";
+import { getUserLists, createList, renameList, deleteList, saveList, unsaveList } from "@/lib/api/feed";
 import { saveArticle, unsaveArticle } from "@/lib/api/interactions";
 
 export function useLists({ author, articleId, enabled = true } = {}) {
@@ -47,6 +47,26 @@ export function useCreateList() {
     });
 }
 
+export function useRenameList() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ listId, name }) => renameList(listId, name),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["lists"] });
+        },
+    });
+}
+
+export function useDeleteList() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (listId) => deleteList(listId),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["lists"] });
+        },
+    });
+}
+
 export function useSaveToList(articleId) {
     const qc = useQueryClient();
     return useMutation({
@@ -69,6 +89,26 @@ export function useUnsaveFromList(articleId) {
             qc.invalidateQueries({ queryKey: ["userSaves"] });
             qc.invalidateQueries({ queryKey: queryKeys.allArticles() });
             qc.invalidateQueries({ queryKey: queryKeys.save(articleId) });
+        },
+    });
+}
+
+export function useSaveList() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (listId) => saveList(listId),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["lists"] });
+        },
+    });
+}
+
+export function useUnsaveList() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: (listId) => unsaveList(listId),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["lists"] });
         },
     });
 }

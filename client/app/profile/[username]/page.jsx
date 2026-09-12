@@ -227,7 +227,7 @@ export default function ProfilePage() {
     const handleShare = () => setShareOpen(true);
 
     const handleCopy = () => {
-        const url = `${window.location.origin}/profile/${profile.username}`;
+        const url = `${window.location.origin}/@${profile.username}`;
         navigator.clipboard?.writeText(url).then(() => {
             toast.success("تم نسخ الرابط");
         });
@@ -449,6 +449,7 @@ export default function ProfilePage() {
                                     key={l.id}
                                     list={parseList(l, profile?.name)}
                                     isMobile={isMobile}
+                                    isOwner={isOwnProfile}
                                 />
                             ))}
                             {lists.hasMore && (
@@ -508,7 +509,7 @@ export default function ProfilePage() {
             <ShareModal
                 open={shareOpen}
                 onClose={() => setShareOpen(false)}
-                url={profile ? `${window.location.origin}/profile/${profile.username}` : ""}
+                url={profile ? `${window.location.origin}/@${profile.username}` : ""}
                 heading="مشاركة الملف الشخصي"
                 subheading="شارك هذا الملف الشخصي مع الآخرين"
             />

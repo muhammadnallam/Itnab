@@ -3,8 +3,22 @@ import asyncErrorHandler from "../../middleware/asyncErrorHandler.js";
 import optionalAuth from "../../middleware/optionalAuth.js";
 import requireAuth from "../../middleware/requireAuth.js";
 import { ValidationError } from "../../lib/errors.js";
-import { getFeed, getUserLists, createUserList } from "./feed.service.js";
-import { feedQuerySchema, listsQuerySchema, createListSchema } from "./feed.schema.js";
+import {
+    getFeed,
+    getUserLists,
+    createUserList,
+    getList,
+    renameList,
+    deleteList,
+    saveList,
+    unsaveList,
+} from "./feed.service.js";
+import {
+    feedQuerySchema,
+    listsQuerySchema,
+    createListSchema,
+    renameListSchema,
+} from "./feed.schema.js";
 
 const router = Router();
 
@@ -32,6 +46,7 @@ router.get(
 
 router.get(
     "/lists",
+    optionalAuth,
     asyncErrorHandler(async (req, res) => {
         const parsed = listsQuerySchema.safeParse(req.query);
         if (!parsed.success) {
@@ -43,6 +58,7 @@ router.get(
             articleId,
             page,
             pageSize: limit,
+            userId: req.user?.id,
         });
         res.json(result);
     }),
@@ -61,6 +77,71 @@ router.post(
             name: parsed.data.name,
         });
         res.status(201).json(list);
+    }),
+);
+
+router.get(
+    "/lists/:listId",
+    optionalAuth,
+    asyncErrorHandler(async (req, res) => {
+        const result = await getList({
+            listId: req.params.listId,
+            userId: req.user?.id,
+        });
+        res.json(result);
+    }),
+);
+
+router.put(
+    "/lists/:listId",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        const parsed = renameListSchema.safeParse(req.body);
+        if (!parsed.success) {
+            throw new ValidationError(parsed.error.issues[0].message);
+        }
+        const result = await renameList({
+            listId: req.params.listId,
+            userId: req.user.id,
+            name: parsed.data.name,
+        });
+        res.json(result);
+    }),
+);
+
+router.delete(
+    "/lists/:listId",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        const result = await deleteList({
+            listId: req.params.listId,
+            userId: req.user.id,
+        });
+        res.json(result);
+    }),
+);
+
+router.put(
+    "/lists/:listId/save",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        const result = await saveList({
+            listId: req.params.listId,
+            userId: req.user.id,
+        });
+        res.json(result);
+    }),
+);
+
+router.delete(
+    "/lists/:listId/save",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        const result = await unsaveList({
+            listId: req.params.listId,
+            userId: req.user.id,
+        });
+        res.json(result);
     }),
 );
 

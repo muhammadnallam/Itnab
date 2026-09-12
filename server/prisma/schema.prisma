@@ -45,6 +45,7 @@ model User {
   views         View[]     @relation("userViews")
   comments      Comment[]
   commentLikes  CommentLike[]
+  savedLists    SavedList[]
 
   name          String
   emailVerified Boolean    @default(false)
@@ -107,6 +108,7 @@ model List {
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   savedArticles SavedArticle[]
+  savedBy       SavedList[]
 
   @@map("list")
 }
@@ -192,6 +194,17 @@ model SavedArticle {
 
   @@id([listId, articleId])
   @@index([articleId])
+}
+
+model SavedList {
+  userId    String   @db.Uuid
+  listId    String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@id([userId, listId])
 }
 
 // Manage threaded comments with nesting replies (max depth 3).
