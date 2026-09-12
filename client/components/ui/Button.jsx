@@ -37,7 +37,9 @@ export default function Button({
                     border:
                         variant === "error"
                             ? "1px solid var(--color-error)"
-                            : "none",
+                            : variant === "secondary"
+                              ? "1px solid var(--color-border)"
+                              : "none",
                     borderRadius: "var(--border-radius)",
                     padding: "8px 10px",
                     fontSize: 15,

@@ -60,12 +60,12 @@ const getInitials = (name) => {
     return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
 };
 
-const FollowButton = ({ following, isMutating, onToggle }) => (
+const FollowButton = ({ following, isMutating, onToggle, style }) => (
     <RequireAuth onClick={onToggle} mode="login">
         <Button
             variant={following ? "secondary" : "primary"}
             loading={isMutating}
-            style={{ width: "100%" }}
+            style={{ width: "100%", ...style }}
         >
             {following ? "إلغاء المتابعة" : "متابعة"}
         </Button>
@@ -209,6 +209,7 @@ export default function ProfilePage() {
     const router = useRouter();
     const { user, loading: userLoading } = useContext(UserContext);
     const isMobile = width < 768;
+    const isTablet = width >= 768 && width < 1100;
 
     const { profile, isLoading, error } = useUser(username);
 
@@ -412,7 +413,50 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            {!isMobile && (
+            {isTablet && (
+                <div className="flex items-center gap-3 mt-4 mb-1">
+                    <Avatar
+                        img={profile.image}
+                        initials={getInitials(profile.name)}
+                        size={52}
+                        bg="var(--color-accent)"
+                    />
+                    <div className="flex-1 min-w-0">
+                        <div className="text-[17px] font-bold text-ink leading-[1.2]">
+                            {profile.name}
+                        </div>
+                        <div className="flex gap-3 text-[13px] text-light">
+                            <span
+                                onClick={followerCount > 0 ? () => setFollowModal("followers") : undefined}
+                                style={{ cursor: followerCount > 0 ? "pointer" : "default" }}
+                            >
+                                {formatCount(followerCount)} متابع
+                            </span>
+                            <span
+                                onClick={profile.followingCount > 0 ? () => setFollowModal("following") : undefined}
+                                style={{ cursor: profile.followingCount > 0 ? "pointer" : "default" }}
+                            >
+                                {formatCount(profile.followingCount)} يتابع
+                            </span>
+                        </div>
+                    </div>
+                    {!isOwnProfile && (
+                        <FollowButton
+                            following={following}
+                            isMutating={isMutating}
+                            onToggle={toggleFollow}
+                            style={{ width: "auto", flexShrink: 0 }}
+                        />
+                    )}
+                    <MoreMenu options={menuOptions}>
+                        <span className="text-light flex p-1">
+                            <MoreHorizontal size={20} />
+                        </span>
+                    </MoreMenu>
+                </div>
+            )}
+
+            {!isMobile && !isTablet && (
                 <div className="flex items-start justify-between mt-10 mb-10">
                     <h1 className="text-[32px] font-bold text-ink m-0 leading-[1.15]">
                         {profile.name}

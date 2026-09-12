@@ -23,6 +23,7 @@ export default function AuthorRow({ author, isSelf = false }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                gap: 12,
             }}
         >
             <Link href={`/@${author.username}`} className="flex items-center gap-2">
