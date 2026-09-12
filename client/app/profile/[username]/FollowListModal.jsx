@@ -2,88 +2,14 @@
 
 import { useContext } from "react";
 import Modal from "@/components/ui/Modal";
-import Avatar from "@/components/ui/Avatar";
-import RequireAuth from "@/components/RequireAuth";
+import AuthorRow from "@/components/AuthorRow";
 import { useFollowers } from "@/hooks/useFollowers";
 import { useFollowing } from "@/hooks/useFollowing";
-import { useFollow } from "@/hooks/useFollow";
 import { UserContext } from "@/context/UserContext";
-
-function UserRow({ user }) {
-    const { user: currentUser } = useContext(UserContext);
-    const {
-        isFollowing,
-        toggle,
-        isMutating,
-    } = useFollow(user.id);
-    const isSelf = currentUser?.id === user.id;
-
-    const getInitials = (name) => {
-        if (!name) return "?";
-        const parts = name.trim().split(/\s+/);
-        return parts.length > 1
-            ? parts[0][0] + parts[1][0]
-            : parts[0][0];
-    };
-
-    return (
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-            }}
-        >
-            <Avatar
-                img={user.image}
-                initials={getInitials(user.name)}
-                size={40}
-                bg="var(--color-accent)"
-            />
-            <span
-                style={{
-                    flex: 1,
-                    fontSize: 15,
-                    fontWeight: 500,
-                    lineHeight: 1.3,
-                    minWidth: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                }}
-            >
-                {user.name}
-            </span>
-            {!isSelf && (
-                <RequireAuth>
-                    <button
-                        onClick={toggle}
-                        className={
-                            isFollowing
-                                ? "bg-accent-light text-ink hover:bg-[#d0d0d0]"
-                                : "bg-accent text-white hover:bg-accent-hover"
-                        }
-                        style={{
-                            border: "none",
-                            borderRadius: 99,
-                            padding: "6px 16px",
-                            fontSize: 13,
-                            cursor: "pointer",
-                            fontWeight: 500,
-                            flexShrink: 0,
-                            transition: "background 0.15s",
-                        }}
-                    >
-                        {isFollowing ? "متابَع" : "اشترك"}
-                    </button>
-                </RequireAuth>
-            )}
-        </div>
-    );
-}
 
 export default function FollowListModal({ open, onClose, type, userId }) {
     const isFollowers = type === "followers";
+    const { user: currentUser } = useContext(UserContext);
     const followersResult = useFollowers(userId, { enabled: open && isFollowers });
     const followingResult = useFollowing(userId, { enabled: open && !isFollowers });
     const { writers, loading } = isFollowers ? followersResult : followingResult;
@@ -131,7 +57,11 @@ export default function FollowListModal({ open, onClose, type, userId }) {
                     </div>
                 )}
                 {writers.map((w) => (
-                    <UserRow key={w.id} user={w} />
+                    <AuthorRow
+                        key={w.id}
+                        author={w}
+                        isSelf={currentUser?.id === w.id}
+                    />
                 ))}
             </div>
         </Modal>

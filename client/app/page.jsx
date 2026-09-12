@@ -6,7 +6,7 @@ import { TAGS } from "@itnab/constants";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
-import Avatar from "@/components/ui/Avatar";
+import AuthorRow from "@/components/AuthorRow";
 import Tabs from "@/components/ui/Tabs";
 import RequireAuth from "@/components/RequireAuth";
 import { UserContext } from "@/context/UserContext";
@@ -15,66 +15,6 @@ import { useAuthModal } from "@/context/AuthModalContext";
 import Button from "@/components/ui/Button";
 import { useArticleList } from "@/hooks/useArticleList";
 import { useTopAuthors } from "@/hooks/useTopAuthors";
-import { useFollow } from "@/hooks/useFollow";
-
-const AuthorRow = ({ author }) => {
-    const { user } = useContext(UserContext);
-    const { isFollowing, toggle } = useFollow(author.id);
-    return (
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                marginBottom: 16,
-            }}
-        >
-            <Link href={`/@${author.username}`} className="flex items-center gap-2">
-                <Avatar
-                    img={author.image}
-                    initials={author.name?.slice(0, 2) || ""}
-                    size={40}
-                    bg="var(--color-accent)"
-                />
-                <span
-                    className="hover:underline"
-                    style={{
-                        flex: 1,
-                        fontSize: 15,
-                        fontWeight: 500,
-                        lineHeight: 1.3,
-                    }}
-                >
-                    {author.name}
-                </span>
-            </Link>
-            {user && (
-                <RequireAuth>
-                    <button
-                        onClick={toggle}
-                        className={
-                            isFollowing
-                                ? "bg-accent-light text-ink hover:bg-[#d0d0d0]"
-                                : "bg-accent text-white hover:bg-accent-hover"
-                        }
-                        style={{
-                            border: "none",
-                            borderRadius: 99,
-                            padding: "6px 16px",
-                            fontSize: 13,
-                            cursor: "pointer",
-                            fontWeight: 500,
-                            flexShrink: 0,
-                            transition: "background 0.15s",
-                        }}
-                    >
-                        {isFollowing ? "متابِع" : "متابعة"}
-                    </button>
-                </RequireAuth>
-            )}
-        </div>
-    );
-};
 
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const { user, loading } = useContext(UserContext);
