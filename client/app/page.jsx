@@ -29,22 +29,25 @@ const AuthorRow = ({ author }) => {
                 marginBottom: 16,
             }}
         >
-            <Avatar
-                img={author.image}
-                initials={author.name?.slice(0, 2) || ""}
-                size={40}
-                bg="var(--color-accent)"
-            />
-            <span
-                style={{
-                    flex: 1,
-                    fontSize: 15,
-                    fontWeight: 500,
-                    lineHeight: 1.3,
-                }}
-            >
-                {author.name}
-            </span>
+            <Link href={`/@${author.username}`} className="flex items-center gap-2">
+                <Avatar
+                    img={author.image}
+                    initials={author.name?.slice(0, 2) || ""}
+                    size={40}
+                    bg="var(--color-accent)"
+                />
+                <span
+                    className="hover:underline"
+                    style={{
+                        flex: 1,
+                        fontSize: 15,
+                        fontWeight: 500,
+                        lineHeight: 1.3,
+                    }}
+                >
+                    {author.name}
+                </span>
+            </Link>
             {user && (
                 <RequireAuth>
                     <button

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 
 import Avatar from "@/components/ui/Avatar";
 import RequireAuth from "@/components/RequireAuth";
@@ -87,15 +88,20 @@ const ArticleCardVertical = ({ article, isMobile }) => {
                 </a>
             )}
 
-            <div className="flex items-center gap-2 mb-2.5 text-sm">
+            <Link
+                href={`/@${article.authorUsername}`}
+                className="flex items-center gap-2 mb-2.5 text-sm"
+            >
                 <Avatar
                     initials={article.authorInitials}
                     img={article.authorImage}
                     size={24}
                     bg="var(--color-accent)"
                 />
-                <span className="font-medium">{article.author}</span>
-            </div>
+                <span className="font-medium hover:underline">
+                    {article.author}
+                </span>
+            </Link>
 
             <a href={`/article/${article.slug}`}>
                 <h2
