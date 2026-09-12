@@ -64,10 +64,10 @@ async function getRandomArticles(take, userId) {
         SELECT "Article"."id", "Article"."slug", "Article"."title", "Article"."subtitle",
                "Article"."topic", "Article"."coverImage", "Article"."readTime",
                "Article"."score", "Article"."createdAt",
-               "User"."id" as "author_id", "User"."name" as "author_name",
-               "User"."username" as "author_username", "User"."image" as "author_image"
+               "user"."id" as "author_id", "user"."name" as "author_name",
+               "user"."username" as "author_username", "user"."image" as "author_image"
         FROM "Article"
-        JOIN "User" ON "Article"."authorId" = "User"."id"
+        JOIN "user" ON "Article"."authorId" = "user"."id"
         WHERE "Article"."deletedAt" IS NULL
         ORDER BY RANDOM()
         LIMIT ${take}
@@ -78,7 +78,7 @@ async function getRandomArticles(take, userId) {
 async function getRandomAuthors(take) {
     const authors = await prisma.$queryRaw`
         SELECT "id", "name", "username", "image", "followerCount"
-        FROM "User"
+        FROM "user"
         ORDER BY RANDOM()
         LIMIT ${take}
     `;
