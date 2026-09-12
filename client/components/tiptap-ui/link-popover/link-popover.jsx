@@ -171,14 +171,6 @@ export const LinkPopover = forwardRef(
         const { editor } = useTiptapEditor(providedEditor);
         const [isOpen, setIsOpen] = useState(false);
 
-        const [prevIsActive, setPrevIsActive] = useState(isActive);
-        if (prevIsActive !== isActive) {
-            setPrevIsActive(isActive);
-            if (autoOpenOnLinkActive && isActive) {
-                setIsOpen(true);
-            }
-        }
-
         const {
             isVisible,
             canSet,
@@ -195,6 +187,14 @@ export const LinkPopover = forwardRef(
             hideWhenUnavailable,
             onSetLink,
         });
+
+        const [prevIsActive, setPrevIsActive] = useState(isActive);
+        if (prevIsActive !== isActive) {
+            setPrevIsActive(isActive);
+            if (autoOpenOnLinkActive && isActive) {
+                setIsOpen(true);
+            }
+        }
 
         const handleOnOpenChange = useCallback(
             (nextIsOpen) => {
