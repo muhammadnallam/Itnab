@@ -28,6 +28,7 @@ import {
 } from "@/hooks/useLists";
 import { toast } from "sonner";
 import Link from "next/link";
+import { BookmarkMinus } from "lucide-react";
 
 export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
     const [saved, setSaved] = useState(list.saved);
@@ -39,7 +40,6 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
 
     const { user, loading: userLoading } = useContext(UserContext);
     const { openAuth } = useAuthModal();
-    const router = useRouter();
 
     const renameMutation = useRenameList();
     const deleteMutation = useDeleteList();
@@ -153,10 +153,12 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
 
     const guestOptions = [
         {
-            icon: BookmarkPlus,
+            icon: saved ? BookmarkMinus : BookmarkPlus,
             label: saved ? "إزالة من المحفوظات" : "حفظ القائمة",
             onClick: handleSaveList,
+            type: "red",
         },
+        { separator: true },
         { icon: Share2, label: "مشاركة القائمة", onClick: handleShare },
         { icon: Copy, label: "نسخ رابط القائمة", onClick: handleCopy },
     ];
@@ -253,23 +255,37 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
                         {list.storyCount} مقالة
                     </p>
                     <div className="flex-1"></div>
-                    <RequireAuth>
-                        <button
-                            onClick={() => setSaved((s) => !s)}
-                            className={`cursor-pointer pl-1 ${
-                                saved
-                                    ? "text-accent"
-                                    : "text-mid hover:text-accent"
-                            }`}
-                            style={{ transition: "color 0.15s" }}
-                        >
-                            <Bookmark
-                                size={19}
-                                fill={saved ? "var(--color-accent)" : "none"}
-                                color="currentColor"
-                            />
-                        </button>
-                    </RequireAuth>
+                    {!isOwner && (
+                        <RequireAuth>
+                            <button
+                                onClick={() => handleSaveList()}
+                                className={`cursor-pointer pl-1 ${
+                                    saved
+                                        ? "text-accent"
+                                        : "text-mid hover:text-accent"
+                                }`}
+                                style={{ transition: "color 0.15s" }}
+                            >
+                                <Bookmark
+                                    size={19}
+                                    fill={
+                                        saved ? "var(--color-accent)" : "none"
+                                    }
+                                    color="currentColor"
+                                />
+                            </button>
+                        </RequireAuth>
+                    )}
+                    {isOwner && (
+                        <RequireAuth>
+                            <button
+                                onClick={() => setRemoveOpen(true)}
+                                className={`cursor-pointer pl-1`}
+                            >
+                                <Trash2 size={19} color="var(--color-error)" />
+                            </button>
+                        </RequireAuth>
+                    )}
 
                     <MoreMenu options={options}>
                         <Ellipsis size={19} style={{ marginLeft: 4 }} />
@@ -326,7 +342,6 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
                 })}
             </div>
 
-            {/* ── Modals ──────────────────────────────────────────── */}
             <ConfirmModal
                 isOpen={removeOpen}
                 icon={Trash2}
