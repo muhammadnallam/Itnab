@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useMemo, useCallback, useContext, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import AppLayout from "@/components/AppLayout";
 import { Compass, Search } from "lucide-react";
 import { TAGS } from "@itnab/constants";
@@ -19,6 +20,7 @@ import { useExploreRecommendations } from "@/hooks/useExploreRecommendations";
 import { useTopAuthors } from "@/hooks/useTopAuthors";
 import { useSearch } from "@/hooks/useSearch";
 import { useTagFeed } from "@/hooks/useTagFeed";
+import { useFollow } from "@/hooks/useFollow";
 
 const MONTH_NAMES = [
     "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
@@ -109,54 +111,76 @@ const TopicsScroller = ({ activeTag, onSelect, style }) => (
     </div>
 );
 
-const AuthorCard = ({ author }) => (
-    <div
-        style={{
-            position: "relative",
-            flex: "0 0 auto",
-            width: 200,
-            padding: "20px 16px 16px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-        }}
-    >
-        <Avatar
-            img={author.image}
-            initials={getInitials(author.name)}
-            size={64}
-        />
-        <span
+const AuthorCard = ({ author }) => {
+    const { isFollowing, toggle } = useFollow(author.id);
+    return (
+        <div
+            className="card"
             style={{
-                marginTop: 12,
-                fontSize: 14,
-                fontWeight: 700,
-                color: "var(--color-ink)",
-                textAlign: "center",
-                maxWidth: "100%",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
+                position: "relative",
+                flex: "0 0 auto",
+                width: 200,
+                padding: "20px 16px 16px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
             }}
         >
-            {author.name}
-        </span>
-        <span
-            style={{
-                marginTop: 2,
-                fontSize: 13,
-                color: "var(--color-mid)",
-                textAlign: "center",
-                maxWidth: "100%",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-            }}
-        >
-            @{author.username}
-        </span>
-    </div>
-);
+            <Link href={`/@${author.username}`}>
+                <Avatar
+                    img={author.image}
+                    initials={getInitials(author.name)}
+                    size={64}
+                />
+            </Link>
+
+            <Link
+                href={`/@${author.username}`}
+                className="hover:underline"
+                style={{
+                    marginTop: 12,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: "var(--color-ink)",
+                    textAlign: "center",
+                    maxWidth: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    display: "block",
+                    textDecoration: "none",
+                }}
+            >
+                {author.name}
+            </Link>
+
+            <span
+                style={{
+                    marginTop: 2,
+                    fontSize: 13,
+                    color: "var(--color-mid)",
+                    textAlign: "center",
+                    maxWidth: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                }}
+            >
+                @{author.username}
+            </span>
+
+            <div style={{ width: "100%", marginTop: 16 }}>
+                <Button
+                    variant={isFollowing ? "secondary" : "primary"}
+                    onClick={toggle}
+                    style={{ width: "100%" }}
+                >
+                    {isFollowing ? "متابِع" : "متابعة"}
+                </Button>
+            </div>
+        </div>
+    );
+};
 
 function RecommendationsView({ isMobile }) {
     const rec = useExploreRecommendations();
