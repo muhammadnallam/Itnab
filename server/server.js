@@ -14,6 +14,7 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import { startGravityCron } from "./lib/gravity.js";
 import { startAuthorScoreCron, recomputeAuthorScores } from "./lib/author-score.js";
+import { checkCronSecret, feedGravityHandler, authorScoreHandler } from "./modules/jobs/jobs.routes.js";
 import logger from "./middleware/logger.js";
 
 const app = express();
@@ -35,6 +36,9 @@ app.use(logger);
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
 });
+
+app.post("/api/jobs/feed-gravity", checkCronSecret, feedGravityHandler);
+app.post("/api/jobs/author-score", checkCronSecret, authorScoreHandler);
 
 app.all("/api/auth/{*any}", logger, toNodeHandler(auth));
 
@@ -61,8 +65,12 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "حدث خطأ داخلي في الخادم" });
 });
 
-startGravityCron();
-startAuthorScoreCron();
+if (process.env.ENABLE_IN_PROCESS_CRON !== "false") {
+    startGravityCron();
+    startAuthorScoreCron();
+} else {
+    console.log("In-process cron disabled (ENABLE_IN_PROCESS_CRON=false)");
+}
 recomputeAuthorScores()
     .then((c) => console.log(`[author-score] Initial recompute: ${c} authors`))
     .catch((err) => console.error("[author-score] Initial recompute failed:", err));
