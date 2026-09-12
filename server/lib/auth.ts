@@ -35,7 +35,7 @@ const adapterFn = (schemaOptions: any) => {
 };
 
 export const auth = betterAuth({
-    trustedOrigins: ["http://localhost:5000", "https://itnab.com"],
+    trustedOrigins: ["http://localhost:5000", "https://itnab.com", "https://www.itnab.com"],
     database: adapterFn as any,
     // BetterAuth generates non-UUID IDs by default
     advanced: {
