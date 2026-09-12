@@ -42,6 +42,10 @@ export const auth = betterAuth({
         database: {
             generateId: "uuid",
         },
+        crossSubDomainCookies: {
+            enabled: true,
+            domain: ".itnab.com",
+        },
     },
     emailAndPassword: {
         enabled: true,
