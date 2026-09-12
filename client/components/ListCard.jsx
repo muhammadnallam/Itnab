@@ -223,22 +223,23 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
                 </div>
 
                 {/* List title */}
-                <h3
-                    style={{
-                        fontFamily: "Georgia, 'Noto Serif Arabic', serif",
-                        fontSize: isMobile ? 16 : 18,
-                        fontWeight: 700,
-                        color: "var(--color-ink)",
-                        lineHeight: 1.3,
-                        margin: "0 0 8px",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                    }}
-                >
-                    {list.name}
-                </h3>
+                <Link href={listUrl()}>
+                    <h3
+                        style={{
+                            fontSize: isMobile ? 16 : 18,
+                            fontWeight: 700,
+                            color: "var(--color-ink)",
+                            lineHeight: 1.3,
+                            margin: "0 0 8px",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                        }}
+                    >
+                        {list.name}
+                    </h3>
+                </Link>
 
                 {/* Actions row */}
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>

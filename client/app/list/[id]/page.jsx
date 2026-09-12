@@ -23,7 +23,11 @@ export default function ListPage({ params }) {
     const width = useContext(WidthContext);
     const isMobile = width < 768;
 
-    const { data: list, isLoading, error } = useQuery({
+    const {
+        data: list,
+        isLoading,
+        error,
+    } = useQuery({
         queryKey: ["list", id],
         queryFn: () => getList(id),
         enabled: !!id,
@@ -33,7 +37,13 @@ export default function ListPage({ params }) {
         if (error.status === 404) return notFound();
         return (
             <AppLayout>
-                <p style={{ textAlign: "center", padding: 40, color: "var(--color-light)" }}>
+                <p
+                    style={{
+                        textAlign: "center",
+                        padding: 40,
+                        color: "var(--color-light)",
+                    }}
+                >
                     حدث خطأ أثناء تحميل القائمة
                 </p>
             </AppLayout>
@@ -54,12 +64,11 @@ export default function ListPage({ params }) {
                     <div style={{ marginBottom: 24 }}>
                         <h1
                             style={{
-                                fontFamily: "Georgia, 'Noto Serif Arabic', serif",
                                 fontSize: isMobile ? 22 : 28,
                                 fontWeight: 700,
                                 color: "var(--color-ink)",
                                 lineHeight: 1.3,
-                                margin: "0 0 12px",
+                                margin: "12px 0 16px",
                             }}
                         >
                             {list.name}
@@ -99,9 +108,15 @@ export default function ListPage({ params }) {
                                 marginTop: 8,
                             }}
                         >
-                            {list._count?.savedArticles ?? 0} مقالة
+                            {list._count?.savedArticles ?? 0} مقال
                         </p>
                     </div>
+
+                    <div
+                        style={{
+                            borderBottom: "1px solid var(--color-border)",
+                        }}
+                    ></div>
 
                     {/* Articles */}
                     {list.articles?.length > 0 ? (

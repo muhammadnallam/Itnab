@@ -65,7 +65,7 @@ const AuthorRow = ({ author }) => {
                             transition: "background 0.15s",
                         }}
                     >
-                        {isFollowing ? "متابَع" : "اشترك"}
+                        {isFollowing ? "متابِع" : "متابعة"}
                     </button>
                 </RequireAuth>
             )}
