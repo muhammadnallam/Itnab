@@ -222,6 +222,7 @@ const ArticleCard = ({ article, isMobile }) => {
             return { previous: [...previousArticles, ...previousLibrary] };
         },
         onSuccess: (_data, save) => {
+            qc.invalidateQueries({ queryKey: ["list"] });
             toast.success(save ? "تم حفظ المقال" : "تم إزالة الحفظ");
         },
         onError: (err, _vars, context) => {

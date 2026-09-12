@@ -249,9 +249,25 @@ export async function getList({ listId, userId }) {
         saved = !!entry;
     }
 
+    let articles = list.savedArticles.map((sa) => sa.article);
+    if (userId && articles.length > 0) {
+        const bookmarks = await prisma.bookmark.findMany({
+            where: {
+                userId,
+                articleId: { in: articles.map((a) => a.id) },
+            },
+            select: { articleId: true },
+        });
+        const savedSet = new Set(bookmarks.map((b) => b.articleId));
+        articles = articles.map((a) => ({
+            ...a,
+            saved: savedSet.has(a.id),
+        }));
+    }
+
     return {
         ...list,
-        articles: list.savedArticles.map((sa) => sa.article),
+        articles,
         savedArticles: undefined,
         saved,
     };
