@@ -9,6 +9,7 @@ import {
     deleteUserAccount,
     getUserSaves,
     getUserViews,
+    getUserSavedLists,
     getFollowing,
     getFollowers,
 } from "./user.service.js";
@@ -124,6 +125,26 @@ router.get(
         }
         const { page, limit } = parsed.data;
         const result = await getUserViews(req.params.id, {
+            page,
+            pageSize: limit,
+        });
+        res.json(result);
+    }),
+);
+
+router.get(
+    "/:id/saved-lists",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        if (req.user.id !== req.params.id) {
+            return res.status(403).json({ error: "غير مصرح لك" });
+        }
+        const parsed = libraryQuerySchema.safeParse(req.query);
+        if (!parsed.success) {
+            return res.status(400).json({ error: "بيانات غير صالحة" });
+        }
+        const { page, limit } = parsed.data;
+        const result = await getUserSavedLists(req.params.id, {
             page,
             pageSize: limit,
         });

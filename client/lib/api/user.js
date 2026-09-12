@@ -1,5 +1,5 @@
 import { fetcher } from "@/lib/fetcher";
-import { parseArticle } from "./feed";
+import { parseArticle, parseList } from "./feed";
 
 export async function getProfile(username) {
     return fetcher(`/api/user/${username}/profile`);
@@ -82,6 +82,18 @@ export async function getFollowers(userId, { page = 1, limit = 50 } = {}) {
     );
     return {
         items: json.writers || [],
+        hasMore: json.hasMore,
+        nextPage: json.nextPage,
+    };
+}
+
+export async function getUserSavedLists(userId, { page = 1, limit = 20 } = {}) {
+    const json = await fetcher(
+        `/api/user/${userId}/saved-lists?page=${page}&limit=${limit}`,
+        { credentials: "include" },
+    );
+    return {
+        items: (json.lists || []).map((l) => parseList(l, l.author?.name)),
         hasMore: json.hasMore,
         nextPage: json.nextPage,
     };

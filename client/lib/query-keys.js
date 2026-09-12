@@ -12,6 +12,7 @@ export const queryKeys = {
     lists: (authorId, articleId) => ["lists", authorId, articleId ?? null],
     userSaves: (userId) => ["userSaves", userId],
     userViews: (userId) => ["userViews", userId],
+    userSavedLists: (userId) => ["userSavedLists", userId],
     exploreRecommendations: () => ["explore", "recommendations"],
     search: (q) => ["search", q],
     subscriptionFeed: () => ["articles", { filter: "subscriptions" }],

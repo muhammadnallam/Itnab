@@ -262,3 +262,55 @@ export async function getUserViews(userId, { page, pageSize }) {
 
     return { articles, ...buildMeta(total, page, pageSize) };
 }
+
+export async function getUserSavedLists(userId, { page, pageSize }) {
+    const where = { userId };
+    const [saves, total] = await Promise.all([
+        prisma.savedList.findMany({
+            where,
+            orderBy: { createdAt: "desc" },
+            select: {
+                list: {
+                    select: {
+                        id: true,
+                        name: true,
+                        authorId: true,
+                        createdAt: true,
+                        author: {
+                            select: {
+                                id: true,
+                                name: true,
+                                username: true,
+                                image: true,
+                            },
+                        },
+                        savedArticles: {
+                            take: 3,
+                            orderBy: { createdAt: "desc" },
+                            select: {
+                                article: {
+                                    select: { coverImage: true },
+                                },
+                            },
+                        },
+                        _count: { select: { savedArticles: true } },
+                    },
+                },
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.savedList.count({ where }),
+    ]);
+
+    const lists = saves.map((s) => ({
+        ...s.list,
+        images: s.list.savedArticles
+            .map((sa) => sa.article.coverImage)
+            .filter(Boolean),
+        savedArticles: undefined,
+        saved: true,
+    }));
+
+    return { lists, ...buildMeta(total, page, pageSize) };
+}
