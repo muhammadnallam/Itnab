@@ -118,7 +118,24 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
             unsaveListMutation.mutate(list.id, {
                 onSuccess: () => {
                     setSaved(false);
-                    toast.success("تم إزالة القائمة من المحفوظات");
+                    toast.success("تم إزالة القائمة من المحفوظات", {
+                        duration: 5000,
+                        action: {
+                            label: "تراجع",
+                            onClick: () =>
+                                saveListMutation.mutate(list.id, {
+                                    onSuccess: () => {
+                                        setSaved(true);
+                                        toast.success("تم حفظ القائمة");
+                                    },
+                                    onError: (err) => {
+                                        toast.error(
+                                            err?.message || "حدث خطأ",
+                                        );
+                                    },
+                                }),
+                        },
+                    });
                 },
                 onError: (err) => {
                     toast.error(err?.message || "حدث خطأ");

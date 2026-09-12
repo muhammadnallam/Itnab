@@ -33,7 +33,17 @@ export function useSave(articleId) {
             return { prev };
         },
         onSuccess: (_data, save) => {
-            toast.success(save ? "تم حفظ المقال" : "تم إزالة الحفظ");
+            if (save) {
+                toast.success("تم حفظ المقال");
+            } else {
+                toast.success("تم إزالة الحفظ", {
+                    duration: 5000,
+                    action: {
+                        label: "تراجع",
+                        onClick: () => mutation.mutate(true),
+                    },
+                });
+            }
         },
         onError: (err, save, context) => {
             qc.setQueryData(key, context.prev);

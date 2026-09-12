@@ -23,7 +23,22 @@ const ListPicker = ({ open, onClose, articleId }) => {
         try {
             if (containsArticle) {
                 await unsaveFromList.mutateAsync(listId);
-                toast.success("تم إزالة المقال من القائمة");
+                toast.success("تم إزالة المقال من القائمة", {
+                    duration: 5000,
+                    action: {
+                        label: "تراجع",
+                        onClick: async () => {
+                            try {
+                                await saveToList.mutateAsync(listId);
+                                toast.success("تم حفظ المقال في القائمة");
+                            } catch (err) {
+                                toast.error(
+                                    err?.message || "حدث خطأ أثناء تنفيذ العملية",
+                                );
+                            }
+                        },
+                    },
+                });
             } else {
                 await saveToList.mutateAsync(listId);
                 toast.success("تم حفظ المقال في القائمة");
