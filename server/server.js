@@ -13,7 +13,7 @@ import searchRouter from "./modules/search/search.routes.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import { startGravityCron } from "./lib/gravity.js";
-import { startAuthorScoreCron } from "./lib/author-score.js";
+import { startAuthorScoreCron, recomputeAuthorScores } from "./lib/author-score.js";
 import logger from "./middleware/logger.js";
 
 const app = express();
@@ -63,6 +63,9 @@ app.use((err, req, res, next) => {
 
 startGravityCron();
 startAuthorScoreCron();
+recomputeAuthorScores()
+    .then((c) => console.log(`[author-score] Initial recompute: ${c} authors`))
+    .catch((err) => console.error("[author-score] Initial recompute failed:", err));
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
