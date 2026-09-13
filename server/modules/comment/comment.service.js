@@ -5,6 +5,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "../../lib/errors.js";
+import { notifyComment } from "../notifications/notify.js";
 
 const MAX_DEPTH = 3;
 
@@ -155,11 +156,18 @@ export async function createComment(articleId, { content, parentId }, userId) {
   let depth = 1;
   let rootId = null;
   let finalContent = content;
+  let parentAuthorId = null;
 
   if (parentId) {
     const parent = await prisma.comment.findFirst({
       where: { id: parentId, articleId, deletedAt: null },
-      include: { author: { select: { username: true } } },
+      select: {
+        id: true,
+        depth: true,
+        rootId: true,
+        authorId: true,
+        author: { select: { username: true } },
+      },
     });
     if (!parent) throw new NotFoundError("التعليق غير موجود");
     if (parent.depth >= MAX_DEPTH) {
@@ -168,6 +176,7 @@ export async function createComment(articleId, { content, parentId }, userId) {
     depth = parent.depth + 1;
     rootId = parent.rootId ?? parent.id;
     finalContent = `@${parent.author.username} ${content}`;
+    parentAuthorId = parent.authorId;
   }
 
   const comment = await prisma.$transaction(async (tx) => {
@@ -200,6 +209,21 @@ export async function createComment(articleId, { content, parentId }, userId) {
     });
     return created;
   });
+
+  const isReply = !!parentId;
+  const recipientId = isReply ? parentAuthorId : article.authorId;
+  if (recipientId && recipientId !== userId) {
+    notifyComment({
+      articleId,
+      commentId: comment.id,
+      content: finalContent,
+      actorId: userId,
+      parentId: parentId ?? null,
+      parentAuthorId,
+      articleAuthorId: article.authorId,
+      isReply,
+    }).catch((e) => console.error("[notify] notifyComment failed:", e));
+  }
 
   return serializeComment(comment, article.authorId, false);
 }

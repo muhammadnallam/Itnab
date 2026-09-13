@@ -22,6 +22,18 @@ enum DeviceType {
     OTHER
 }
 
+enum NotificationType {
+    LIKE
+    FOLLOW
+    COMMENT
+}
+
+enum NotificationTargetType {
+    ARTICLE
+    USER
+    COMMENT
+}
+
 model User {
   id          String   @id @default(uuid()) @db.Uuid
   email       String   @unique
@@ -46,6 +58,8 @@ model User {
   comments      Comment[]
   commentLikes  CommentLike[]
   savedLists    SavedList[]
+  receivedNotifications Notification[] @relation("receivedNotifications")
+  sentNotifications     Notification[] @relation("sentNotifications")
 
   name          String
   emailVerified Boolean    @default(false)
@@ -294,4 +308,27 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Notification {
+  id            String                @id @default(uuid()) @db.Uuid
+  recipientId   String                @db.Uuid
+  recipient     User                  @relation("receivedNotifications", fields: [recipientId], references: [id], onDelete: Cascade)
+  type          NotificationType
+  actorIds      String[]              @default([])
+  actorId       String?               @db.Uuid
+  actor         User?                 @relation("sentNotifications", fields: [actorId], references: [id], onDelete: SetNull)
+  targetType    NotificationTargetType
+  targetId      String                @db.Uuid
+  commentId     String?               @db.Uuid
+  commentPreview String?
+  count         Int                   @default(1)
+  groupKey      String?
+  readAt        DateTime?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([recipientId, updatedAt(sort: Desc)])
+  @@index([recipientId, readAt])
+  @@unique([recipientId, groupKey])
 }

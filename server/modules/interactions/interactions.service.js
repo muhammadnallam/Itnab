@@ -5,6 +5,10 @@ import {
   NotFoundError,
   ValidationError,
 } from "../../lib/errors.js";
+import {
+  notifyArticleLike,
+  notifyFollow,
+} from "../notifications/notify.js";
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -24,7 +28,7 @@ function isP2002(e) {
 async function assertArticleExists(db, articleId) {
   const article = await db.article.findFirst({
     where: { id: articleId, deletedAt: null },
-    select: { id: true },
+    select: { id: true, authorId: true },
   });
   if (!article) throw new NotFoundError("المقال غير موجود");
   return article;
@@ -69,6 +73,7 @@ export async function followUser(targetUserId, userId) {
   }
   await assertUserExists(targetUserId);
 
+  let inserted = false;
   try {
     await prisma.$transaction(async (tx) => {
       await tx.follow.create({
@@ -83,8 +88,15 @@ export async function followUser(targetUserId, userId) {
         data: { followerCount: { increment: 1 } },
       });
     });
+    inserted = true;
   } catch (e) {
     if (!isP2002(e)) throw e;
+  }
+
+  if (inserted) {
+    notifyFollow({ targetUserId, actorId: userId }).catch((e) =>
+      console.error("[notify] notifyFollow failed:", e),
+    );
   }
 
   const target = await prisma.user.findUnique({
@@ -150,14 +162,15 @@ export async function setReaction(articleId, type, userId) {
   assertUuid(articleId, "معرف المقال غير صالح");
   await assertArticleExists(prisma, articleId);
 
+  let wasNewLike = false;
   try {
-    await prisma.$transaction(async (tx) => {
+    wasNewLike = await prisma.$transaction(async (tx) => {
       const existing = await tx.like.findUnique({
         where: { userId_articleId: { userId, articleId } },
       });
 
       if (existing && existing.type === type) {
-        return;
+        return false;
       }
 
       if (!existing) {
@@ -170,6 +183,7 @@ export async function setReaction(articleId, type, userId) {
             },
           },
         });
+        return type === "LIKE";
       } else {
         await tx.like.update({
           where: { userId_articleId: { userId, articleId } },
@@ -191,10 +205,18 @@ export async function setReaction(articleId, type, userId) {
             },
           },
         });
+        return type === "LIKE" && existing.type === "DISLIKE";
       }
     });
   } catch (e) {
     if (!isP2002(e)) throw e;
+    if (type === "LIKE") wasNewLike = true;
+  }
+
+  if (wasNewLike) {
+    notifyArticleLike({ articleId, actorId: userId }).catch((e) =>
+      console.error("[notify] notifyArticleLike failed:", e),
+    );
   }
 
   const article = await prisma.article.findUnique({

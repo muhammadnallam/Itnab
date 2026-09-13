@@ -115,6 +115,7 @@ export default function CommentItem({
 
     return (
         <div
+            id={comment?.id ? `comment-${comment.id}` : undefined}
             style={{
                 opacity: comment.pending ? 0.6 : 1,
                 pointerEvents: comment.pending ? "none" : "auto",

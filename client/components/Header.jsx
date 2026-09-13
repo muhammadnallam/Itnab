@@ -1,9 +1,12 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Bell, Search, Menu, SquarePen } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import UserDropdown from "@/components/UserDropdown";
+import NotificationDropdown from "@/components/NotificationDropdown";
 import { UserContext } from "@/context/UserContext";
+import { useUnreadCount } from "@/hooks/useNotifications";
+import { useMarkNotificationsRead } from "@/hooks/useMarkNotificationsRead";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -15,11 +18,25 @@ const getInitials = (name) => {
 
 export default function Header({ onToggleSidebar, isMobile }) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [notifOpen, setNotifOpen] = useState(false);
     const [headerSearch, setHeaderSearch] = useState("");
     const { user } = useContext(UserContext);
+    const { unreadCount } = useUnreadCount();
+    const { mutate: markAllRead } = useMarkNotificationsRead();
+    const markTimer = useRef(null);
     const router = useRouter();
     const pathname = usePathname();
     const isExplore = pathname === "/explore";
+
+    // Mark notifications as read shortly after the dropdown opens
+    // (delayed so items render first).
+    useEffect(() => {
+        if (!notifOpen || !user || unreadCount === 0) return;
+        markTimer.current = setTimeout(() => {
+            markAllRead();
+        }, 800);
+        return () => clearTimeout(markTimer.current);
+    }, [notifOpen, user, unreadCount, markAllRead]);
 
     return (
         <header
@@ -152,15 +169,53 @@ export default function Header({ onToggleSidebar, isMobile }) {
                     </button>
                 )}
 
-                <button
-                    className="text-mid hover:text-ink"
-                    style={{
-                        cursor: "pointer",
-                        transition: "color 0.15s",
-                    }}
-                >
-                    <Bell size={24} />
-                </button>
+                <div style={{ position: "relative" }}>
+                    <button
+                        onClick={() => {
+                            setNotifOpen((v) => !v);
+                            setMenuOpen(false);
+                        }}
+                        aria-label="الإشعارات"
+                        className="text-mid hover:text-ink"
+                        style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            display: "flex",
+                            padding: 4,
+                            transition: "color 0.15s",
+                        }}
+                    >
+                        <Bell size={24} />
+                    </button>
+                    {user && unreadCount > 0 && (
+                        <span
+                            style={{
+                                position: "absolute",
+                                top: -6,
+                                insetInlineEnd: -6,
+                                background: "var(--color-accent)",
+                                color: "var(--color-white)",
+                                fontSize: 11,
+                                fontWeight: 700,
+                                minWidth: 18,
+                                height: 18,
+                                borderRadius: 999,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: "0 5px",
+                                pointerEvents: "none",
+                            }}
+                        >
+                            {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                    )}
+                    <NotificationDropdown
+                        open={notifOpen}
+                        onClose={() => setNotifOpen(false)}
+                    />
+                </div>
 
                 <div style={{ position: "relative" }}>
                     <Avatar
@@ -168,7 +223,10 @@ export default function Header({ onToggleSidebar, isMobile }) {
                         initials={user?.name ? getInitials(user.name) : "?"}
                         size={34}
                         bg="var(--color-accent)"
-                        onClick={() => setMenuOpen((v) => !v)}
+                        onClick={() => {
+                            setMenuOpen((v) => !v);
+                            setNotifOpen(false);
+                        }}
                     />
                     <UserDropdown
                         open={menuOpen}

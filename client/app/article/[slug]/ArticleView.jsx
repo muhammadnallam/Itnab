@@ -4,7 +4,7 @@ import { useArticle } from "@/hooks/useArticle";
 import { useLikes } from "@/hooks/useLikes";
 import { useSave } from "@/hooks/useSave";
 import { useView } from "@/hooks/useView";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import RequireAuth from "@/components/RequireAuth";
 import ShareModal from "@/components/ShareModal";
 import {
@@ -36,6 +36,40 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
     useView(article?.id);
     const [shareOpen, setShareOpen] = useState(false);
     const commentsRef = useRef(null);
+
+    // Deep-link support: /article/{slug}#comment-{commentId}
+    // Comments load async, so retry until the anchor appears.
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        let timer;
+        const scrollToHash = () => {
+            clearTimeout(timer);
+            const hash = window.location.hash;
+            if (!hash.startsWith("#comment-")) return;
+            let attempts = 0;
+            const tryScroll = () => {
+                const el = document.getElementById(hash.slice(1));
+                if (el) {
+                    el.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                    return;
+                }
+                if (attempts < 20) {
+                    attempts += 1;
+                    timer = setTimeout(tryScroll, 300);
+                }
+            };
+            tryScroll();
+        };
+        scrollToHash();
+        window.addEventListener("hashchange", scrollToHash);
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener("hashchange", scrollToHash);
+        };
+    }, []);
 
     if (!article) return null;
 
