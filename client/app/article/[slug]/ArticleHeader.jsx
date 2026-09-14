@@ -112,7 +112,7 @@ export default function ArticleHeader({ article }) {
                         textDecoration: "none",
                     }}
                     onClick={() => {
-                        router.push("/");
+                        router.back();
                     }}
                 >
                     رجوع

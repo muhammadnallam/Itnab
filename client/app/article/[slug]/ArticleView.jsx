@@ -11,7 +11,7 @@ import {
     Bookmark,
     MessageSquare,
     MoreHorizontal,
-    Share,
+    Share2,
     ThumbsDown,
     ThumbsUp,
 } from "lucide-react";
@@ -169,9 +169,9 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                         </RequireAuth>
                         <button
                             onClick={() => setShareOpen(true)}
-                            className="flex items-center gap-1.5 text-mid hover:text-ink"
+                            className="flex items-center gap-1.5 text-mid hover:text-ink cursor-pointer"
                         >
-                            <Share size={19} strokeWidth={1.75} />
+                            <Share2 size={19} strokeWidth={1.75} />
                         </button>
                     </div>
                     <div className="flex items-center gap-5 text-xs font-medium">

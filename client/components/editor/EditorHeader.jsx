@@ -69,7 +69,7 @@ export default function EditorHeader({
                         {wordCount} كلمة
                     </div>
                     <button
-                        onClick={() => router.push("/")}
+                        onClick={() => router.back()}
                         className="text-mid hover:text-ink"
                         style={{
                             display: "flex",

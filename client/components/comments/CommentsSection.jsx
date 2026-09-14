@@ -106,6 +106,7 @@ export default function CommentsSection({ articleId, authorId, sectionRef }) {
             id="comments"
             ref={sectionRef}
             style={{ maxWidth: 740, margin: "auto", paddingBottom: 80 }}
+            className="px-5 md:px-0"
         >
             {/* Header */}
             <div

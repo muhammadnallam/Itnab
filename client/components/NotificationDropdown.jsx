@@ -2,6 +2,7 @@
 
 import { useContext, useEffect, useRef } from "react";
 import { UserContext } from "@/context/UserContext";
+import { WidthContext } from "@/context/ScreenContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import NotificationRow from "./notifications/NotificationRow";
 
@@ -64,6 +65,8 @@ const NotificationDropdown = ({ open, onClose, onNavigate }) => {
     const scrollRef = useRef(null);
     const sentinelRef = useRef(null);
     const { user } = useContext(UserContext);
+    const width = useContext(WidthContext);
+    const isMobile = width < 768;
     const {
         notifications,
         isLoading,
@@ -124,9 +127,9 @@ const NotificationDropdown = ({ open, onClose, onNavigate }) => {
                 style={{
                     position: "absolute",
                     top: "100%",
-                    left: -45,
+                    left: isMobile ? -45 : 0,
                     marginTop: 8,
-                    width: "min(380px, 85vw)",
+                    width: "min(380px, 90vw)",
                     zIndex: 80,
                     boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                     overflow: "hidden",
