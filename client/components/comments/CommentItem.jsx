@@ -338,7 +338,7 @@ export default function CommentItem({
                                 fontWeight: 600,
                             }}
                         >
-                            رد
+                            كتابة رد
                         </button>
                     )}
                 </div>

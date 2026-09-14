@@ -2,32 +2,14 @@
 
 import { useState, useContext } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 import Avatar from "@/components/ui/Avatar";
 import RequireAuth from "@/components/RequireAuth";
-import ConfirmModal from "@/components/ConfirmModal";
-import ListPicker from "@/components/ListPicker";
-import ShareModal from "@/components/ShareModal";
-import MoreMenu from "@/components/MoreMenu";
-import {
-    Bookmark,
-    Ellipsis,
-    Pencil,
-    Trash2,
-    Share2,
-    BookmarkPlus,
-    UserRoundPlus,
-    UserRoundX,
-    Copy,
-    CircleAlert,
-} from "lucide-react";
+import ArticleMoreMenu from "@/components/article/ArticleMoreMenu";
+import { Bookmark, Ellipsis } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
 import { saveArticle, unsaveArticle } from "@/lib/api/interactions";
-import { deleteArticle } from "@/lib/api/article";
-import { useFollow } from "@/hooks/useFollow";
 import { UserContext } from "@/context/UserContext";
-import { useAuthModal } from "@/context/AuthModalContext";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -71,121 +53,11 @@ const ArticleCard = ({ article, isMobile }) => {
     const qc = useQueryClient();
 
     const { user, loading: userLoading } = useContext(UserContext);
-    const { openAuth } = useAuthModal();
-    const router = useRouter();
-    const { isFollowing, toggle: toggleFollow } = useFollow(article.authorId);
-
-    const [removeOpen, setRemoveOpen] = useState(false);
-    const [removing, setRemoving] = useState(false);
-    const [reportOpen, setReportOpen] = useState(false);
-    const [pickerOpen, setPickerOpen] = useState(false);
-    const [shareOpen, setShareOpen] = useState(false);
 
     const isOwner =
         !userLoading &&
         Boolean(user) &&
         user.username === article.authorUsername;
-
-    const articleUrl = () =>
-        typeof window !== "undefined"
-            ? `${window.location.origin}/article/${article.slug}`
-            : "";
-
-    const handleEdit = () => router.push(`/edit/${article.slug}`);
-
-    const handleShare = () => setShareOpen(true);
-
-    const handleCopy = () => {
-        if (typeof navigator !== "undefined" && navigator.clipboard) {
-            navigator.clipboard.writeText(articleUrl()).then(() => {
-                toast.success("تم نسخ الرابط");
-            });
-        }
-    };
-
-    const requireAuth = (action) => {
-        if (!user) {
-            openAuth("login");
-            return false;
-        }
-        return true;
-    };
-
-    const handleSave = () => {
-        if (!requireAuth()) return;
-        setPickerOpen(true);
-    };
-
-    const handleFollow = () => {
-        if (!requireAuth()) return;
-        toggleFollow();
-    };
-
-    const handleReport = () => {
-        if (!requireAuth()) return;
-        setReportOpen(true);
-    };
-
-    const confirmRemove = async () => {
-        try {
-            setRemoving(true);
-            await deleteArticle(id);
-            qc.setQueriesData({ queryKey: queryKeys.allArticles() }, (data) =>
-                filterArticle(data, id),
-            );
-            for (const prefix of LIBRARY_KEYS) {
-                qc.invalidateQueries({ queryKey: [prefix] });
-            }
-            setRemoveOpen(false);
-            toast.success("تم حذف المقال");
-        } catch (err) {
-            toast.error(err?.message || "حدث خطأ أثناء حذف المقال");
-        } finally {
-            setRemoving(false);
-        }
-    };
-
-    const neutralOptions = [
-        { icon: Share2, label: "مشاركة المقال", onClick: handleShare },
-        { icon: Copy, label: "نسخ رابط المقال", onClick: handleCopy },
-        { icon: BookmarkPlus, label: "حفظ إلى قائمة", onClick: handleSave },
-    ];
-
-    const ownerOptions = [
-        { icon: Pencil, label: "تعديل المقال", onClick: handleEdit },
-        { separator: true },
-        ...neutralOptions,
-        { separator: true },
-        {
-            icon: Trash2,
-            label: "حذف المقال",
-            type: "red",
-            onClick: () => setRemoveOpen(true),
-        },
-    ];
-
-    const guestOptions = [
-        {
-            icon: isFollowing ? UserRoundX : UserRoundPlus,
-            label: isFollowing ? "إلغاء متابعة الكاتب" : "متابعة الكاتب",
-            onClick: handleFollow,
-        },
-        { separator: true },
-        ...neutralOptions,
-        { separator: true },
-        {
-            icon: CircleAlert,
-            label: "الإبلاغ عن المقال",
-            type: "red",
-            onClick: handleReport,
-        },
-    ];
-
-    const options = userLoading
-        ? neutralOptions
-        : isOwner
-          ? ownerOptions
-          : guestOptions;
 
     const mutation = useMutation({
         mutationFn: (save) => (save ? saveArticle(id) : unsaveArticle(id)),
@@ -343,51 +215,11 @@ const ArticleCard = ({ article, isMobile }) => {
                         </button>
                     </RequireAuth>
 
-                    <MoreMenu options={options}>
+                    <ArticleMoreMenu article={article} isOwner={isOwner}>
                         <Ellipsis size={19} style={{ marginLeft: 4 }} />
-                    </MoreMenu>
+                    </ArticleMoreMenu>
                 </div>
             </div>
-
-            <ConfirmModal
-                isOpen={removeOpen}
-                icon={Trash2}
-                color="var(--color-error)"
-                icoBackground="var(--color-error-light)"
-                title="حذف المقال"
-                description="هل أنت متأكد من حذف هذا المقال؟ لا يمكن التراجع عن هذا الإجراء."
-                buttonText="حذف"
-                loading={removing}
-                onCancel={() => setRemoveOpen(false)}
-                onConfirm={confirmRemove}
-            />
-
-            <ConfirmModal
-                isOpen={reportOpen}
-                icon={CircleAlert}
-                color="var(--color-error)"
-                icoBackground="var(--color-error-light)"
-                title="الإبلاغ عن المقال"
-                description="شكرًا لك، تم استلام بلاغك وسنراجعه في أقرب وقت."
-                buttonText="حسنًا"
-                onCancel={() => setReportOpen(false)}
-                onConfirm={() => setReportOpen(false)}
-            />
-
-            <ListPicker
-                open={pickerOpen}
-                articleId={id}
-                onClose={() => setPickerOpen(false)}
-            />
-
-            <ShareModal
-                open={shareOpen}
-                onClose={() => setShareOpen(false)}
-                articleId={id}
-                url={articleUrl()}
-                heading="مشاركة المقال"
-                subheading="القراءة أكثر إفادةً عندما نشاركها مع الآخرين"
-            />
         </article>
     );
 };

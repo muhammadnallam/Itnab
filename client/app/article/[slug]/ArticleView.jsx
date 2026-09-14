@@ -4,9 +4,10 @@ import { useArticle } from "@/hooks/useArticle";
 import { useLikes } from "@/hooks/useLikes";
 import { useSave } from "@/hooks/useSave";
 import { useView } from "@/hooks/useView";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import RequireAuth from "@/components/RequireAuth";
 import ShareModal from "@/components/ShareModal";
+import ArticleMoreMenu from "@/components/article/ArticleMoreMenu";
 import {
     Bookmark,
     MessageSquare,
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import CommentsSection from "@/components/comments/CommentsSection";
+import { UserContext } from "@/context/UserContext";
 
 function formatDate(dateStr) {
     const d = new Date(dateStr);
@@ -34,8 +36,15 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
     const likes = useLikes(article?.id);
     const save = useSave(article?.id);
     useView(article?.id);
+    const { user, loading: userLoading } = useContext(UserContext);
     const [shareOpen, setShareOpen] = useState(false);
     const commentsRef = useRef(null);
+
+    const isOwner =
+        !userLoading &&
+        Boolean(user) &&
+        article?.author?.username &&
+        user.username === article.author.username;
 
     // Deep-link support: /article/{slug}#comment-{commentId}
     // Comments load async, so retry until the anchor appears.
@@ -141,13 +150,14 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                 />
                 <div className="flex items-center justify-between border-b border-t border-border pb-4 pt-4 mt-10">
                     <div className="flex items-center gap-5 text-sm text-gray-700 font-medium">
-                        <button className="flex items-center gap-1.5 text-mid hover:text-ink">
-                            <MoreHorizontal
-                                size={19}
-                                strokeWidth={1.75}
-                                fill={saved ? "currentColor" : "none"}
-                            />
-                        </button>
+                        <ArticleMoreMenu
+                            article={article}
+                            isOwner={isOwner}
+                            onDeleted={() => (window.location.href = "/")}
+                            align="end"
+                        >
+                            <MoreHorizontal size={19} strokeWidth={1.75} />
+                        </ArticleMoreMenu>
                         <RequireAuth onClick={save.toggle}>
                             <button
                                 className={`flex items-center gap-1.5 ${

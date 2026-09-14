@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const GAP = 8;
 
-const MoreMenu = ({ options = [], widthClass = "w-[260px]", children }) => {
+const MoreMenu = ({ options = [], widthClass = "w-[260px]", align = "start", children }) => {
     const [open, setOpen] = useState(false);
     const [positioned, setPositioned] = useState(false);
     const [placement, setPlacement] = useState({});
@@ -86,7 +86,7 @@ const MoreMenu = ({ options = [], widthClass = "w-[260px]", children }) => {
                 <div
                     ref={menuRef}
                     role="menu"
-                    className={`card absolute left-0 z-80 ${widthClass} overflow-hidden p-2! shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${
+                    className={`card absolute ${align === "end" ? "right-0" : "left-0"} z-80 ${widthClass} overflow-hidden p-2! shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${
                         positioned ? "visible" : "invisible"
                     }`}
                     style={{ top: placement.top, bottom: placement.bottom }}
