@@ -7,7 +7,7 @@
     "type": "module",
     "main": "server.js",
     "scripts": {
-        "dev": "nodemon --exec \"dotenv -- tsx server.js\"",
+        "dev": "nodemon --exec tsx server.js",
         "build": "prisma generate && bash scripts/fetch-geolite-optional.sh",
         "start": "prisma migrate deploy && tsx server.js",
         "format": "npx prettier --write . --tab-width 4"
