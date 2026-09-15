@@ -31,7 +31,7 @@ ARG MAXMIND_LICENSE_KEY=""
 COPY --from=deps /app /app
 COPY server ./server
 COPY shared ./shared
-RUN pnpm --filter itnab-api exec prisma generate
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" pnpm --filter itnab-api exec prisma generate
 RUN if [ -n "$MAXMIND_LICENSE_KEY" ]; then \
       bash server/scripts/fetch-geolite-optional.sh; \
     else \
