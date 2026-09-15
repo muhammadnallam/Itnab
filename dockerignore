@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+.next
+**/.next
+.git
+.vscode
+.agents
+tests
+*.md
+.env
+.env.*
+!server/.env.example
