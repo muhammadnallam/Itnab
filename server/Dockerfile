@@ -5,13 +5,19 @@
 
 FROM node:22-slim AS base
 RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
-RUN corepack enable && corepack prepare pnpm@11.13.0 --activate
+# NOTE: not using corepack here — root package.json declares
+# devEngines.packageManager.version as "^11.13.0" (a semver range), and
+# corepack's pnpm shim rejects ranges ("Invalid package manager specification
+# ... expected a semver version"). Installing pnpm as a plain global binary
+# sidesteps that check entirely.
+RUN npm install -g pnpm@11.13.0
 WORKDIR /app
 
 # ---- deps: install once, cached unless lockfile/package.json files change ----
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY server/package.json ./server/package.json
+COPY client/package.json ./client/package.json
 COPY shared/constants/package.json ./shared/constants/package.json
 COPY shared/normalize/package.json ./shared/normalize/package.json
 COPY shared/tiptap/package.json ./shared/tiptap/package.json
@@ -19,8 +25,9 @@ RUN pnpm install --frozen-lockfile
 
 # ---- build: prisma generate (+ optional GeoLite2 db) ----
 FROM base AS build
+# NOTE: ARG (not ENV) on purpose — the key is only needed by the RUN steps
+# below and must not persist in any image layer. Never add an ENV line for it.
 ARG MAXMIND_LICENSE_KEY=""
-ENV MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
 COPY --from=deps /app /app
 COPY server ./server
 COPY shared ./shared

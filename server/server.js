@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(
     cors({
         origin:
-            process.env.ENV === "production"
+            process.env.NODE_ENV === "production"
                 ? process.env.CORS_ORIGIN?.split(",").map((s) => s.trim())
                 : ["http://localhost:5000"],
         credentials: true,
