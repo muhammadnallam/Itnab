@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
 
   const profileMatch = pathname.match(/^\/@([^/]+)/);
