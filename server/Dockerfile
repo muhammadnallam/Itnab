@@ -4,13 +4,13 @@
 # lockfile. Coolify field: Dockerfile Location = server/Dockerfile
 
 FROM node:22-slim AS base
-RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y openssl ca-certificates curl tar && rm -rf /var/lib/apt/lists/*
 # NOTE: not using corepack here — root package.json declares
-# devEngines.packageManager.version as "^11.13.0" (a semver range), and
+# devEngines.packageManager.version as "^11.13.1" (a semver range), and
 # corepack's pnpm shim rejects ranges ("Invalid package manager specification
 # ... expected a semver version"). Installing pnpm as a plain global binary
 # sidesteps that check entirely.
-RUN npm install -g pnpm@11.13.0
+RUN npm install -g pnpm@11.13.1
 WORKDIR /app
 
 # ---- deps: install once, cached unless lockfile/package.json files change ----
@@ -41,8 +41,15 @@ RUN if [ -n "$MAXMIND_LICENSE_KEY" ]; then \
 # ---- runtime ----
 FROM base AS runner
 ENV NODE_ENV=production
-COPY --from=build /app /app
+RUN groupadd --gid 1001 nodejs && useradd --uid 1001 --gid nodejs --shell /bin/sh --create-home node
 WORKDIR /app
+COPY --from=build --chown=node:nodejs /app/node_modules ./node_modules
+COPY --from=build --chown=node:nodejs /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/.npmrc ./
+COPY --from=build --chown=node:nodejs /app/server ./server
+COPY --from=build --chown=node:nodejs /app/shared ./shared
 EXPOSE 3000
 # start script runs: prisma migrate deploy && tsx server.js
+USER node
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "fetch('http://localhost:3000/api/health').then(r=>{if(!r.ok)throw 1}).catch(()=>process.exit(1))"
 CMD ["pnpm", "--filter", "itnab-api", "start"]
