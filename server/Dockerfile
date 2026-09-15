@@ -41,12 +41,11 @@ RUN if [ -n "$MAXMIND_LICENSE_KEY" ]; then \
 # ---- runtime ----
 FROM base AS runner
 ENV NODE_ENV=production
-RUN groupadd --gid 1001 nodejs && useradd --uid 1001 --gid nodejs --shell /bin/sh --create-home node
 WORKDIR /app
-COPY --from=build --chown=node:nodejs /app/node_modules ./node_modules
-COPY --from=build --chown=node:nodejs /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/.npmrc ./
-COPY --from=build --chown=node:nodejs /app/server ./server
-COPY --from=build --chown=node:nodejs /app/shared ./shared
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/.npmrc ./
+COPY --from=build --chown=node:node /app/server ./server
+COPY --from=build --chown=node:node /app/shared ./shared
 EXPOSE 3000
 # start script runs: prisma migrate deploy && tsx server.js
 USER node

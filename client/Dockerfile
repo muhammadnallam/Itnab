@@ -38,15 +38,14 @@ RUN pnpm --filter client build
 # ---- runtime (standalone output = only what's needed to run, much smaller) ----
 FROM node:22-slim AS runner
 ENV NODE_ENV=production
-RUN groupadd --gid 1001 nodejs && useradd --uid 1001 --gid nodejs --shell /bin/sh --create-home node
 WORKDIR /app
 
 # In a pnpm-workspace standalone build, the traced output preserves the
 # workspace layout: .next/standalone/client/server.js is the entrypoint,
 # with node_modules hoisted alongside it.
-COPY --from=build --chown=node:nodejs /app/client/.next/standalone ./
-COPY --from=build --chown=node:nodejs /app/client/.next/static ./client/.next/static
-COPY --from=build --chown=node:nodejs /app/client/public ./client/public
+COPY --from=build --chown=node:node /app/client/.next/standalone ./
+COPY --from=build --chown=node:node /app/client/.next/static ./client/.next/static
+COPY --from=build --chown=node:node /app/client/public ./client/public
 
 EXPOSE 5000
 ENV PORT=5000
