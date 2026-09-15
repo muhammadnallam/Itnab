@@ -42,6 +42,7 @@ RUN if [ -n "$MAXMIND_LICENSE_KEY" ]; then \
 FROM base AS runner
 ENV NODE_ENV=production
 WORKDIR /app
+RUN chown node:node /app
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/.npmrc ./
 COPY --from=build --chown=node:node /app/server ./server
