@@ -1,14 +1,15 @@
 {
-    "name": "publishing-platform",
+    "name": "itnab-api",
     "version": "1.0.0",
-    "description": "An Arabic publishing platform.",
+    "description": "",
     "license": "ISC",
     "author": "Mohamed Nasser",
     "type": "module",
     "main": "server.js",
     "scripts": {
         "dev": "nodemon --exec tsx server.js",
-        "start": "tsx server.js",
+        "build": "prisma generate && bash scripts/fetch-geolite-optional.sh",
+        "start": "prisma migrate deploy && tsx server.js",
         "format": "npx prettier --write . --tab-width 4"
     },
     "dependencies": {

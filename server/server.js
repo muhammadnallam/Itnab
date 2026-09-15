@@ -14,19 +14,25 @@ import searchRouter from "./modules/search/search.routes.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import { startGravityCron } from "./lib/gravity.js";
-import { startAuthorScoreCron, recomputeAuthorScores } from "./lib/author-score.js";
+import {
+    startAuthorScoreCron,
+    recomputeAuthorScores,
+} from "./lib/author-score.js";
 import logger from "./middleware/logger.js";
 
 const app = express();
 app.set("trust proxy", 1);
-const PORT = process.env.PORT;
+const PORT = Number(process.env.PORT) || 3000
 
 app.use(express.json());
 app.use(cookieParser());
 
 app.use(
     cors({
-        origin: "http://localhost:5000",
+        origin:
+            process.env.ENV === "production"
+                ? process.env.CORS_ORIGIN?.split(",").map((s) => s.trim())
+                : ["http://localhost:5000"],
         credentials: true,
     }),
 );
@@ -68,8 +74,10 @@ startGravityCron();
 startAuthorScoreCron();
 recomputeAuthorScores()
     .then((c) => console.log(`[author-score] Initial recompute: ${c} authors`))
-    .catch((err) => console.error("[author-score] Initial recompute failed:", err));
+    .catch((err) =>
+        console.error("[author-score] Initial recompute failed:", err),
+    );
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
