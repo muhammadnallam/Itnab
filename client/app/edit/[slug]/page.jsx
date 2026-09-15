@@ -1,22 +1,10 @@
-import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
-
 import { Editor } from "@/components/editor/Editor";
 import { getArticleBySlug } from "@/lib/data/articles";
 import "@/styles/_variables.scss";
 
 export default async function EditPage({ params }) {
     const { slug } = await params;
-    const { data: session } = await authClient.getSession({
-        fetchOptions: {
-            headers: await headers(),
-        },
-    });
-
-    if (!session) {
-        redirect("/auth");
-    }
 
     let article;
     try {

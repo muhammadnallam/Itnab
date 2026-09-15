@@ -2,13 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useContext } from "react";
-import {
-    House,
-    Inbox,
-    Bookmark,
-    UserRound,
-    Search,
-} from "lucide-react";
+import { House, Inbox, Bookmark, UserRound, Search } from "lucide-react";
 import { UserContext } from "@/context/UserContext";
 import RequireAuth from "@/components/RequireAuth";
 
@@ -18,10 +12,15 @@ const MobileBottomNav = () => {
     const profileLink = user?.username ? `/@${user.username}` : "/auth";
     const items = [
         { icon: House, label: "الرئيسية", link: "/" },
-        { icon: Inbox, label: "الاشتراكات", link: "/subscriptions", protected: true },
+        {
+            icon: Inbox,
+            label: "الاشتراكات",
+            link: "/subscriptions",
+            protected: true,
+        },
         { icon: Search, label: "استكشف", link: "/explore", protected: false },
         { icon: Bookmark, label: "المكتبة", link: "/library", protected: true },
-        { icon: UserRound, label: "أنت", link: profileLink },
+        { icon: UserRound, label: "أنت", link: profileLink, protected: true },
     ];
     return (
         <nav
@@ -48,9 +47,7 @@ const MobileBottomNav = () => {
                         key={item.label}
                         href={item.link}
                         className={
-                            active
-                                ? "text-accent"
-                                : "text-mid hover:text-ink"
+                            active ? "text-accent" : "text-mid hover:text-ink"
                         }
                         style={{
                             flex: 1,
