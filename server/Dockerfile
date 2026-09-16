@@ -51,6 +51,6 @@ COPY --from=build --chown=node:node /app/shared ./shared
 EXPOSE 3000
 # start script runs: prisma migrate deploy && tsx server.js
 USER node
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=3 \
   CMD node -e "fetch('http://localhost:3000/api/health').then(r=>{if(!r.ok)throw 1}).catch(()=>process.exit(1))"
 CMD ["pnpm", "--filter", "itnab-api", "start"]
