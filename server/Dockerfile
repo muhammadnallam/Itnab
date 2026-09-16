@@ -4,7 +4,7 @@
 # lockfile. Coolify field: Dockerfile Location = server/Dockerfile
 
 FROM node:22-slim AS base
-RUN apt-get update -y && apt-get install -y openssl ca-certificates curl tar && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y openssl ca-certificates curl tar chromium && rm -rf /var/lib/apt/lists/*
 # NOTE: not using corepack here — root package.json declares
 # devEngines.packageManager.version as "^11.13.1" (a semver range), and
 # corepack's pnpm shim rejects ranges ("Invalid package manager specification

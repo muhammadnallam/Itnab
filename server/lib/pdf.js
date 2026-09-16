@@ -1,5 +1,4 @@
 import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
 
 function escapeHtml(str) {
     return str
@@ -15,7 +14,7 @@ function buildHtml({ title, subtitle, topic, authorName, coverImage, html }) {
 <head>
 <meta charset="utf-8" />
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+Arabic:wght@400;500;600;700&display=swap");
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -288,8 +287,12 @@ async function getBrowser() {
         return browserInstance;
     }
     browserInstance = await puppeteer.launch({
-        args: chromium.args,
-        executablePath: await chromium.executablePath(),
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+        ],
+        executablePath: "/usr/bin/chromium",
         headless: "shell",
     });
     return browserInstance;
@@ -316,7 +319,10 @@ export async function generateArticlePdf({
             html,
         });
 
-        await page.setContent(htmlContent, { waitUntil: "networkidle0", timeout: 15000 });
+        await page.setContent(htmlContent, {
+            waitUntil: "networkidle0",
+            timeout: 15000,
+        });
 
         const pdfBuffer = await page.pdf({
             format: "A4",

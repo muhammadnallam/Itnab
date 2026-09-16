@@ -21,7 +21,6 @@
         "@prisma/adapter-pg": "^7.8.0",
         "@prisma/client": "^7.8.0",
         "@prisma/client-runtime-utils": "^7.8.0",
-        "@sparticuz/chromium": "^153.0.0",
         "@tiptap/core": "^3.27.3",
         "@tiptap/html": "^3.28.0",
         "bcryptjs": "^3.0.3",
