@@ -54,7 +54,7 @@ const WritersSlider = ({
                             }}
                         >
                             <Avatar
-                                src={writer.image}
+                                img={writer.image}
                                 initials={writer.name?.[0]}
                                 size={avatarSize}
                                 bg="var(--color-accent)"
