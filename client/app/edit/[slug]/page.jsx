@@ -1,4 +1,4 @@
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Editor } from "@/components/editor/Editor";
 import { getArticleBySlug } from "@/lib/data/articles";
 import "@/styles/_variables.scss";
@@ -11,10 +11,6 @@ export default async function EditPage({ params }) {
         article = await getArticleBySlug(slug);
     } catch {
         notFound();
-    }
-
-    if (session.user.id !== article.authorId) {
-        redirect("/");
     }
 
     const articleContent = {
