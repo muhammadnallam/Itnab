@@ -4,7 +4,6 @@ import { UserContext } from "@/context/UserContext";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { signOut } from "@/lib/api/auth";
 import { UserRound, Settings, LogOut, Sun, Monitor, Moon } from "lucide-react";
-import { redirect } from "next/navigation";
 import Avatar from "./ui/Avatar";
 
 const navItems = {
@@ -69,7 +68,7 @@ const UserDropdown = ({ open, onClose }) => {
         await signOut();
         setUser(null);
         onClose();
-        redirect("/");
+        window.location.reload();
     };
 
     const handleLogin = () => {
@@ -113,7 +112,9 @@ const UserDropdown = ({ open, onClose }) => {
                             <Avatar
                                 size={32}
                                 img={user?.image}
-                                initials={user?.name ? getInitials(user.name) : "?"}
+                                initials={
+                                    user?.name ? getInitials(user.name) : "?"
+                                }
                             />
                             <div style={{ minWidth: 0 }}>
                                 <p

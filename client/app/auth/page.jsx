@@ -1,6 +1,5 @@
 "use client";
 import { handleUser } from "@/lib/handlers";
-import { redirect } from "next/navigation";
 import { AuthForm, BrandBadge } from "@/components/AuthModal";
 import { useState } from "react";
 
@@ -23,7 +22,7 @@ export default function Auth() {
                         setMode(mode === "login" ? "signup" : "login")
                     }
                     onSubmit={handleUser}
-                    onClose={() => redirect("/")}
+                    onClose={() => window.location.assign("/")}
                 />
             </div>
         </div>

@@ -14,7 +14,6 @@ import Tabs from "@/components/ui/Tabs";
 
 import { UserContext } from "@/context/UserContext";
 import { signOut } from "@/lib/api/auth";
-import { redirect } from "next/navigation";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useUser } from "@/hooks/useUser";
 import { Trash } from "lucide-react";
@@ -192,7 +191,7 @@ const TabAccount = ({
         }
         await signOut();
         setUser(null);
-        redirect("/");
+        window.location.assign("/");
     };
 
     return (
@@ -644,7 +643,7 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
         toast.success("تم تحديث كلمة المرور");
         await signOut();
         setUser(null);
-        return redirect("/");
+        window.location.assign("/");
     };
 
     return (

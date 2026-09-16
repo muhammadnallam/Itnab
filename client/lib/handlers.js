@@ -92,12 +92,14 @@ export async function handleUser(mode, email, password, setUser) {
             await signInEmail(email, password);
             const session = await getSession();
             if (session?.user) setUser(session.user);
+            if (typeof window !== "undefined") window.location.reload();
             return { success: true };
         }
 
         const name = email.split("@")[0];
         const data = await signUpEmail(email, password, name);
         if (data?.user) setUser(data.user);
+        if (typeof window !== "undefined") window.location.reload();
         return { success: true };
     } catch (err) {
         return {
