@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Bookmark, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, Bookmark, FileDown, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { useSave } from "@/hooks/useSave";
 import { downloadPdf } from "@/lib/api/article";
+import { toast } from "sonner";
 
 export default function ArticleHeader({ article }) {
     const [hidden, setHidden] = useState(false);
@@ -50,6 +51,7 @@ export default function ArticleHeader({ article }) {
         try {
             await downloadPdf(article.slug);
         } catch {
+            toast.error("حدث خطأ أثناء تحميل ال PDF");
         } finally {
             setDownloading(false);
         }
@@ -94,7 +96,7 @@ export default function ArticleHeader({ article }) {
                     {downloading ? (
                         <Loader2 size={24} className="animate-spin" />
                     ) : (
-                        <Download size={24} />
+                        <FileDown size={23} />
                     )}
                 </button>
                 <RequireAuth onClick={toggleSave}>
