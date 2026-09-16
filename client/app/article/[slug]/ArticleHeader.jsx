@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Bookmark, Download } from "lucide-react";
+import { ArrowLeft, Bookmark, Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { useSave } from "@/hooks/useSave";
+import { downloadPdf } from "@/lib/api/article";
 
 export default function ArticleHeader({ article }) {
     const [hidden, setHidden] = useState(false);
+    const [downloading, setDownloading] = useState(false);
     const lastScrollY = useRef(0);
     const ticking = useRef(false);
     const router = useRouter();
@@ -42,6 +44,17 @@ export default function ArticleHeader({ article }) {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    const handleDownload = async () => {
+        if (downloading) return;
+        setDownloading(true);
+        try {
+            await downloadPdf(article.slug);
+        } catch {
+        } finally {
+            setDownloading(false);
+        }
+    };
+
     return (
         <header
             className={`article-header${hidden ? " article-header-hidden" : ""}`}
@@ -65,17 +78,24 @@ export default function ArticleHeader({ article }) {
 
             <div className="article-header-icons">
                 <button
-                    aria-label="share article"
+                    aria-label="download article"
                     className="text-mid hover:text-ink"
+                    onClick={handleDownload}
+                    disabled={downloading}
                     style={{
-                        cursor: "pointer",
+                        cursor: downloading ? "wait" : "pointer",
                         transition: "color 0.15s",
                         background: "none",
                         border: "none",
                         padding: 0,
+                        opacity: downloading ? 0.6 : 1,
                     }}
                 >
-                    <Download size={24} />
+                    {downloading ? (
+                        <Loader2 size={24} className="animate-spin" />
+                    ) : (
+                        <Download size={24} />
+                    )}
                 </button>
                 <RequireAuth onClick={toggleSave}>
                     <button

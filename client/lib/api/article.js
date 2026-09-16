@@ -1,4 +1,5 @@
 import { fetcher } from "@/lib/fetcher";
+import { API_URL } from "@/lib/api/config";
 
 export async function publishArticle({ content, data }) {
     return fetcher("/api/article/create", {
@@ -27,4 +28,20 @@ export async function deleteArticle(articleId) {
         credentials: "include",
         method: "DELETE",
     });
+}
+
+export async function downloadPdf(slug) {
+    const res = await fetch(`${API_URL}/api/article/${slug}/pdf`);
+    if (!res.ok) {
+        throw new Error("تعذر تحميل المقال");
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${slug}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }

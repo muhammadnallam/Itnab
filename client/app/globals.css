@@ -5,7 +5,7 @@
 
 :root {
     --font-family-sans: "Noto Sans Arabic", Cairo, "Segoe UI", sans-serif;
-    --font-family-serif: "Amiri, Noto Serif Arabic", Georgia, serif;
+    --font-family-serif: "Noto Serif Arabic", Georgia, serif;
 
     /* Border radius */
     --radius-btn: 8px;

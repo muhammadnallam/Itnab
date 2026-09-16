@@ -1,7 +1,10 @@
 import { Router } from "express";
+import { generateHTML } from "@tiptap/html";
+import { extensions } from "@itnab/tiptap";
 import asyncErrorHandler from "../../middleware/asyncErrorHandler.js";
 import validateArticle from "./article.validate.js";
 import requireAuth from "../../middleware/requireAuth.js";
+import { generateArticlePdf } from "../../lib/pdf.js";
 import {
     createArticle,
     getArticle,
@@ -56,6 +59,33 @@ router.delete(
     asyncErrorHandler(async (req, res) => {
         await deleteArticle(req.params.id, req.user.id);
         res.status(200).json({ success: true });
+    }),
+);
+
+router.get(
+    "/:slug/pdf",
+    asyncErrorHandler(async (req, res) => {
+        const article = await getArticle({ slug: req.params.slug });
+
+        const contentClone = JSON.parse(JSON.stringify(article.content));
+        contentClone.content.splice(0, 2);
+        const html = generateHTML(contentClone, extensions);
+
+        const pdfBuffer = await generateArticlePdf({
+            title: article.title,
+            subtitle: article.subtitle,
+            topic: article.topic,
+            authorName: article.author.name,
+            coverImage: article.coverImage,
+            html,
+        });
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename*=UTF-8''${encodeURIComponent(article.slug)}.pdf`,
+        );
+        res.send(pdfBuffer);
     }),
 );
 
