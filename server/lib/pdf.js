@@ -1,8 +1,5 @@
 import puppeteer from "puppeteer-core";
-
-const CHROME_PATH =
-    process.env.CHROME_PATH ||
-    "/home/mohamed/.cache/puppeteer/chrome/linux-153.0.8010.36/chrome-linux64/chrome";
+import chromium from "@sparticuz/chromium";
 
 function escapeHtml(str) {
     return str
@@ -291,14 +288,9 @@ async function getBrowser() {
         return browserInstance;
     }
     browserInstance = await puppeteer.launch({
-        executablePath: CHROME_PATH,
-        headless: true,
-        args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-dev-shm-usage",
-            "--disable-gpu",
-        ],
+        args: chromium.args,
+        executablePath: await chromium.executablePath(),
+        headless: "shell",
     });
     return browserInstance;
 }
