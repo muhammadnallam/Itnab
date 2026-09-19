@@ -58,10 +58,9 @@ export default function SignupForm({ onSwitchMode, onSuccess }) {
 
         if (exists) {
             setLoading(false);
-            setErrors((p) => ({
-                ...p,
-                email: "هذا البريد الإلكتروني مسجّل بالفعل. جرّب تسجيل الدخول أو استخدم بريدًا آخر",
-            }));
+            setApiError(
+                "هذا البريد الإلكتروني مسجّل بالفعل. جرّب تسجيل الدخول أو استخدم بريدًا آخر",
+            );
             return;
         }
 
