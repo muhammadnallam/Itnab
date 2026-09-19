@@ -7,6 +7,7 @@ import AuthModalProvider from "@/context/AuthModalContext";
 import SidebarProvider from "@/context/SidebarContext";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { SITE_URL } from "@/lib/site-url";
 
 const wordmarkFont = localFont({
     src: [
@@ -20,10 +21,11 @@ const wordmarkFont = localFont({
 });
 
 export const metadata = {
-    metadataBase: new URL(
-        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:5000",
-    ),
-    title: { default: "إطناب", template: "%s | إطناب" },
+    metadataBase: new URL(SITE_URL),
+    title: {
+        default: "إطناب | نافذة على الفكر والقلم العربي",
+        template: "%s | إطناب",
+    },
     description: "نافذة على الفكر والقلم العربي",
     openGraph: {
         type: "website",

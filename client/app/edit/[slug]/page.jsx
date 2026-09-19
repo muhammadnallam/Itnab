@@ -3,6 +3,11 @@ import { Editor } from "@/components/editor/Editor";
 import { getArticleBySlug } from "@/lib/data/articles";
 import "@/styles/_variables.scss";
 
+export const metadata = {
+    title: "تعديل المقال",
+    robots: { index: false, follow: false },
+};
+
 export default async function EditPage({ params }) {
     const { slug } = await params;
 
