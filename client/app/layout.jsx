@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./layout.css";
 import localFont from "next/font/local";
 import UserProvider from "@/context/UserContext";
 import ScreenProvider from "@/context/ScreenContext";
@@ -25,11 +26,16 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html dir="rtl" lang="ar" className={wordmarkFont.variable}>
+        <html dir="rtl" lang="ar" className={wordmarkFont.variable} suppressHydrationWarning>
             <head>
                 <meta
                     name="viewport"
                     content="width=device-width, initial-scale=1.0"
+                />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `(function(){var d=document.documentElement;try{d.dataset.sidebar=window.localStorage.getItem('itnab.sidebar')==='0'?'closed':'open'}catch(e){d.dataset.sidebar='open'}})();`,
+                    }}
                 />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link

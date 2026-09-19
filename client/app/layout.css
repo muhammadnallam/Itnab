@@ -1,0 +1,327 @@
+/*
+ * Responsive app shell + persisted sidebar.
+ *
+ * Layout is driven entirely by CSS media queries so the server-rendered HTML
+ * is already correct at first paint (no desktop-then-mobile flash). The
+ * sidebar's open/closed state lives on <html data-sidebar>, set before paint
+ * by the inline script in app/layout.jsx.
+ *
+ * Breakpoints: mobile < 768, tablet 768-1099, desktop >= 1100.
+ */
+
+:root {
+    --header-h: 57px;
+    --sidebar-col: 240px;
+    --sidebar-width: 232px;
+    --sidebar-slide: 240px;
+    --left-panel-width: 350px;
+}
+
+/* ---------------------------------------------------------------- shell -- */
+
+.app-root {
+    direction: rtl;
+    background: var(--color-bg);
+    min-height: 100vh;
+    color: var(--color-ink);
+}
+
+.app-body {
+    display: grid;
+    grid-template-columns: var(--sidebar-col) 1fr;
+    width: 100%;
+    min-height: calc(100vh - var(--header-h));
+    align-items: start;
+    transition: grid-template-columns 0.3s ease;
+}
+
+.app-sidebar {
+    border-left: 1px solid var(--color-border);
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100vh - var(--header-h));
+    overflow: hidden;
+    width: var(--sidebar-width);
+    transform: translateX(0);
+    transition: transform 0.4s ease;
+    will-change: transform;
+}
+
+.app-center {
+    min-width: 0;
+    min-height: calc(100vh - var(--header-h));
+    border-left: 1px solid var(--color-border);
+}
+
+.app-center-wrap {
+    padding: 24px 48px;
+}
+
+.app-center-inner {
+    max-width: var(--center-max-width, 640px);
+    margin: 0 auto;
+}
+
+.app-left-panel {
+    padding: 24px;
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100vh - var(--header-h));
+    overflow-y: scroll;
+}
+
+/* Desktop also shows a third column when a left panel is provided. */
+@media (min-width: 1100px) {
+    .app-body--has-left {
+        grid-template-columns: var(--sidebar-col) 1fr var(--left-panel-width);
+    }
+}
+
+/* Closed sidebar. */
+html[data-sidebar="closed"] .app-body,
+html[data-sidebar="closed"] .app-body--has-left {
+    grid-template-columns: 0px 1fr;
+}
+
+html[data-sidebar="closed"] .app-sidebar {
+    transform: translateX(var(--sidebar-slide));
+}
+
+@media (min-width: 1100px) {
+    html[data-sidebar="closed"] .app-body--has-left {
+        grid-template-columns: 0px 1fr var(--left-panel-width);
+    }
+}
+
+/* --------------------------------------------------------------- header -- */
+
+.header-menu-btn {
+    display: flex;
+}
+
+.header-search-btn {
+    display: none;
+}
+
+.header-search {
+    display: flex;
+}
+
+.header--explore .header-search {
+    display: none;
+}
+
+/* ----------------------------------------------------------- bottom nav -- */
+
+.app-bottom-nav {
+    display: none;
+}
+
+/* --------------------------------------------------------------- tablet -- */
+
+@media (max-width: 1099px) {
+    .app-body,
+    .app-body--has-left {
+        grid-template-columns: var(--sidebar-col) 1fr;
+    }
+
+    html[data-sidebar="closed"] .app-body,
+    html[data-sidebar="closed"] .app-body--has-left {
+        grid-template-columns: 0px 1fr;
+    }
+
+    .app-left-panel {
+        display: none;
+    }
+
+    .app-center {
+        border-left: none;
+    }
+
+    .app-center-wrap {
+        padding: 24px 32px;
+    }
+}
+
+/* --------------------------------------------------------------- mobile -- */
+
+@media (max-width: 767px) {
+    .app-body,
+    .app-body--has-left {
+        display: block;
+    }
+
+    .app-sidebar,
+    .app-left-panel {
+        display: none;
+    }
+
+    .app-center {
+        border-left: none;
+    }
+
+    .app-center-wrap {
+        padding: 16px 16px 80px;
+    }
+
+    .app-bottom-nav {
+        display: flex;
+    }
+
+    .header-menu-btn {
+        display: none;
+    }
+
+    .header-search-btn {
+        display: flex;
+    }
+
+    .header-search {
+        display: none;
+    }
+}
+
+/*
+ * Transitions are enabled only after hydration. This means a persisted
+ * "closed" sidebar is applied silently before paint and never animates on
+ * first load, while user toggles still animate normally.
+ */
+html:not([data-hydrated]) .app-body,
+html:not([data-hydrated]) .app-sidebar {
+    transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-body,
+    .app-sidebar {
+        transition: none !important;
+    }
+}
+
+/* ------------------------------------------------------------- profile -- */
+
+.profile-banner {
+    height: 200px;
+}
+
+.profile-header--mobile,
+.profile-header--tablet {
+    display: none;
+}
+
+.profile-header--desktop {
+    display: flex;
+}
+
+.profile-mobile-only {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .profile-banner {
+        height: 130px;
+    }
+
+    .profile-header--mobile {
+        display: flex;
+    }
+
+    .profile-header--desktop {
+        display: none;
+    }
+
+    .profile-mobile-only {
+        display: block;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1099px) {
+    .profile-header--tablet {
+        display: flex;
+    }
+
+    .profile-header--desktop {
+        display: none;
+    }
+}
+
+/* --------------------------------------------------------------- cards -- */
+
+.article-title {
+    font-size: 20px;
+}
+
+.article-thumb {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.article-title-skeleton {
+    height: 20px;
+}
+
+.article-thumb-skeleton {
+    width: 120px;
+    height: 120px;
+}
+
+.list-card-strip {
+    height: 110px;
+}
+
+.list-card-title {
+    font-size: 18px;
+}
+
+.list-card-img-0 {
+    width: 110px;
+}
+
+.list-card-img-1 {
+    width: 76px;
+}
+
+.list-card-img-2 {
+    width: 56px;
+}
+
+@media (max-width: 767px) {
+    .article-title {
+        font-size: 17px;
+    }
+
+    .article-thumb {
+        width: 88px;
+        height: 88px;
+    }
+
+    .article-title-skeleton {
+        height: 17px;
+    }
+
+    .article-thumb-skeleton {
+        width: 88px;
+        height: 88px;
+    }
+
+    .list-card-strip {
+        height: 88px;
+    }
+
+    .list-card-title {
+        font-size: 16px;
+    }
+
+    .list-card-img-0 {
+        width: 88px;
+    }
+
+    .list-card-img-1 {
+        width: 60px;
+    }
+
+    .list-card-img-2 {
+        width: 44px;
+    }
+}

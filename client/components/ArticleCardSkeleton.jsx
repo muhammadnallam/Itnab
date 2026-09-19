@@ -1,6 +1,6 @@
 "use client";
 
-const ArticleCardSkeleton = ({ isMobile }) => (
+const ArticleCardSkeleton = () => (
     <article
         style={{
             padding: "24px 0",
@@ -46,9 +46,9 @@ const ArticleCardSkeleton = ({ isMobile }) => (
                     />
                 </div>
                 <div
+                    className="article-title-skeleton"
                     style={{
                         width: "90%",
-                        height: isMobile ? 17 : 20,
                         borderRadius: 4,
                         background: "var(--color-tag-bg)",
                         marginBottom: 8,
@@ -66,9 +66,8 @@ const ArticleCardSkeleton = ({ isMobile }) => (
                 />
             </div>
             <div
+                className="article-thumb-skeleton"
                 style={{
-                    width: isMobile ? 88 : 120,
-                    height: isMobile ? 88 : 120,
                     borderRadius: "var(--border-radius)",
                     background: "var(--color-tag-bg)",
                     flexShrink: 0,

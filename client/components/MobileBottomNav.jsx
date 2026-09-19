@@ -24,6 +24,7 @@ const MobileBottomNav = () => {
     ];
     return (
         <nav
+            className="app-bottom-nav"
             style={{
                 position: "fixed",
                 bottom: 0,
@@ -32,7 +33,6 @@ const MobileBottomNav = () => {
                 zIndex: 60,
                 background: "var(--color-white)",
                 borderTop: "1px solid var(--color-border)",
-                display: "flex",
                 height: 56,
             }}
         >

@@ -1,10 +1,8 @@
 "use client";
 
-import { useContext } from "react";
 import Header from "@/components/Header";
 import RightSidebar from "@/components/RightSidebar";
 import MobileBottomNav from "@/components/MobileBottomNav";
-import { WidthContext } from "@/context/ScreenContext";
 import { useSidebar } from "@/context/SidebarContext";
 
 export default function AppLayout({
@@ -13,113 +11,37 @@ export default function AppLayout({
     centerMaxWidth = 640,
     fullWidthContent,
 }) {
-    const { sidebarOpen, toggleSidebar } = useSidebar();
-    const width = useContext(WidthContext);
-    const isMobile = width < 768;
-    const isTablet = width >= 768 && width < 1100;
-
-    const HEADER_H = 57;
-
-    const desktopGridColumns = () => {
-        const base = isTablet
-            ? sidebarOpen
-                ? "240px 1fr"
-                : "0px 1fr"
-            : sidebarOpen
-              ? "240px 1fr"
-              : "0px 1fr";
-        if (leftPanel && !isTablet) {
-            return sidebarOpen ? "240px 1fr 350px" : "0px 1fr 350px";
-        }
-        return base;
-    };
-
-    const styles = {
-        root: {
-            direction: "rtl",
-            background: "var(--color-bg)",
-            minHeight: "100vh",
-            color: "var(--color-ink)",
-        },
-        desktopGrid: {
-            display: "grid",
-            gridTemplateColumns: desktopGridColumns(),
-            width: "100%",
-            minHeight: `calc(100vh - ${HEADER_H}px)`,
-            alignItems: "start",
-            transition: "grid-template-columns 0.3s ease",
-        },
-        rightSidebarWrap: {
-            borderLeft: "1px solid var(--color-border)",
-            position: "sticky",
-            top: HEADER_H,
-            height: `calc(100vh - ${HEADER_H}px)`,
-            overflow: "hidden",
-            width: 232,
-            transform: sidebarOpen
-                ? "translateX(0)"
-                : "translateX(240px)",
-            transition: "transform 0.4s ease",
-            willChange: "transform",
-        },
-        centerColumn: {
-            minWidth: 0,
-            minHeight: `calc(100vh - ${HEADER_H}px)`,
-            borderLeft: isTablet ? "none" : "1px solid var(--color-border)",
-        },
-        centerWrap: {
-            padding: isTablet ? "24px 32px" : "24px 48px",
-        },
-        centerInner: {
-            maxWidth: centerMaxWidth,
-            margin: "0 auto",
-        },
-        leftPanelWrap: {
-            padding: "24px",
-            position: "sticky",
-            top: HEADER_H,
-            height: `calc(100vh - ${HEADER_H}px)`,
-            overflowY: "scroll",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-        },
-    };
+    const { toggleSidebar } = useSidebar();
 
     return (
-        <div style={styles.root}>
-            <Header
-                onToggleSidebar={toggleSidebar}
-                isMobile={isMobile}
-            />
-            {isMobile ? (
-                <>
+        <div className="app-root">
+            <Header onToggleSidebar={toggleSidebar} />
+            <div
+                className={`app-body${leftPanel ? " app-body--has-left" : ""}`}
+            >
+                <aside className="app-sidebar">
+                    <RightSidebar />
+                </aside>
+                <div className="app-center">
                     {fullWidthContent}
-                    <main style={{ padding: "16px 16px 80px" }}>
-                        {children}
-                    </main>
-                    <MobileBottomNav />
-                </>
-            ) : (
-                <div style={styles.desktopGrid}>
-                    <div style={styles.rightSidebarWrap}>
-                        <RightSidebar isOpen={sidebarOpen} />
-                    </div>
-                    <div style={styles.centerColumn}>
-                        {fullWidthContent}
-                        <div style={styles.centerWrap}>
-                            <div style={styles.centerInner}>{children}</div>
-                        </div>
-                    </div>
-                    {leftPanel && !isTablet && (
+                    <div className="app-center-wrap">
                         <div
-                            style={styles.leftPanelWrap}
-                            className="hide-scroll"
+                            className="app-center-inner"
+                            style={{
+                                "--center-max-width": `${centerMaxWidth}px`,
+                            }}
                         >
-                            {leftPanel}
+                            {children}
                         </div>
-                    )}
+                    </div>
                 </div>
-            )}
+                {leftPanel && (
+                    <aside className="app-left-panel hide-scroll">
+                        {leftPanel}
+                    </aside>
+                )}
+            </div>
+            <MobileBottomNav />
         </div>
     );
 }

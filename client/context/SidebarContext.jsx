@@ -1,40 +1,47 @@
 "use client";
 
-import { createContext, useContext, useSyncExternalStore } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const STORAGE_KEY = "itnab.sidebar";
 
-const getSnapshot = () => {
-    try {
-        return window.localStorage.getItem(STORAGE_KEY);
-    } catch {
-        return null;
-    }
-};
-
-const getServerSnapshot = () => null;
-
-const subscribe = (callback) => {
-    window.addEventListener("storage", callback);
-    return () => window.removeEventListener("storage", callback);
-};
-
 export const SidebarContext = createContext(null);
 
+function readStoredOpen() {
+    if (typeof window === "undefined") return true;
+    try {
+        return window.localStorage.getItem(STORAGE_KEY) !== "0";
+    } catch {
+        return true;
+    }
+}
+
 export default function SidebarProvider({ children }) {
-    const stored = useSyncExternalStore(
-        subscribe,
-        getSnapshot,
-        getServerSnapshot,
-    );
-    const sidebarOpen = stored !== "0";
+    const [sidebarOpen, setSidebarOpen] = useState(readStoredOpen);
+
+    // Mirror the state onto <html> so CSS owns the actual layout. The inline
+    // script in app/layout.jsx already set this before first paint; running it
+    // again here keeps the attribute in sync with React after hydration.
+    useEffect(() => {
+        const root = document.documentElement;
+        root.dataset.sidebar = sidebarOpen ? "open" : "closed";
+        root.dataset.hydrated = "true";
+    }, [sidebarOpen]);
+
+    // Keep multiple tabs in sync.
+    useEffect(() => {
+        const onStorage = () => setSidebarOpen(readStoredOpen());
+        window.addEventListener("storage", onStorage);
+        return () => window.removeEventListener("storage", onStorage);
+    }, []);
 
     const toggleSidebar = () => {
-        const next = sidebarOpen ? "0" : "1";
-        try {
-            window.localStorage.setItem(STORAGE_KEY, next);
-        } catch {}
-        window.dispatchEvent(new Event("storage"));
+        setSidebarOpen((prev) => {
+            const next = !prev;
+            try {
+                window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+            } catch {}
+            return next;
+        });
     };
 
     return (

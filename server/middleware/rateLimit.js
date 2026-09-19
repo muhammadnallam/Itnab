@@ -7,12 +7,13 @@ function authRateLimitHandler(req, res) {
     const seconds = resetTime
         ? Math.max(1, Math.ceil((resetTime.getTime() - Date.now()) / 1000))
         : 60;
+    const minutes = Math.max(1, Math.ceil(seconds / 60));
 
     res.set("Retry-After", String(seconds));
     res.status(429).json({
-        message: `لقد تخطيت الحد المسموح به من المحاولات، حاول مرة أخرى بعد ${seconds} ثانية`,
+        message: `لقد تخطيت الحد المسموح به من المحاولات، حاول مرة أخرى بعد ${minutes} دقيقة`,
         code: "RATE_LIMIT_EXCEEDED",
-        retryAfter: seconds,
+        retryAfter: minutes,
     });
 }
 
@@ -41,33 +42,33 @@ export const emailCheckLimiter = rateLimit({
 });
 
 export const viewLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 60,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: MESSAGE,
+    windowMs: 60 * 1000,
+    limit: 60,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: MESSAGE,
 });
 
 export const commentLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 30,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: MESSAGE,
+    windowMs: 60 * 1000,
+    limit: 30,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: MESSAGE,
 });
 
 export const shareLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 20,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: MESSAGE,
+    windowMs: 60 * 1000,
+    limit: 20,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: MESSAGE,
 });
 
 export const uploadLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  limit: 20,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: MESSAGE,
+    windowMs: 60 * 1000,
+    limit: 20,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: MESSAGE,
 });

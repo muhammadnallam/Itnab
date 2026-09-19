@@ -16,7 +16,7 @@ const getInitials = (name) => {
     return parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
 };
 
-export default function Header({ onToggleSidebar, isMobile }) {
+export default function Header({ onToggleSidebar }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [notifOpen, setNotifOpen] = useState(false);
     const [headerSearch, setHeaderSearch] = useState("");
@@ -40,6 +40,7 @@ export default function Header({ onToggleSidebar, isMobile }) {
 
     return (
         <header
+            className={isExplore ? "header--explore" : undefined}
             style={{
                 position: "sticky",
                 top: 0,
@@ -55,22 +56,20 @@ export default function Header({ onToggleSidebar, isMobile }) {
             }}
         >
             <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-                {!isMobile && (
-                    <button
-                        onClick={onToggleSidebar}
-                        className="text-mid hover:text-ink"
-                        style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            display: "flex",
-                            padding: 4,
-                            transition: "color 0.15s",
-                        }}
-                    >
-                        <Menu size={24}></Menu>
-                    </button>
-                )}
+                <button
+                    onClick={onToggleSidebar}
+                    aria-label="القائمة"
+                    className="header-menu-btn text-mid hover:text-ink"
+                    style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 4,
+                        transition: "color 0.15s",
+                    }}
+                >
+                    <Menu size={24}></Menu>
+                </button>
                 <Link href="/">
                     <span
                         style={{
@@ -87,63 +86,59 @@ export default function Header({ onToggleSidebar, isMobile }) {
                         إطناب
                     </span>
                 </Link>
-                {isMobile && (
-                    <button
-                        onClick={() => router.push("/explore")}
-                        className="text-mid hover:text-ink"
-                        style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            display: "flex",
-                            padding: 4,
-                            transition: "color 0.15s",
-                        }}
-                    >
-                        <Search size={22} />
-                    </button>
-                )}
-            </div>
-
-            {!isMobile && !isExplore && (
-                <div
+                <button
+                    onClick={() => router.push("/explore")}
+                    aria-label="بحث"
+                    className="header-search-btn text-mid hover:text-ink"
                     style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        background: "var(--color-bg)",
-                        border: "1px solid var(--color-border)",
-                        borderRadius: "var(--border-radius)",
-                        padding: "8px 16px",
-                        flex: 1,
-                        maxWidth: 540,
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 4,
+                        transition: "color 0.15s",
                     }}
                 >
-                    <Search size={18} />
-                    <input
-                        placeholder="بحث"
-                        value={headerSearch}
-                        onChange={(e) => setHeaderSearch(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && headerSearch.trim()) {
-                                router.push(
-                                    `/explore?q=${encodeURIComponent(headerSearch.trim())}&tab=articles`,
-                                );
-                                setHeaderSearch("");
-                            }
-                        }}
-                        style={{
-                            background: "none",
-                            border: "none",
-                            outline: "none",
-                            fontSize: 14,
-                            color: "var(--color-ink)",
-                            width: "100%",
-                            direction: "rtl",
-                        }}
-                    />
-                </div>
-            )}
+                    <Search size={22} />
+                </button>
+            </div>
+
+            <div
+                className="header-search"
+                style={{
+                    alignItems: "center",
+                    gap: 8,
+                    background: "var(--color-bg)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--border-radius)",
+                    padding: "8px 16px",
+                    flex: 1,
+                    maxWidth: 540,
+                }}
+            >
+                <Search size={18} />
+                <input
+                    placeholder="بحث"
+                    value={headerSearch}
+                    onChange={(e) => setHeaderSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && headerSearch.trim()) {
+                            router.push(
+                                `/explore?q=${encodeURIComponent(headerSearch.trim())}&tab=articles`,
+                            );
+                            setHeaderSearch("");
+                        }
+                    }}
+                    style={{
+                        background: "none",
+                        border: "none",
+                        outline: "none",
+                        fontSize: 14,
+                        color: "var(--color-ink)",
+                        width: "100%",
+                        direction: "rtl",
+                    }}
+                />
+            </div>
 
             <div style={{ display: "flex", gap: 16 }}>
                 {user && (

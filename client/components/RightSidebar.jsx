@@ -19,7 +19,7 @@ const BASE_NAV_ITEMS = [
     { icon: Bookmark, label: "مكتبتي", link: "/library", protected: true },
 ];
 
-const RightSidebar = ({ isOpen, isActive } = {}) => {
+const RightSidebar = () => {
     const pathname = usePathname();
     const { user } = useContext(UserContext);
     const profileLink = user?.username ? `/@${user.username}` : "/auth";
@@ -32,7 +32,7 @@ const RightSidebar = ({ isOpen, isActive } = {}) => {
         <div>
             <aside
                 style={{
-                    display: isActive !== false ? "flex" : "none",
+                    display: "flex",
                     flexDirection: "column",
                     padding: "24px 16px",
                     height: "100%",

@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { BookmarkMinus } from "lucide-react";
 
-export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
+export default function ListCard({ list, isOwner: isOwnerProp }) {
     const [saved, setSaved] = useState(list.saved);
     const [removeOpen, setRemoveOpen] = useState(false);
     const [removing, setRemoving] = useState(false);
@@ -51,9 +51,6 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
         (!userLoading &&
             Boolean(user) &&
             user.username === list.authorUsername);
-
-    const imgWidths = isMobile ? [88, 60, 44] : [110, 76, 56];
-    const cardHeight = isMobile ? 88 : 110;
 
     const listUrl = () =>
         typeof window !== "undefined"
@@ -244,8 +241,8 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
                 {/* List title */}
                 <Link href={listUrl()}>
                     <h3
+                        className="list-card-title"
                         style={{
-                            fontSize: isMobile ? 16 : 18,
                             fontWeight: 700,
                             color: "var(--color-ink)",
                             lineHeight: 1.3,
@@ -312,10 +309,10 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
 
             {/* ── Image strip (3 photos, descending widths) ─────────── */}
             <div
+                className="list-card-strip"
                 style={{
                     display: "flex",
                     alignItems: "stretch",
-                    height: cardHeight,
                     flexShrink: 0,
                     borderRadius: 2,
                     overflow: "hidden",
@@ -323,13 +320,12 @@ export default function ListCard({ list, isMobile, isOwner: isOwnerProp }) {
             >
                 {[0, 1, 2].map((i) => {
                     const src = list.images?.[i];
-                    const w = imgWidths[i];
 
                     return (
                         <div
                             key={i}
+                            className={`list-card-img-${i}`}
                             style={{
-                                width: w,
                                 height: "100%",
                                 flexShrink: 0,
                                 background: src

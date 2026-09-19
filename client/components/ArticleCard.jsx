@@ -47,7 +47,7 @@ function filterArticle(data, articleId) {
 
 const LIBRARY_KEYS = ["userSaves", "userViews"];
 
-const ArticleCard = ({ article, isMobile }) => {
+const ArticleCard = ({ article }) => {
     const id = article?.id;
     const saved = article?.saved ?? false;
     const qc = useQueryClient();
@@ -151,10 +151,7 @@ const ArticleCard = ({ article, isMobile }) => {
                     </div>
 
                     <a href={`/article/${article.slug}`}>
-                        <h2
-                            className="font-semibold leading-normal mb-1.5 cursor-pointer"
-                            style={{ fontSize: isMobile ? 17 : 20 }}
-                        >
+                        <h2 className="article-title font-semibold leading-normal mb-1.5 cursor-pointer">
                             {article.title}
                         </h2>
                     </a>
@@ -174,12 +171,7 @@ const ArticleCard = ({ article, isMobile }) => {
                     <img
                         src={article.image}
                         alt={article.excerpt}
-                        className="shrink-0 rounded-sm"
-                        style={{
-                            width: isMobile ? 88 : 120,
-                            height: isMobile ? 88 : 120,
-                            objectFit: "cover",
-                        }}
+                        className="article-thumb shrink-0 rounded-sm"
                     />
                 )}
             </div>

@@ -25,7 +25,6 @@ import MoreMenu from "@/components/MoreMenu";
 import FollowListModal from "@/app/profile/[username]/FollowListModal";
 import ShareModal from "@/components/ShareModal";
 
-import { WidthContext } from "@/context/ScreenContext";
 import { UserContext } from "@/context/UserContext";
 
 import { useArticleList } from "@/hooks/useArticleList";
@@ -205,11 +204,8 @@ export default function ProfilePage() {
     const params = useParams();
     const username = params?.username;
     const [tab, setTab] = useState("home");
-    const width = useContext(WidthContext);
     const router = useRouter();
     const { user, loading: userLoading } = useContext(UserContext);
-    const isMobile = width < 768;
-    const isTablet = width >= 768 && width < 1100;
 
     const { profile, isLoading, error } = useUser(username);
 
@@ -270,11 +266,7 @@ export default function ProfilePage() {
     if (error) notFound();
 
     const banner = profile?.bannerUrl?.trim() ? (
-        <div
-            className={`w-250 max-w-full mx-auto overflow-hidden bg-surface-subtle ${
-                isMobile ? "h-32.5" : "h-50"
-            }`}
-        >
+        <div className="profile-banner w-250 max-w-full mx-auto overflow-hidden bg-surface-subtle">
             <img
                 src={profile.bannerUrl}
                 alt=""
@@ -345,7 +337,7 @@ export default function ProfilePage() {
                     loading={false}
                 />
                 {[1, 2, 3].map((i) => (
-                    <ArticleCardSkeleton key={i} isMobile={isMobile} />
+                    <ArticleCardSkeleton key={i} />
                 ))}
             </AppLayout>
         );
@@ -368,8 +360,7 @@ export default function ProfilePage() {
             centerMaxWidth={700}
             fullWidthContent={banner}
         >
-            {isMobile && (
-                <div className="flex items-center gap-3 mt-4 mb-1">
+            <div className="profile-header--mobile items-center gap-3 mt-4 mb-1">
                     <Avatar
                         img={profile.image}
                         initials={getInitials(profile.name)}
@@ -401,10 +392,9 @@ export default function ProfilePage() {
                         </span>
                     </MoreMenu>
                 </div>
-            )}
 
-            {isMobile && !isOwnProfile && (
-                <div className="my-5">
+            {!isOwnProfile && (
+                <div className="profile-mobile-only my-5">
                     <FollowButton
                         following={following}
                         isMutating={isMutating}
@@ -413,8 +403,7 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            {isTablet && (
-                <div className="flex items-center gap-3 mt-4 mb-1">
+            <div className="profile-header--tablet items-center gap-3 mt-4 mb-1">
                     <Avatar
                         img={profile.image}
                         initials={getInitials(profile.name)}
@@ -454,10 +443,8 @@ export default function ProfilePage() {
                         </span>
                     </MoreMenu>
                 </div>
-            )}
 
-            {!isMobile && !isTablet && (
-                <div className="flex items-start justify-between mt-10 mb-10">
+            <div className="profile-header--desktop items-start justify-between mt-10 mb-10">
                     <h1 className="text-[32px] font-bold text-ink m-0 leading-[1.15]">
                         {profile.name}
                     </h1>
@@ -467,7 +454,6 @@ export default function ProfilePage() {
                         </span>
                     </MoreMenu>
                 </div>
-            )}
 
             <Tabs
                 active={tab}
@@ -483,7 +469,7 @@ export default function ProfilePage() {
                     {lists.loading ? (
                         <>
                             {[1, 2, 3].map((i) => (
-                                <ArticleCardSkeleton key={i} isMobile={isMobile} />
+                                <ArticleCardSkeleton key={i} />
                             ))}
                         </>
                     ) : (
@@ -492,7 +478,7 @@ export default function ProfilePage() {
                                 <ListCard
                                     key={l.id}
                                     list={parseList(l, profile?.name)}
-                                    isMobile={isMobile}
+                                   
                                     isOwner={isOwnProfile}
                                 />
                             ))}
@@ -514,7 +500,7 @@ export default function ProfilePage() {
             ) : articles.loading ? (
                 <>
                     {[1, 2, 3].map((i) => (
-                        <ArticleCardSkeleton key={i} isMobile={isMobile} />
+                        <ArticleCardSkeleton key={i} />
                     ))}
                 </>
             ) : articles.items.length ? (
@@ -523,7 +509,7 @@ export default function ProfilePage() {
                         <ArticleCard
                             key={a.id}
                             article={a}
-                            isMobile={isMobile}
+                           
                         />
                     ))}
                     {articles.hasMore && (
