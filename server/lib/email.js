@@ -59,3 +59,23 @@ export async function sendVerificationOtpEmail({ email, otp }) {
         `),
     });
 }
+
+export async function sendPasswordResetEmail({ user, url }) {
+    await sendEmail({
+        to: user.email,
+        subject: "إعادة تعيين كلمة المرور",
+        html: layout(`
+            <h1 style="font-size:20px;margin:0 0 12px;">إعادة تعيين كلمة المرور</h1>
+            <p style="font-size:14px;line-height:1.7;color:#4b5563;margin:0 0 24px;">
+                وصلنا طلب لإعادة تعيين كلمة المرور لحسابك. اضغط على الزر أدناه لاختيار كلمة مرور جديدة. الرابط صالح لمدة 15 دقيقة ولمرة واحدة فقط.
+            </p>
+            <a href="${url}" style="display:inline-block;background:#1f2430;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:12px 28px;border-radius:10px;">
+                إعادة تعيين كلمة المرور
+            </a>
+            <p style="font-size:13px;line-height:1.7;color:#8a8f9a;margin:24px 0 0;">
+                إذا لم تطلب إعادة التعيين، يمكنك تجاهل هذه الرسالة.
+            </p>
+        `),
+    });
+}
+

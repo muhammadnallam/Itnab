@@ -1,5 +1,7 @@
 import {
     getSession,
+    requestPasswordReset,
+    resetPassword,
     sendVerificationOtp,
     signInEmail,
     signUpEmail,
@@ -155,6 +157,34 @@ export async function handleResendOtp(email) {
         return {
             success: false,
             error: err.message || "تعذر إرسال رمز التحقق",
+        };
+    }
+}
+
+export async function handleRequestReset(email) {
+    try {
+        const redirectTo =
+            typeof window !== "undefined"
+                ? `${window.location.origin}/reset-password`
+                : undefined;
+        await requestPasswordReset(email, redirectTo);
+        return { success: true };
+    } catch (err) {
+        return {
+            success: false,
+            error: err.message || "تعذر إرسال رابط إعادة التعيين",
+        };
+    }
+}
+
+export async function handleResetPassword(newPassword, token) {
+    try {
+        await resetPassword(newPassword, token);
+        return { success: true };
+    } catch (err) {
+        return {
+            success: false,
+            error: err.message || "تعذر إعادة تعيين كلمة المرور",
         };
     }
 }

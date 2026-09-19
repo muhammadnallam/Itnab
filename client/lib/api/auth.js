@@ -45,6 +45,24 @@ export async function verifyEmailOtp(email, otp) {
     return data;
 }
 
+export async function requestPasswordReset(email, redirectTo) {
+    const { data, error } = await authClient.requestPasswordReset({
+        email,
+        redirectTo,
+    });
+    if (error) throw toError(error, "تعذر إرسال رابط إعادة التعيين");
+    return data;
+}
+
+export async function resetPassword(newPassword, token) {
+    const { data, error } = await authClient.resetPassword({
+        newPassword,
+        token,
+    });
+    if (error) throw toError(error, "تعذر إعادة تعيين كلمة المرور");
+    return data;
+}
+
 export async function signOut() {
     await authClient.signOut();
 }

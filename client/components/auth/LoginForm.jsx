@@ -1,5 +1,6 @@
 "use client";
 import { useState, useContext } from "react";
+import { useRouter } from "next/navigation";
 import { UserContext } from "@/context/UserContext";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -14,6 +15,7 @@ export default function LoginForm({ onSwitchMode, onSuccess }) {
     const [errors, setErrors] = useState({});
     const [apiError, setApiError] = useState("");
     const { setUser } = useContext(UserContext);
+    const router = useRouter();
 
     const validate = () => {
         const e = {};
@@ -102,6 +104,7 @@ export default function LoginForm({ onSwitchMode, onSuccess }) {
             <div style={{ textAlign: "center", marginTop: 16 }}>
                 <button
                     type="button"
+                    onClick={() => router.push("/forgot-password")}
                     style={{
                         background: "none",
                         border: "none",

@@ -9,7 +9,7 @@ import { generateFromEmail } from "unique-username-generator";
 import { localization } from "better-auth-localization";
 import { emailOTP } from "better-auth/plugins/email-otp";
 
-import { sendVerificationOtpEmail } from "./email.js";
+import { sendPasswordResetEmail, sendVerificationOtpEmail } from "./email.js";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
@@ -61,6 +61,11 @@ export const auth = betterAuth({
         minPasswordLength: 8,
         maxPasswordLength: 20,
         requireEmailVerification: emailVerificationEnabled,
+        resetPasswordTokenExpiresIn: 900,
+        revokeSessionsOnPasswordReset: true,
+        sendResetPassword: async ({ user, url }) => {
+            await sendPasswordResetEmail({ user, url });
+        },
     },
     emailVerification: emailVerificationEnabled
         ? {
