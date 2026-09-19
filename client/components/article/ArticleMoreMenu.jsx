@@ -8,6 +8,7 @@ import MoreMenu from "@/components/MoreMenu";
 import ConfirmModal from "@/components/ConfirmModal";
 import ListPicker from "@/components/ListPicker";
 import ShareModal from "@/components/ShareModal";
+import ReportModal from "@/components/ReportModal";
 import { getArticleUrl } from "@/lib/share";
 import {
     Pencil,
@@ -217,16 +218,11 @@ export default function ArticleMoreMenu({
                 onConfirm={() => deleteMutation.mutate()}
             />
 
-            <ConfirmModal
-                isOpen={reportOpen}
-                icon={CircleAlert}
-                color="var(--color-error)"
-                icoBackground="var(--color-error-light)"
-                title="الإبلاغ عن المقال"
-                description="شكرًا لك، تم استلام بلاغك وسنراجعه في أقرب وقت."
-                buttonText="حسنًا"
-                onCancel={() => setReportOpen(false)}
-                onConfirm={() => setReportOpen(false)}
+            <ReportModal
+                open={reportOpen}
+                onClose={() => setReportOpen(false)}
+                targetType="article"
+                articleId={id}
             />
 
             <ListPicker

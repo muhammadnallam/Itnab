@@ -33,6 +33,15 @@ export class AuthorizationError extends Error {
     }
 }
 
+export class ConflictError extends Error {
+    constructor(message, code) {
+        super(message);
+        this.name = "ConflictError";
+        this.status = 409;
+        this.code = code;
+    }
+}
+
 export class AuthenticationError extends Error {
     constructor(message) {
         super(message);

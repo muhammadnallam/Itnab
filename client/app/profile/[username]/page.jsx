@@ -24,6 +24,8 @@ import RequireAuth from "@/components/RequireAuth";
 import MoreMenu from "@/components/MoreMenu";
 import FollowListModal from "@/app/profile/[username]/FollowListModal";
 import ShareModal from "@/components/ShareModal";
+import ReportModal from "@/components/ReportModal";
+import { useAuthModal } from "@/context/AuthModalContext";
 
 import { UserContext } from "@/context/UserContext";
 
@@ -206,6 +208,7 @@ export default function ProfilePage() {
     const [tab, setTab] = useState("home");
     const router = useRouter();
     const { user, loading: userLoading } = useContext(UserContext);
+    const { openAuth } = useAuthModal();
 
     const { profile, isLoading, error } = useUser(username);
 
@@ -220,6 +223,7 @@ export default function ProfilePage() {
 
     const [followModal, setFollowModal] = useState(null);
     const [shareOpen, setShareOpen] = useState(false);
+    const [reportOpen, setReportOpen] = useState(false);
 
     const handleShare = () => setShareOpen(true);
 
@@ -241,7 +245,18 @@ export default function ProfilePage() {
         { icon: Share2, label: "مشاركة الملف الشخصي", onClick: handleShare },
         { icon: Copy, label: "نسخ رابط الملف الشخصي", onClick: handleCopy },
         { separator: true },
-        { icon: CircleAlert, label: "إبلاغ عن المؤلف", type: "red", onClick: () => {} },
+        {
+            icon: CircleAlert,
+            label: "إبلاغ عن المؤلف",
+            type: "red",
+            onClick: () => {
+                if (!user) {
+                    openAuth("login");
+                    return;
+                }
+                setReportOpen(true);
+            },
+        },
     ];
 
     const menuOptions = userLoading
@@ -542,6 +557,12 @@ export default function ProfilePage() {
                 url={profile ? `${window.location.origin}/@${profile.username}` : ""}
                 heading="مشاركة الملف الشخصي"
                 subheading="شارك هذا الملف الشخصي مع الآخرين"
+            />
+            <ReportModal
+                open={reportOpen}
+                onClose={() => setReportOpen(false)}
+                targetType="profile"
+                profileId={profile.id}
             />
         </AppLayout>
     );

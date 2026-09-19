@@ -15,6 +15,7 @@ export default function Modal({
     onSubmit,
     children,
     ariaLabel = "نافذة",
+    maxHeight = "92vh",
 }) {
     const panelRef = useRef(null);
     const previouslyFocused = useRef(null);
@@ -182,7 +183,7 @@ export default function Modal({
                     animation: "modalIn 0.18s ease",
                     outline: "none",
                     ...(hasStructure
-                        ? { maxHeight: "92vh", display: "flex", flexDirection: "column", overflow: "hidden" }
+                        ? { maxHeight, display: "flex", flexDirection: "column", overflow: "hidden" }
                         : {}),
                 }}
             >

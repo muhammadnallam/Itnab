@@ -60,6 +60,8 @@ model User {
   savedLists    SavedList[]
   receivedNotifications Notification[] @relation("receivedNotifications")
   sentNotifications     Notification[] @relation("sentNotifications")
+  reports               Report[]       @relation("ReportReporter")
+  reportedIn            Report[]       @relation("ReportProfile")
 
   name          String
   emailVerified Boolean    @default(false)
@@ -107,6 +109,7 @@ model Article {
   shares    Share[]
   views     View[]       @relation("articleViews")
   comments  Comment[]
+  reports   Report[]
 
   @@index([topic, createdAt(sort: Desc)])
 }
@@ -331,4 +334,27 @@ model Notification {
   @@index([recipientId, updatedAt(sort: Desc)])
   @@index([recipientId, readAt])
   @@unique([recipientId, groupKey])
+}
+
+// Reports submitted by a user against an article or another user's profile.
+// Exactly one of articleId / profileId is set per row.
+
+model Report {
+  id         String   @id @default(uuid()) @db.Uuid
+  category   String
+  details    String?
+  createdAt  DateTime @default(now())
+
+  reporterId String  @db.Uuid
+  reporter   User    @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  articleId  String? @db.Uuid
+  article    Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  profileId  String? @db.Uuid
+  profile    User?   @relation("ReportProfile", fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([reporterId, articleId])
+  @@unique([reporterId, profileId])
+  @@index([articleId])
+  @@index([profileId])
+  @@map("report")
 }
