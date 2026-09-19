@@ -5,11 +5,13 @@ import BrandBadge from "./auth/BrandBadge";
 import LoginForm from "./auth/LoginForm";
 import SignupForm from "./auth/SignupForm";
 import VerifyOtpForm from "./auth/VerifyOtpForm";
+import ForgotPasswordForm from "./auth/ForgotPasswordForm";
 
 export { default as BrandBadge } from "./auth/BrandBadge";
 export { default as LoginForm } from "./auth/LoginForm";
 export { default as SignupForm } from "./auth/SignupForm";
 export { default as VerifyOtpForm } from "./auth/VerifyOtpForm";
+export { default as ForgotPasswordForm } from "./auth/ForgotPasswordForm";
 
 const RESENT_NOTICE = "البريد الإلكتروني غير مُتحقق. أرسلنا رمزًا جديدًا إلى بريدك.";
 
@@ -45,6 +47,7 @@ export default function AuthModal({ open, onClose, defaultMode = "login" }) {
                 <LoginForm
                     onSwitchMode={() => setMode("signup")}
                     onSuccess={handleSuccess}
+                    onForgotPassword={() => setMode("forgot")}
                 />
             )}
             {mode === "signup" && (
@@ -52,6 +55,9 @@ export default function AuthModal({ open, onClose, defaultMode = "login" }) {
                     onSwitchMode={() => setMode("login")}
                     onSuccess={handleSuccess}
                 />
+            )}
+            {mode === "forgot" && (
+                <ForgotPasswordForm onBack={() => setMode("login")} />
             )}
             {mode === "verify" && (
                 <VerifyOtpForm

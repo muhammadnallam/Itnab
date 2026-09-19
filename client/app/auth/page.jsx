@@ -6,18 +6,24 @@ import {
     LoginForm,
     SignupForm,
     VerifyOtpForm,
+    ForgotPasswordForm,
 } from "@/components/AuthModal";
 import { safeRedirect } from "@/lib/handlers";
 
 const RESENT_NOTICE = "البريد الإلكتروني غير مُتحقق. أرسلنا رمزًا جديدًا إلى بريدك.";
+const MODES = ["login", "signup", "forgot"];
 
 function AuthContent() {
-    const [mode, setMode] = useState("login");
-    const [verifyEmail, setVerifyEmail] = useState("");
-    const [notice, setNotice] = useState("");
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirect = safeRedirect(searchParams.get("redirect"));
+
+    const requestedMode = searchParams.get("mode");
+    const [mode, setMode] = useState(
+        MODES.includes(requestedMode) ? requestedMode : "login",
+    );
+    const [verifyEmail, setVerifyEmail] = useState("");
+    const [notice, setNotice] = useState("");
 
     const handleSuccess = (result) => {
         if (result?.needsVerification) {
@@ -46,6 +52,7 @@ function AuthContent() {
                     <LoginForm
                         onSwitchMode={switchMode}
                         onSuccess={handleSuccess}
+                        onForgotPassword={() => setMode("forgot")}
                     />
                 )}
                 {mode === "signup" && (
@@ -53,6 +60,9 @@ function AuthContent() {
                         onSwitchMode={switchMode}
                         onSuccess={handleSuccess}
                     />
+                )}
+                {mode === "forgot" && (
+                    <ForgotPasswordForm onBack={() => setMode("login")} />
                 )}
                 {mode === "verify" && (
                     <VerifyOtpForm

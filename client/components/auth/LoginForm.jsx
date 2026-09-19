@@ -1,6 +1,5 @@
 "use client";
 import { useState, useContext } from "react";
-import { useRouter } from "next/navigation";
 import { UserContext } from "@/context/UserContext";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -8,14 +7,13 @@ import PasswordInput from "./PasswordInput";
 import { EMAIL_RE, headingStyle, linkBtnStyle, subTextStyle } from "./styles";
 import { handleLogin } from "@/lib/handlers";
 
-export default function LoginForm({ onSwitchMode, onSuccess }) {
+export default function LoginForm({ onSwitchMode, onSuccess, onForgotPassword }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [apiError, setApiError] = useState("");
     const { setUser } = useContext(UserContext);
-    const router = useRouter();
 
     const validate = () => {
         const e = {};
@@ -108,7 +106,7 @@ export default function LoginForm({ onSwitchMode, onSuccess }) {
             <div style={{ textAlign: "center", marginTop: 16 }}>
                 <button
                     type="button"
-                    onClick={() => router.push("/forgot-password")}
+                    onClick={onForgotPassword}
                     style={{
                         background: "none",
                         border: "none",

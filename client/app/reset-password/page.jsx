@@ -90,7 +90,7 @@ function ResetPasswordContent() {
                             الرابط صالح لمدة 15 دقيقة ولمرة واحدة فقط.
                         </p>
                         <Link
-                            href="/forgot-password"
+                            href="/auth?mode=forgot"
                             style={{
                                 display: "block",
                                 textAlign: "center",
