@@ -12,6 +12,7 @@ import commentRouter from "./modules/comment/comment.routes.js";
 import notificationRouter from "./modules/notifications/notification.routes.js";
 import exploreRouter from "./modules/explore/explore.routes.js";
 import searchRouter from "./modules/search/search.routes.js";
+import sitemapRouter from "./modules/sitemap/sitemap.routes.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import { startGravityCron } from "./lib/gravity.js";
@@ -99,6 +100,8 @@ app.use("/api/notifications", notificationRouter);
 
 app.use("/api/explore", exploreRouter);
 app.use("/api/search", searchRouter);
+
+app.use("/api/sitemap", sitemapRouter);
 
 app.use((err, req, res, next) => {
     if (err.status) {
