@@ -183,7 +183,7 @@ const UserDropdown = ({ open, onClose }) => {
                         </button>
                     );
                 })}
-{/* 
+
                 <div
                     style={{
                         height: 1,
@@ -200,11 +200,12 @@ const UserDropdown = ({ open, onClose }) => {
                             color: "var(--color-mid)",
                         }}
                     >
-                        المظهر
+                        المظهر (قريبًا)
                     </p>
                     <div
                         role="radiogroup"
                         aria-label="اختيار المظهر"
+                        className="pointer-events-none cursor-not-allowed"
                         style={{
                             display: "flex",
                             gap: 4,
@@ -223,6 +224,7 @@ const UserDropdown = ({ open, onClose }) => {
                                     aria-checked={active}
                                     onClick={() => setTheme(opt.value)}
                                     title={opt.label}
+                                    disabled
                                     style={{
                                         flex: 1,
                                         display: "flex",
@@ -250,7 +252,7 @@ const UserDropdown = ({ open, onClose }) => {
                             );
                         })}
                     </div>
-                </div> */}
+                </div>
 
                 {user && (
                     <>
