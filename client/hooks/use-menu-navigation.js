@@ -19,7 +19,8 @@ export function useMenuNavigation(
     onSelect,
     onClose,
     orientation = "vertical",
-    autoSelectFirstItem = true
+    autoSelectFirstItem = true,
+    ignoreEditableTarget = false
   }
 ) {
   const [selectedIndex, setSelectedIndex] = useState(autoSelectFirstItem ? 0 : -1)
@@ -27,6 +28,19 @@ export function useMenuNavigation(
   useEffect(() => {
     const handleKeyboardNavigation = (event) => {
       if (!items.length) return false
+
+      if (ignoreEditableTarget) {
+        const target = event.target
+        if (
+          target &&
+          (target.isContentEditable ||
+            target.tagName === "INPUT" ||
+            target.tagName === "TEXTAREA" ||
+            target.tagName === "SELECT")
+        ) {
+          return false
+        }
+      }
 
       const moveNext = () =>
         setSelectedIndex((currentIndex) => {
@@ -136,6 +150,7 @@ export function useMenuNavigation(
     onSelect,
     onClose,
     orientation,
+    ignoreEditableTarget,
   ])
 
   const [prevQuery, setPrevQuery] = useState(query);

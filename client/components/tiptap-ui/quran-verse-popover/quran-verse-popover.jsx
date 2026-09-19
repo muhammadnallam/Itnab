@@ -10,6 +10,7 @@ import { QuranIcon } from "@/components/tiptap-icons/quran-icon";
 import { Button } from "@/components/tiptap-ui-primitive/button";
 import {
     Popover,
+    PopoverAnchor,
     PopoverTrigger,
     PopoverContent,
 } from "@/components/tiptap-ui-primitive/popover";
@@ -52,38 +53,42 @@ function searchQuran(query) {
     return results;
 }
 
-const QuranVerseButton = forwardRef(({ className, children, ...props }, ref) => {
-    return (
-        <Button
-            type="button"
-            className={className}
-            variant="ghost"
-            role="button"
-            tabIndex={-1}
-            aria-label="آية قرءآنية"
-            tooltip="آية قرءآنية"
-            ref={ref}
-            {...props}
-        >
-            {children ?? (
-                <>
-                    <QuranIcon className="tiptap-button-icon" />
-                    <span className="tiptap-button-text">آية قرءآنية</span>
-                </>
-            )}
-        </Button>
-    );
-});
+export const QuranVerseButton = forwardRef(
+    ({ className, children, ...props }, ref) => {
+        return (
+            <Button
+                type="button"
+                className={className}
+                variant="ghost"
+                role="button"
+                tabIndex={-1}
+                aria-label="آية قرءآنية"
+                tooltip="آية قرءآنية"
+                ref={ref}
+                {...props}
+            >
+                {children ?? (
+                    <>
+                        <QuranIcon className="tiptap-button-icon" />
+                        <span className="tiptap-button-text">
+                            آية قرءآنية
+                        </span>
+                    </>
+                )}
+            </Button>
+        );
+    },
+);
 
 QuranVerseButton.displayName = "QuranVerseButton";
 
-function QuranVerseContent({ onClose }) {
+/**
+ * Shared search state and handlers for the Quran verse search input.
+ */
+function useQuranSearch({ onClose } = {}) {
     const { editor } = useTiptapEditor();
-    const isMobile = useIsBreakpoint();
     const [query, setQuery] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const containerRef = useRef(null);
-    const inputRef = useRef(null);
 
     const results = useMemo(() => searchQuran(query), [query]);
 
@@ -126,6 +131,71 @@ function QuranVerseContent({ onClose }) {
         [results, selectedIndex, handleSelect],
     );
 
+    return {
+        query,
+        setQuery,
+        selectedIndex,
+        setSelectedIndex,
+        results,
+        handleSelect,
+        handleKeyDown,
+    };
+}
+
+function QuranVerseResults({
+    results,
+    selectedIndex,
+    onSelect,
+    onMouseEnter,
+}) {
+    return (
+        <div className="quran-search-results">
+            {results.length === 0 ? (
+                <div className="quran-search-empty">لا توجد نتائج</div>
+            ) : (
+                results.map((result, index) => (
+                    <div
+                        key={`${result.surahId}-${result.verseNumber}`}
+                        className="quran-result-item"
+                        data-highlighted={index === selectedIndex}
+                        onClick={() => onSelect(result)}
+                        onMouseEnter={() => onMouseEnter(index)}
+                    >
+                        <div className="quran-result-info">
+                            <div className="quran-result-surah">
+                                {result.surahName}
+                            </div>
+                            <div className="quran-result-text">
+                                {result.verseText}
+                            </div>
+                            <div className="quran-result-ref">
+                                [ {result.surahName}: {result.verseNumber} ]
+                            </div>
+                        </div>
+                    </div>
+                ))
+            )}
+        </div>
+    );
+}
+
+/**
+ * Content for the desktop popover: input and results live together in a Card.
+ */
+export function QuranVerseContent({ onClose }) {
+    const isMobile = useIsBreakpoint();
+    const containerRef = useRef(null);
+    const inputRef = useRef(null);
+    const {
+        query,
+        setQuery,
+        selectedIndex,
+        setSelectedIndex,
+        results,
+        handleSelect,
+        handleKeyDown,
+    } = useQuranSearch({ onClose });
+
     return (
         <Card
             ref={containerRef}
@@ -150,41 +220,76 @@ function QuranVerseContent({ onClose }) {
                     className="quran-search-input"
                 />
                 {query.length >= 2 && (
-                    <div className="quran-search-results">
-                        {results.length === 0 ? (
-                            <div className="quran-search-empty">
-                                لا توجد نتائج
-                            </div>
-                        ) : (
-                            results.map((result, index) => (
-                                <div
-                                    key={`${result.surahId}-${result.verseNumber}`}
-                                    className="quran-result-item"
-                                    data-highlighted={index === selectedIndex}
-                                    onClick={() => handleSelect(result)}
-                                    onMouseEnter={() =>
-                                        setSelectedIndex(index)
-                                    }
-                                >
-                                    <div className="quran-result-info">
-                                        <div className="quran-result-surah">
-                                            {result.surahName}
-                                        </div>
-                                        <div className="quran-result-text">
-                                            {result.verseText}
-                                        </div>
-                                        <div className="quran-result-ref">
-                                            [ {result.surahName}:{" "}
-                                            {result.verseNumber} ]
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
+                    <QuranVerseResults
+                        results={results}
+                        selectedIndex={selectedIndex}
+                        onSelect={handleSelect}
+                        onMouseEnter={setSelectedIndex}
+                    />
                 )}
             </CardBody>
         </Card>
+    );
+}
+
+/**
+ * Content for the mobile toolbar: a bare input that replaces the toolbar, with
+ * the results anchored to it in a portal so they keep floating as a dropdown.
+ */
+export function QuranVerseToolbarContent({ onClose }) {
+    const {
+        query,
+        setQuery,
+        selectedIndex,
+        setSelectedIndex,
+        results,
+        handleSelect,
+        handleKeyDown,
+    } = useQuranSearch({ onClose });
+
+    return (
+        <Popover open={query.length >= 2} onOpenChange={() => {}}>
+            <PopoverAnchor asChild>
+                <div className="quran-toolbar-anchor">
+                    <Input
+                        type="text"
+                        placeholder="ابحث عن آية..."
+                        value={query}
+                        onChange={(e) => {
+                            setQuery(e.target.value);
+                            setSelectedIndex(0);
+                        }}
+                        onKeyDown={handleKeyDown}
+                        autoFocus
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        className="quran-search-input"
+                    />
+                </div>
+            </PopoverAnchor>
+            <PopoverContent
+                side="bottom"
+                align="start"
+                sideOffset={6}
+                collisionPadding={8}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                onCloseAutoFocus={(e) => e.preventDefault()}
+            >
+                <Card>
+                    <CardBody>
+                        {query.length >= 2 && (
+                            <QuranVerseResults
+                                results={results}
+                                selectedIndex={selectedIndex}
+                                onSelect={handleSelect}
+                                onMouseEnter={setSelectedIndex}
+                            />
+                        )}
+                    </CardBody>
+                </Card>
+            </PopoverContent>
+        </Popover>
     );
 }
 

@@ -1,13 +1,4 @@
-/*
- * Responsive app shell + persisted sidebar.
- *
- * Layout is driven entirely by CSS media queries so the server-rendered HTML
- * is already correct at first paint (no desktop-then-mobile flash). The
- * sidebar's open/closed state lives on <html data-sidebar>, set before paint
- * by the inline script in app/layout.jsx.
- *
- * Breakpoints: mobile < 768, tablet 768-1099, desktop >= 1100.
- */
+/* Breakpoints: mobile < 768, tablet 768-1099, desktop >= 1100. */
 
 :root {
     --header-h: 57px;
@@ -16,8 +7,6 @@
     --sidebar-slide: 240px;
     --left-panel-width: 350px;
 }
-
-/* ---------------------------------------------------------------- shell -- */
 
 .app-root {
     direction: rtl;
@@ -70,14 +59,24 @@
     overflow-y: scroll;
 }
 
-/* Desktop also shows a third column when a left panel is provided. */
+.app-left-panel::-webkit-scrollbar {
+    display: none;
+}
+
+.app-left-panel {
+    -ms-overflow-style: none;
+}
+
+.app-left-panel {
+    scrollbar-width: none;
+}
+
 @media (min-width: 1100px) {
     .app-body--has-left {
         grid-template-columns: var(--sidebar-col) 1fr var(--left-panel-width);
     }
 }
 
-/* Closed sidebar. */
 html[data-sidebar="closed"] .app-body,
 html[data-sidebar="closed"] .app-body--has-left {
     grid-template-columns: 0px 1fr;
@@ -92,8 +91,6 @@ html[data-sidebar="closed"] .app-sidebar {
         grid-template-columns: 0px 1fr var(--left-panel-width);
     }
 }
-
-/* --------------------------------------------------------------- header -- */
 
 .header-menu-btn {
     display: flex;
@@ -111,13 +108,9 @@ html[data-sidebar="closed"] .app-sidebar {
     display: none;
 }
 
-/* ----------------------------------------------------------- bottom nav -- */
-
 .app-bottom-nav {
     display: none;
 }
-
-/* --------------------------------------------------------------- tablet -- */
 
 @media (max-width: 1099px) {
     .app-body,
@@ -142,8 +135,6 @@ html[data-sidebar="closed"] .app-sidebar {
         padding: 24px 32px;
     }
 }
-
-/* --------------------------------------------------------------- mobile -- */
 
 @media (max-width: 767px) {
     .app-body,
@@ -181,11 +172,6 @@ html[data-sidebar="closed"] .app-sidebar {
     }
 }
 
-/*
- * Transitions are enabled only after hydration. This means a persisted
- * "closed" sidebar is applied silently before paint and never animates on
- * first load, while user toggles still animate normally.
- */
 html:not([data-hydrated]) .app-body,
 html:not([data-hydrated]) .app-sidebar {
     transition: none !important;
@@ -197,8 +183,6 @@ html:not([data-hydrated]) .app-sidebar {
         transition: none !important;
     }
 }
-
-/* ------------------------------------------------------------- profile -- */
 
 .profile-banner {
     height: 200px;
@@ -244,8 +228,6 @@ html:not([data-hydrated]) .app-sidebar {
         display: none;
     }
 }
-
-/* --------------------------------------------------------------- cards -- */
 
 .article-title {
     font-size: 20px;
@@ -325,8 +307,6 @@ html:not([data-hydrated]) .app-sidebar {
         width: 44px;
     }
 }
-
-/* --------------------------------------------------------- notifications -- */
 
 /* Desktop: popover anchored to the bell. */
 .notification-dropdown {

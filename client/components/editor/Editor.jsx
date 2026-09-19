@@ -47,7 +47,11 @@ import "@/components/tiptap-node/quran-verse-node/quran-verse-node.scss";
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu";
 import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
-import { QuranVersePopover } from "@/components/tiptap-ui/quran-verse-popover";
+import {
+    QuranVersePopover,
+    QuranVerseToolbarContent,
+    QuranVerseButton,
+} from "@/components/tiptap-ui/quran-verse-popover";
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button";
@@ -69,6 +73,7 @@ import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button";
 import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon";
 import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon";
 import { LinkIcon } from "@/components/tiptap-icons/link-icon";
+import { QuranIcon } from "@/components/tiptap-icons/quran-icon";
 
 // --- Hooks ---
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint";
@@ -82,7 +87,12 @@ import { Trash } from "lucide-react";
 import CoverImage from "./CoverImageNode";
 import { useArticle } from "@/hooks/useArticle";
 
-const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
+const MainToolbarContent = ({
+    onHighlighterClick,
+    onLinkClick,
+    onQuranClick,
+    isMobile,
+}) => {
     return (
         <>
             <Spacer />
@@ -127,7 +137,11 @@ const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
             <ToolbarSeparator />
             <ToolbarGroup>
                 <ImageUploadButton text="صورة" />
-                <QuranVersePopover />
+                {!isMobile ? (
+                    <QuranVersePopover />
+                ) : (
+                    <QuranVerseButton onClick={onQuranClick} />
+                )}
             </ToolbarGroup>
             <Spacer />
             {isMobile && <ToolbarSeparator />}
@@ -135,28 +149,40 @@ const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
     );
 };
 
-const MobileToolbarContent = ({ type, onBack }) => (
-    <>
-        <ToolbarGroup>
-            <Button variant="ghost" onClick={onBack}>
-                <ArrowLeftIcon className="tiptap-button-icon" />
-                {type === "highlighter" ? (
-                    <HighlighterIcon className="tiptap-button-icon" />
-                ) : (
-                    <LinkIcon className="tiptap-button-icon" />
-                )}
-            </Button>
-        </ToolbarGroup>
+const MOBILE_TOOLBAR_ICONS = {
+    highlighter: HighlighterIcon,
+    link: LinkIcon,
+    quran: QuranIcon,
+};
 
-        <ToolbarSeparator />
+const MobileToolbarContent = ({ type, onBack }) => {
+    const TypeIcon = MOBILE_TOOLBAR_ICONS[type];
 
-        {type === "highlighter" ? (
-            <ColorHighlightPopoverContent />
-        ) : (
-            <LinkContent />
-        )}
-    </>
-);
+    return (
+        <>
+            <ToolbarGroup>
+                <Button variant="ghost" onClick={onBack}>
+                    <ArrowLeftIcon className="tiptap-button-icon" />
+                    {TypeIcon && (
+                        <TypeIcon className="tiptap-button-icon" />
+                    )}
+                </Button>
+            </ToolbarGroup>
+
+            <ToolbarSeparator />
+
+            {type === "highlighter" ? (
+                <ColorHighlightPopoverContent />
+            ) : type === "link" ? (
+                <LinkContent />
+            ) : (
+                <div className="quran-toolbar-content">
+                    <QuranVerseToolbarContent onClose={onBack} />
+                </div>
+            )}
+        </>
+    );
+};
 
 export function Editor({ articleContent, articleData, mode } = {}) {
     const isUpdate = mode === "update";
@@ -341,15 +367,12 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                                 setMobileView("highlighter")
                             }
                             onLinkClick={() => setMobileView("link")}
+                            onQuranClick={() => setMobileView("quran")}
                             isMobile={isMobile}
                         />
                     ) : (
                         <MobileToolbarContent
-                            type={
-                                mobileView === "highlighter"
-                                    ? "highlighter"
-                                    : "link"
-                            }
+                            type={mobileView}
                             onBack={() => setMobileView("main")}
                         />
                     )}

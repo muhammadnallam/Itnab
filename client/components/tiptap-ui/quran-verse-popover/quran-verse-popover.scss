@@ -79,3 +79,21 @@
     font-size: 0.8125rem;
     color: color-mix(in srgb, var(--color-ink, #1a1a1a) 50%, transparent);
 }
+
+/* Mobile toolbar variant: the input stretches to fill the toolbar, while the
+   results stay in a portaled dropdown anchored to the input. */
+.quran-toolbar-content {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.quran-toolbar-anchor {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.quran-toolbar-content .quran-search-input {
+    width: 100%;
+}
