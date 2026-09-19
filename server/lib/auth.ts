@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError } from "better-auth/api";
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
@@ -22,19 +23,50 @@ const emailVerificationEnabled =
 
 const baseAdapter = prismaAdapter(prisma, { provider: "postgresql" });
 
+const USERNAME_RE = /^[a-zA-Z0-9_]+$/;
+
 // BetterAuth doesn't invoke before database hook automatically, it is a limitation in the current architecture
 const adapterFn = (schemaOptions: any) => {
     const adapter = baseAdapter(schemaOptions);
     const originalCreate = adapter.create.bind(adapter);
 
     adapter.create = async ({ model, data, select }: any) => {
-        if (model === "user") {
-            data = {
-                ...data,
-                username: data.username || generateFromEmail(data.email, 3),
-            };
+        if (model !== "user") {
+            return originalCreate({ model, data, select });
         }
-        return originalCreate({ model, data, select });
+
+        if (data.username && !USERNAME_RE.test(data.username)) {
+            throw APIError.from("BAD_REQUEST", {
+                message:
+                    "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط",
+                code: "INVALID_USERNAME",
+            });
+        }
+
+        let username = data.username || generateFromEmail(data.email, 3);
+
+        for (let attempt = 0; ; attempt++) {
+            try {
+                return await originalCreate({
+                    model,
+                    data: { ...data, username },
+                    select,
+                });
+            } catch (err: any) {
+                const duplicateUsername =
+                    err?.code === "P2002" &&
+                    (!Array.isArray(err?.meta?.target) ||
+                        err.meta.target.includes("username"));
+
+                // Only retry auto-generated usernames; a user-chosen one should
+                // surface the conflict instead of being silently replaced.
+                if (data.username || !duplicateUsername || attempt >= 4) {
+                    throw err;
+                }
+
+                username = generateFromEmail(data.email, 3);
+            }
+        }
     };
 
     return adapter;
@@ -51,10 +83,16 @@ export const auth = betterAuth({
         database: {
             generateId: "uuid",
         },
-        crossSubDomainCookies: {
-            enabled: true,
-            domain: ".itnab.com",
-        },
+        // Only share cookies across subdomains when a domain is configured
+        // (empty in local development, where host-only cookies are required).
+        ...(process.env.AUTH_COOKIE_DOMAIN
+            ? {
+                  crossSubDomainCookies: {
+                      enabled: true,
+                      domain: process.env.AUTH_COOKIE_DOMAIN,
+                  },
+              }
+            : {}),
     },
     rateLimit: {
         enabled: false,
@@ -84,6 +122,9 @@ export const auth = betterAuth({
                 type: "string",
                 required: false,
             },
+        },
+        deleteUser: {
+            enabled: true,
         },
     },
     plugins: [
@@ -182,7 +223,7 @@ export const auth = betterAuth({
                         "لا يوجد حساب مرتبط بهذا البريد الإلكتروني. هل تريد إنشاء حساب جديد؟",
 
                     // -- Verification --
-                    FAILED_TO_CREATE_VERIFICATIO:
+                    FAILED_TO_CREATE_VERIFICATION:
                         "تعذر إرسال رمز التحقق. يرجى التحقق من البريد الإلكتروني والمحاولة مرة أخرى",
                     VERIFICATION_EMAIL_NOT_ENABLED:
                         "التحقق عبر البريد الإلكتروني غير متاح حاليًا. حاول لاحقًا أو استخدم طريقة أخرى",
@@ -219,7 +260,7 @@ export const auth = betterAuth({
                         "رابط الإعادة غير صحيح. تحقق من إعدادات التطبيق",
                     INVALID_REDIRECT_URL: "رابط التحويل غير صحيح",
                     INVALID_ERROR_CALLBACK_URL: "رابط إعادة الأخطاء غير صحيح",
-                    NVALID_NEW_USER_CALLBACK_URL:
+                    INVALID_NEW_USER_CALLBACK_URL:
                         "رابط إعادة المستخدم الجديد غير صحيح",
                     MISSING_OR_NULL_ORIGIN:
                         "مصدر الطلب غير موجود. تحقق من الإعدادات",

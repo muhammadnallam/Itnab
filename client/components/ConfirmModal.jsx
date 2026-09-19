@@ -13,6 +13,7 @@ export default function ConfirmModal({
     isOpen,
     loading = false,
     error = null,
+    children,
 }) {
     return (
         <Modal open={isOpen} onClose={onCancel} style={{ textAlign: "center" }}>
@@ -71,6 +72,8 @@ export default function ConfirmModal({
                     {error}
                 </p>
             )}
+
+            {children && <div style={{ marginBottom: 16 }}>{children}</div>}
 
             {/* Actions — deliberately kept LTR so Cancel stays left and the
             primary action stays right, matching the original layout. */}

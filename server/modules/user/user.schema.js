@@ -23,6 +23,10 @@ export const passwordSchema = z.object({
         .max(20, "كلمة المرور يجب أن تكون ٢٠ حرفًا كحد أقصى"),
 });
 
+export const deleteAccountSchema = z.object({
+    password: z.string().min(1, "كلمة المرور مطلوبة"),
+});
+
 export const socialLinksSchema = z.object({
     socialLinks: z.object({
         website: z.string().nullable().optional(),

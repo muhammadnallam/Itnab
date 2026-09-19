@@ -64,5 +64,9 @@ export async function resetPassword(newPassword, token) {
 }
 
 export async function signOut() {
-    await authClient.signOut();
+    try {
+        await authClient.signOut();
+    } catch {
+        // The session may already be gone (e.g. after account deletion).
+    }
 }

@@ -114,6 +114,7 @@ const TabAccount = ({
     const [profileError, setProfileError] = useState({});
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleteError, setDeleteError] = useState(null);
+    const [deletePassword, setDeletePassword] = useState("");
     const { setUser } = useContext(UserContext);
     const avatarInputRef = useRef(null);
     const router = useRouter();
@@ -183,8 +184,12 @@ const TabAccount = ({
 
     const handleAccountDelete = async () => {
         setDeleteError(null);
+        if (!deletePassword.trim()) {
+            setDeleteError("أدخل كلمة المرور لتأكيد الحذف");
+            return;
+        }
         try {
-            await deleteAccount();
+            await deleteAccount(deletePassword);
         } catch (err) {
             setDeleteError(err.message || "حدث خطأ أثناء حذف الحساب");
             return;
@@ -415,7 +420,11 @@ const TabAccount = ({
             />
             <ConfirmModal
                 isOpen={confirmDelete}
-                onCancel={() => setConfirmDelete(false)}
+                onCancel={() => {
+                    setConfirmDelete(false);
+                    setDeletePassword("");
+                    setDeleteError(null);
+                }}
                 onConfirm={() => handleAccountDelete()}
                 icon={Trash}
                 color={"var(--color-error)"}
@@ -427,7 +436,18 @@ const TabAccount = ({
                 buttonText={"حذف الحساب"}
                 loading={isDeleting}
                 error={deleteError}
-            />
+            >
+                <Input
+                    type="password"
+                    placeholder="كلمة المرور"
+                    value={deletePassword}
+                    onChange={(e) => {
+                        setDeletePassword(e.target.value);
+                        setDeleteError(null);
+                    }}
+                    autoComplete="current-password"
+                />
+            </ConfirmModal>
         </div>
     );
 };

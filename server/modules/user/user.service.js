@@ -113,13 +113,16 @@ export async function updatePassword(
     }
 }
 
-export async function deleteUserAccount(userId) {
+export async function deleteUserAccount(password, headers) {
     try {
-        await prisma.user.delete({
-            where: { id: userId },
+        await auth.api.deleteUser({
+            body: { password },
+            headers,
         });
     } catch (err) {
-        handlePrismaError(err, { notFoundMsg: "المستخدم غير موجود" });
+        const message =
+            err.body?.message || err.message || "تعذر حذف الحساب";
+        throw new ValidationError(message);
     }
 }
 

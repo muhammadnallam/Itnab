@@ -18,6 +18,7 @@ import {
     passwordSchema,
     socialLinksSchema,
     libraryQuerySchema,
+    deleteAccountSchema,
 } from "./user.schema.js";
 
 const router = Router();
@@ -87,7 +88,17 @@ router.post(
     "/delete-account",
     requireAuth,
     asyncErrorHandler(async (req, res) => {
-        await deleteUserAccount(req.user.id);
+        const result = deleteAccountSchema.safeParse(req.body);
+        if (!result.success) {
+            return res
+                .status(400)
+                .json({ error: result.error.issues[0].message });
+        }
+
+        await deleteUserAccount(
+            result.data.password,
+            fromNodeHeaders(req.headers),
+        );
         res.json({ success: true });
     }),
 );

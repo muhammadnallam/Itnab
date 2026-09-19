@@ -32,10 +32,12 @@ export async function updatePassword(data) {
     });
 }
 
-export async function deleteAccount() {
+export async function deleteAccount(password) {
     return fetcher("/api/user/delete-account", {
         credentials: "include",
+        headers: { "Content-Type": "application/json" },
         method: "POST",
+        body: JSON.stringify({ password }),
     });
 }
 
