@@ -593,7 +593,6 @@ function ExploreContent() {
                     <Search size={18} />
                     <input
                         placeholder="بحث"
-                        autoFocus
                         value={rawQ}
                         onChange={(e) => handleSearchChange(e.target.value)}
                         style={{
