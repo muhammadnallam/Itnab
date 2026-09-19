@@ -1,3 +1,4 @@
+import { TAGS } from "@itnab/constants";
 import prisma from "../../lib/prisma.js";
 import { ARTICLE_METADATA_SELECT } from "../feed/feed.service.js";
 import { getMonthBounds, getYearBounds } from "../../lib/time.js";
@@ -83,6 +84,26 @@ async function getRandomAuthors(take) {
         LIMIT ${take}
     `;
     return authors;
+}
+
+export async function getTopTags(limit = 8) {
+    const grouped = await prisma.article.groupBy({
+        by: ["topic"],
+        where: { deletedAt: null },
+        _count: { _all: true },
+    });
+
+    const validTags = new Set(TAGS);
+
+    return grouped
+        .filter((row) => validTags.has(row.topic))
+        .sort(
+            (a, b) =>
+                b._count._all - a._count._all ||
+                a.topic.localeCompare(b.topic, "ar"),
+        )
+        .slice(0, limit)
+        .map((row) => ({ tag: row.topic, count: row._count._all }));
 }
 
 function mapRandomArticle(row) {

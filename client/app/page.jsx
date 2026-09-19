@@ -2,7 +2,6 @@
 
 import { useState, useContext } from "react";
 import Link from "next/link";
-import { TAGS } from "@itnab/constants";
 import AppLayout from "@/components/AppLayout";
 import ArticleCard from "@/components/ArticleCard";
 import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
@@ -15,6 +14,7 @@ import { useAuthModal } from "@/context/AuthModalContext";
 import Button from "@/components/ui/Button";
 import { useArticleList } from "@/hooks/useArticleList";
 import { useTopAuthors } from "@/hooks/useTopAuthors";
+import { useTopTags } from "@/hooks/useTopTags";
 
 const QuoteCard = ({ className = "" }) => (
     <div
@@ -32,6 +32,7 @@ const QuoteCard = ({ className = "" }) => (
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const { user, loading } = useContext(UserContext);
     const { authors, loading: authorsLoading } = useTopAuthors(5);
+    const { tags, loading: tagsLoading } = useTopTags(8, { enabled: !!user });
 
     if (loading) return null;
     if (!user) {
@@ -144,24 +145,38 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                         </Link>
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                        {TAGS.map((tag) => (
-                            <a
-                                href={`/explore/?tag=${tag}`}
-                                key={tag}
-                                style={{
-                                    background: "var(--color-tag-bg)",
-                                    border: "1px solid var(--color-border)",
-                                    borderRadius: 99,
-                                    padding: "6px 16px",
-                                    fontSize: 13,
-                                    cursor: "pointer",
-                                    transition:
-                                        "background 0.15s, border-color 0.15s, color 0.15s",
-                                }}
-                            >
-                                {tag}
-                            </a>
-                        ))}
+                        {tagsLoading
+                            ? Array.from({ length: 8 }).map((_, i) => (
+                                  <span
+                                      key={i}
+                                      style={{
+                                          width: 72,
+                                          height: 32,
+                                          borderRadius: 99,
+                                          background: "var(--color-tag-bg)",
+                                          animation:
+                                              "pulse 1.5s ease-in-out infinite",
+                                      }}
+                                  />
+                              ))
+                            : tags.map(({ tag }) => (
+                                  <a
+                                      href={`/explore/?tag=${tag}`}
+                                      key={tag}
+                                      style={{
+                                          background: "var(--color-tag-bg)",
+                                          border: "1px solid var(--color-border)",
+                                          borderRadius: 99,
+                                          padding: "6px 16px",
+                                          fontSize: 13,
+                                          cursor: "pointer",
+                                          transition:
+                                              "background 0.15s, border-color 0.15s, color 0.15s",
+                                      }}
+                                  >
+                                      {tag}
+                                  </a>
+                              ))}
                     </div>
                 </div>
 

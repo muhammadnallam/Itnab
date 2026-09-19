@@ -19,6 +19,7 @@ export const queryKeys = {
     following: (userId) => ["following", userId],
     followers: (userId) => ["followers", userId],
     topAuthors: (limit) => ["topAuthors", limit],
+    topTags: (limit) => ["topTags", limit],
     notificationsList: (params = {}) => ["notifications", "list", params],
     notificationsUnread: () => ["notifications", "unread"],
 };
