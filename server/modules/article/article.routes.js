@@ -4,6 +4,7 @@ import { extensions } from "@itnab/tiptap";
 import asyncErrorHandler from "../../middleware/asyncErrorHandler.js";
 import validateArticle from "./article.validate.js";
 import requireAuth from "../../middleware/requireAuth.js";
+import { pdfLimiter } from "../../middleware/rateLimit.js";
 import { generateArticlePdf } from "../../lib/pdf.js";
 import {
     createArticle,
@@ -64,6 +65,8 @@ router.delete(
 
 router.get(
     "/:slug/pdf",
+    requireAuth,
+    pdfLimiter,
     asyncErrorHandler(async (req, res) => {
         const article = await getArticle({ slug: req.params.slug });
 

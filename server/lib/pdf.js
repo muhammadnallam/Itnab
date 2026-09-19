@@ -1,5 +1,14 @@
 import puppeteer from "puppeteer-core";
 
+// SSRF mitigation: only allow Chromium to fetch resources from this allowlist.
+// Everything else (e.g. internal/private addresses injected via article <img src>)
+// is aborted. The document itself and data: URLs are always permitted.
+const ALLOWED_REQUEST_HOSTS = new Set([
+    "res.cloudinary.com",
+    "fonts.googleapis.com",
+    "fonts.gstatic.com",
+]);
+
 function escapeHtml(str) {
     return str
         .replace(/&/g, "&amp;")
@@ -286,12 +295,14 @@ async function getBrowser() {
     if (browserInstance && browserInstance.connected) {
         return browserInstance;
     }
+    // The Chromium sandbox is enabled by default for security. Only opt out
+    // (e.g. environments where the sandbox cannot run) when explicitly requested.
+    const args = ["--disable-dev-shm-usage"];
+    if (process.env.PUPPETEER_DISABLE_SANDBOX === "true") {
+        args.push("--no-sandbox", "--disable-setuid-sandbox");
+    }
     browserInstance = await puppeteer.launch({
-        args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-dev-shm-usage",
-        ],
+        args,
         executablePath: "/usr/bin/chromium",
         headless: "shell",
     });
@@ -319,9 +330,41 @@ export async function generateArticlePdf({
             html,
         });
 
+        await page.setRequestInterception(true);
+
+        page.on("request", (request) => {
+            const url = request.url();
+            let allowed = false;
+
+            if (!url || url === "about:blank" || url.startsWith("about:")) {
+                allowed = true;
+            } else if (url.startsWith("data:")) {
+                allowed = true;
+            } else {
+                try {
+                    const parsed = new URL(url);
+                    allowed =
+                        parsed.protocol === "https:" &&
+                        ALLOWED_REQUEST_HOSTS.has(parsed.hostname);
+                } catch {
+                    allowed = false;
+                }
+            }
+
+            try {
+                if (allowed) {
+                    request.continue();
+                } else {
+                    request.abort();
+                }
+            } catch {
+                // Request was already handled elsewhere; ignore.
+            }
+        });
+
         await page.setContent(htmlContent, {
-            waitUntil: "networkidle0",
-            timeout: 15000,
+            waitUntil: "domcontentloaded",
+            timeout: 10000,
         });
 
         const pdfBuffer = await page.pdf({
