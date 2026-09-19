@@ -8,6 +8,7 @@ import MoreMenu from "@/components/MoreMenu";
 import ConfirmModal from "@/components/ConfirmModal";
 import ListPicker from "@/components/ListPicker";
 import ShareModal from "@/components/ShareModal";
+import { getArticleUrl } from "@/lib/share";
 import {
     Pencil,
     Trash2,
@@ -101,10 +102,7 @@ export default function ArticleMoreMenu({
     const [removing, setRemoving] = useState(false);
     const [reportOpen, setReportOpen] = useState(false);
 
-    const articleUrl =
-        typeof window !== "undefined"
-            ? `${window.location.origin}/article/${slug}`
-            : "";
+    const articleUrl = getArticleUrl(slug);
 
     const requireAuth = (action) => {
         if (!user) {

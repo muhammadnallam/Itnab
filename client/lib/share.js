@@ -24,6 +24,11 @@ function BrandIcon({ size = 18, path }) {
 const FacebookIcon = (props) => <BrandIcon {...props} path={FACEBOOK_PATH} />;
 const LinkedinIcon = (props) => <BrandIcon {...props} path={LINKEDIN_PATH} />;
 
+export function getArticleUrl(slug) {
+    if (!slug || typeof window === "undefined") return "";
+    return `${window.location.origin}/article/${slug}`;
+}
+
 export const SHARE_PLATFORMS = [
     { id: "copy", label: "نسخ الرابط", icon: Copy, kind: "copy" },
     {

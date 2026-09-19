@@ -7,6 +7,7 @@ import { useView } from "@/hooks/useView";
 import { useState, useRef, useEffect, useContext } from "react";
 import RequireAuth from "@/components/RequireAuth";
 import ShareModal from "@/components/ShareModal";
+import { getArticleUrl } from "@/lib/share";
 import ArticleMoreMenu from "@/components/article/ArticleMoreMenu";
 import {
     Bookmark,
@@ -268,7 +269,7 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                 open={shareOpen}
                 onClose={() => setShareOpen(false)}
                 articleId={article.id}
-                url={typeof window !== "undefined" ? window.location.href : ""}
+                url={getArticleUrl(article?.slug)}
                 heading="مشاركة المقال"
                 subheading="القراءة أكثر إفادةً عندما نشاركها مع الآخرين"
             />
