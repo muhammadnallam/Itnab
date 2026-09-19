@@ -13,6 +13,7 @@ export default function Input({
     autoComplete,
     error,
     style,
+    ...rest
 }) {
     const inputId = id || name;
     const errId = inputId ? `${inputId}-error` : undefined;
@@ -66,6 +67,7 @@ export default function Input({
                         if (!error)
                             e.target.style.borderColor = "var(--color-border)";
                     }}
+                    {...rest}
                 />
                 {rightIcon && (
                     <div

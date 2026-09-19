@@ -7,12 +7,18 @@ import { PrismaClient } from "./generated/prisma/client";
 import { generateFromEmail } from "unique-username-generator";
 
 import { localization } from "better-auth-localization";
+import { emailOTP } from "better-auth/plugins/email-otp";
+
+import { sendVerificationOtpEmail } from "./email.js";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
 });
 
 const prisma = new PrismaClient({ adapter });
+
+const emailVerificationEnabled =
+    process.env.EMAIL_VERIFICATION_ENABLED === "true";
 
 const baseAdapter = prismaAdapter(prisma, { provider: "postgresql" });
 
@@ -52,7 +58,18 @@ export const auth = betterAuth({
     },
     emailAndPassword: {
         enabled: true,
+        minPasswordLength: 8,
+        maxPasswordLength: 20,
+        requireEmailVerification: emailVerificationEnabled,
     },
+    emailVerification: emailVerificationEnabled
+        ? {
+              sendOnSignUp: true,
+              sendOnSignIn: true,
+              autoSignInAfterVerification: true,
+              expiresIn: 300,
+          }
+        : undefined,
     user: {
         additionalFields: {
             username: {
@@ -62,6 +79,22 @@ export const auth = betterAuth({
         },
     },
     plugins: [
+        ...(emailVerificationEnabled
+            ? [
+                  emailOTP({
+                      otpLength: 6,
+                      expiresIn: 300,
+                      storeOTP: "hashed",
+                      allowedAttempts: 3,
+                      overrideDefaultEmailVerification: true,
+                      sendVerificationOTP: async ({ email, otp, type }) => {
+                          if (type === "email-verification") {
+                              await sendVerificationOtpEmail({ email, otp });
+                          }
+                      },
+                  }),
+              ]
+            : []),
         localization({
             defaultLocale: "ar-SA",
             fallbackLocale: "default",

@@ -1,4 +1,10 @@
-import { getSession, signInEmail, signUpEmail } from "./api/auth";
+import {
+    getSession,
+    sendVerificationOtp,
+    signInEmail,
+    signUpEmail,
+    verifyEmailOtp,
+} from "./api/auth";
 import { upload } from "./api/upload";
 import { processContentImages } from "./processImages";
 
@@ -86,25 +92,69 @@ export async function prepareArticlePayload({
     };
 }
 
-export async function handleUser(mode, email, password, setUser) {
-    try {
-        if (mode === "login") {
-            await signInEmail(email, password);
-            const session = await getSession();
-            if (session?.user) setUser(session.user);
-            if (typeof window !== "undefined") window.location.reload();
-            return { success: true };
-        }
+export function safeRedirect(target, fallback = "/") {
+    if (typeof target !== "string" || !target.startsWith("/")) return fallback;
+    if (target.startsWith("//") || target.startsWith("/\\")) return fallback;
+    if (target === "/auth" || target.startsWith("/auth?")) return fallback;
+    return target;
+}
 
-        const name = email.split("@")[0];
-        const data = await signUpEmail(email, password, name);
-        if (data?.user) setUser(data.user);
-        if (typeof window !== "undefined") window.location.reload();
+export async function handleLogin(email, password, setUser) {
+    try {
+        await signInEmail(email, password);
+        const session = await getSession();
+        if (session?.user) setUser(session.user);
         return { success: true };
     } catch (err) {
         return {
             success: false,
-            error: err.message || "حدث خطأ ما من جانبنا. يرجى المحاولة لاحقًا",
+            error: err.message || "فشل تسجيل الدخول",
+            needsVerification: err.code === "EMAIL_NOT_VERIFIED",
+            email,
+        };
+    }
+}
+
+export async function handleSignup(email, password, setUser) {
+    try {
+        const name = email.split("@")[0];
+        const data = await signUpEmail(email, password, name);
+        if (data?.token) {
+            const session = await getSession();
+            if (session?.user) setUser(session.user);
+            return { success: true };
+        }
+        return { success: true, needsVerification: true, email };
+    } catch (err) {
+        return {
+            success: false,
+            error: err.message || "فشل إنشاء الحساب",
+        };
+    }
+}
+
+export async function handleVerifyOtp(email, otp, setUser) {
+    try {
+        await verifyEmailOtp(email, otp);
+        const session = await getSession();
+        if (session?.user) setUser(session.user);
+        return { success: true };
+    } catch (err) {
+        return {
+            success: false,
+            error: err.message || "رمز التحقق غير صحيح",
+        };
+    }
+}
+
+export async function handleResendOtp(email) {
+    try {
+        await sendVerificationOtp(email, "email-verification");
+        return { success: true };
+    } catch (err) {
+        return {
+            success: false,
+            error: err.message || "تعذر إرسال رمز التحقق",
         };
     }
 }
