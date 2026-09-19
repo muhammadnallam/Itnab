@@ -16,6 +16,19 @@ import Button from "@/components/ui/Button";
 import { useArticleList } from "@/hooks/useArticleList";
 import { useTopAuthors } from "@/hooks/useTopAuthors";
 
+const QuoteCard = ({ className = "" }) => (
+    <div
+        className={`card ${className}`.trim()}
+        style={{ padding: 0, overflow: "hidden" }}
+    >
+        <img
+            src="/left-panel-quote.jpg"
+            alt="وَمَا كَانَ رَبُّكَ نَسِيًّا"
+            style={{ display: "block", width: "100%", height: "auto" }}
+        />
+    </div>
+);
+
 const LeftPanel = ({ onLogin, onSignUp }) => {
     const { user, loading } = useContext(UserContext);
     const { authors, loading: authorsLoading } = useTopAuthors(5);
@@ -93,6 +106,7 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                         انضم إلينا
                     </Button>
                 </div>
+                <QuoteCard />
             </div>
         );
     } else {
@@ -209,6 +223,7 @@ const LeftPanel = ({ onLogin, onSignUp }) => {
                               </div>
                           ))}
                 </div>
+                <QuoteCard className="mb-4" />
             </div>
         );
     }
