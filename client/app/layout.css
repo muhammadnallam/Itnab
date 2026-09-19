@@ -325,3 +325,30 @@ html:not([data-hydrated]) .app-sidebar {
         width: 44px;
     }
 }
+
+/* --------------------------------------------------------- notifications -- */
+
+/* Desktop: popover anchored to the bell. */
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    width: min(380px, 90vw);
+}
+
+/* Mobile: full-width panel pinned below the header, 16px gutters. */
+@media (max-width: 767px) {
+    .notification-dropdown {
+        position: fixed;
+        top: calc(var(--header-h) + 8px);
+        left: 16px;
+        right: 16px;
+        width: auto;
+        margin-top: 0;
+    }
+
+    .notification-dropdown__scroll {
+        max-height: calc(100vh - var(--header-h) - 24px);
+    }
+}
