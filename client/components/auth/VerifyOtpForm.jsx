@@ -137,14 +137,7 @@ export default function VerifyOtpForm({ email, onVerified, onBack, notice }) {
                     <button
                         type="button"
                         onClick={onBack}
-                        style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: "var(--color-accent)",
-                        }}
+                        className="text-mid text-sm cursor-pointer hover:text-ink"
                     >
                         رجوع
                     </button>

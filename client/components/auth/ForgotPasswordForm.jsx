@@ -6,20 +6,15 @@ import ApiMessage from "@/components/ui/ApiMessage";
 import { EMAIL_RE, headingStyle } from "./styles";
 import { handleRequestReset } from "@/lib/handlers";
 
-const backBtnStyle = {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    fontSize: 13,
-    fontWeight: 700,
-    color: "var(--color-accent)",
-};
-
 function BackButton({ onClick }) {
     if (!onClick) return null;
     return (
         <div style={{ textAlign: "center", marginTop: 16 }}>
-            <button type="button" onClick={onClick} style={backBtnStyle}>
+            <button
+                className="text-mid text-sm cursor-pointer hover:text-ink"
+                type="button"
+                onClick={onClick}
+            >
                 العودة لتسجيل الدخول
             </button>
         </div>

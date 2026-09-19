@@ -7,7 +7,11 @@ import PasswordInput from "./PasswordInput";
 import { EMAIL_RE, headingStyle, linkBtnStyle, subTextStyle } from "./styles";
 import { handleLogin } from "@/lib/handlers";
 
-export default function LoginForm({ onSwitchMode, onSuccess, onForgotPassword }) {
+export default function LoginForm({
+    onSwitchMode,
+    onSuccess,
+    onForgotPassword,
+}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -107,13 +111,7 @@ export default function LoginForm({ onSwitchMode, onSuccess, onForgotPassword })
                 <button
                     type="button"
                     onClick={onForgotPassword}
-                    style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: 13,
-                        color: "var(--color-light-txt)",
-                    }}
+                    className="text-mid text-sm cursor-pointer hover:text-ink"
                 >
                     نسيت كلمة المرور؟
                 </button>
