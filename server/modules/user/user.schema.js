@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeSocialUrl } from "@itnab/url";
 
 export const profileSchema = z.object({
     name: z.string().min(1, "الاسم مطلوب").optional(),
@@ -40,20 +41,23 @@ export const checkEmailSchema = z.object({
     email: z.string().email("صيغة البريد الإلكتروني غير صحيحة"),
 });
 
+const socialLinkField = (platform) =>
+    z
+        .string()
+        .max(300, "الرابط طويل جدًا")
+        .refine(
+            (value) => !normalizeSocialUrl(value, platform).error,
+            { error: (issue) => normalizeSocialUrl(issue.input, platform).error },
+        )
+        .transform((value) => normalizeSocialUrl(value, platform).value ?? value)
+        .optional()
+        .nullable();
+
 export const socialLinksSchema = z.object({
     socialLinks: z.object({
-        website: z
-            .union([z.string().url("الرابط غير صالح"), z.literal("")])
-            .nullable()
-            .optional(),
-        youtube: z
-            .union([z.string().url("الرابط غير صالح"), z.literal("")])
-            .nullable()
-            .optional(),
-        x: z
-            .union([z.string().url("الرابط غير صالح"), z.literal("")])
-            .nullable()
-            .optional(),
+        website: socialLinkField("website"),
+        youtube: socialLinkField("youtube"),
+        x: socialLinkField("x"),
     }),
 });
 

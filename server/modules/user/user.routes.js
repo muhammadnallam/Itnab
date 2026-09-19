@@ -73,7 +73,9 @@ router.put(
     asyncErrorHandler(async (req, res) => {
         const result = socialLinksSchema.safeParse(req.body);
         if (!result.success) {
-            return res.status(400).json({ error: "بيانات غير صالحة" });
+            return res
+                .status(400)
+                .json({ error: result.error.issues[0].message });
         }
 
         const profile = await updateProfile(req.user.id, result.data);

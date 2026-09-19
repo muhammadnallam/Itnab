@@ -221,6 +221,9 @@ importers:
       '@itnab/tiptap':
         specifier: workspace:*
         version: link:../shared/tiptap
+      '@itnab/url':
+        specifier: workspace:*
+        version: link:../shared/url
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.20
         version: 2.1.20(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -354,6 +357,9 @@ importers:
       '@itnab/tiptap':
         specifier: workspace:*
         version: link:../shared/tiptap
+      '@itnab/url':
+        specifier: workspace:*
+        version: link:../shared/url
       '@maxmind/geoip2-node':
         specifier: ^7.1.0
         version: 7.1.0
@@ -479,6 +485,8 @@ importers:
       prosemirror-model:
         specifier: ^1.25.0
         version: 1.25.11
+
+  shared/url: {}
 
 packages:
 

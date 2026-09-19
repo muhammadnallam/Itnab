@@ -9,7 +9,11 @@ import { useRouter } from "next/navigation";
 import ImagePicker from "@/components/ImagePicker";
 import { ArrowUpRight, Globe, Pencil } from "lucide-react";
 import { useState, useContext, useRef } from "react";
-import { validatePasswordFields, validateProfileFields } from "@/lib/handlers";
+import {
+    validatePasswordFields,
+    validateProfileFields,
+    validateSocialLinks,
+} from "@/lib/handlers";
 import Tabs from "@/components/ui/Tabs";
 
 import { UserContext } from "@/context/UserContext";
@@ -111,6 +115,7 @@ const TabAccount = ({
     const [website, setWebsite] = useState(profile.socialLinks?.website || "");
     const [youtube, setYoutube] = useState(profile.socialLinks?.youtube || "");
     const [xAccount, setXAccount] = useState(profile.socialLinks?.x || "");
+    const [linksError, setLinksError] = useState({});
     const [profileError, setProfileError] = useState({});
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleteError, setDeleteError] = useState(null);
@@ -172,10 +177,19 @@ const TabAccount = ({
     };
 
     const handleLinksSubmit = async () => {
+        const { errors, values } = validateSocialLinks({
+            website,
+            youtube,
+            x: xAccount,
+        });
+        setLinksError(errors);
+        if (Object.keys(errors).length > 0) return;
+
         try {
-            await updateSocialLinks({
-                socialLinks: { website, youtube, x: xAccount },
-            });
+            await updateSocialLinks({ socialLinks: values });
+            setWebsite(values.website);
+            setYoutube(values.youtube);
+            setXAccount(values.x);
             toast.success("تم تحديث الروابط");
         } catch (err) {
             toast.error(err?.message || "حدث خطأ أثناء تحديث الروابط");
@@ -376,24 +390,30 @@ const TabAccount = ({
                     value={website}
                     onChange={(e) => {
                         setWebsite(e.target.value);
+                        setLinksError((p) => ({ ...p, website: "" }));
                     }}
                     rightIcon={<Globe color="var(--color-mid)" size={19} />}
+                    error={linksError.website}
                 />
                 <Input
                     placeholder="youtube.com/@yourchannel"
                     value={youtube}
                     onChange={(e) => {
                         setYoutube(e.target.value);
+                        setLinksError((p) => ({ ...p, youtube: "" }));
                     }}
                     rightIcon={<YouTube />}
+                    error={linksError.youtube}
                 />
                 <Input
                     placeholder="x.com/youraccount"
                     value={xAccount}
                     onChange={(e) => {
                         setXAccount(e.target.value);
+                        setLinksError((p) => ({ ...p, x: "" }));
                     }}
                     rightIcon={<X />}
+                    error={linksError.x}
                 />
             </div>
             <Button

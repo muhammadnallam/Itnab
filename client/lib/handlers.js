@@ -9,6 +9,7 @@ import {
 } from "./api/auth";
 import { upload } from "./api/upload";
 import { processContentImages } from "./processImages";
+import { normalizeSocialUrl } from "@itnab/url";
 
 export function validateArticleFields({
     coverImage,
@@ -227,6 +228,23 @@ export function validateProfileFields({ name, username, bio, avatar, banner }) {
         errors.banner = "الحد الأقصى 3 ميغابايت";
 
     return errors;
+}
+
+export function validateSocialLinks({ website, youtube, x }) {
+    const errors = {};
+    const values = {};
+
+    for (const [key, raw] of [
+        ["website", website],
+        ["youtube", youtube],
+        ["x", x],
+    ]) {
+        const { value, error } = normalizeSocialUrl(raw, key);
+        if (error) errors[key] = error;
+        else values[key] = value;
+    }
+
+    return { errors, values };
 }
 
 export async function handleInitSession(setUser, setLoading) {
