@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -7,6 +8,95 @@ import { PrismaClient } from "./generated/prisma/client";
 import { generateFromEmail } from "unique-username-generator";
 
 import { localization } from "better-auth-localization";
+
+// Email verification is opt-in so local/dev environments without a mail
+// provider keep working. Enable with EMAIL_VERIFICATION_ENABLED=true once a
+// provider (RESEND_API_KEY + MAIL_FROM) is configured in production.
+const EMAIL_VERIFICATION_ENABLED =
+    process.env.EMAIL_VERIFICATION_ENABLED === "true";
+
+// Provider-agnostic transactional mail sender. Uses Resend's HTTP API when
+// configured and otherwise refuses to leak tokens: in production it logs an
+// error, in development it logs the link to speed up local testing.
+async function sendMail({
+    to,
+    subject,
+    text,
+}: {
+    to: string;
+    subject: string;
+    text: string;
+}) {
+    const apiKey = process.env.RESEND_API_KEY;
+    const from = process.env.MAIL_FROM;
+
+    if (!apiKey || !from) {
+        if (process.env.NODE_ENV === "production") {
+            console.error(
+                `[auth] Email provider not configured; dropped "${subject}" to ${to}`,
+            );
+        } else {
+            console.warn(`[auth] Email not sent ("${subject}"). ${text}`);
+        }
+        return;
+    }
+
+    try {
+        const res = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ from, to, subject, text }),
+        });
+        if (!res.ok) {
+            console.error(
+                `[auth] Failed to send "${subject}" to ${to}: ${res.status}`,
+            );
+        }
+    } catch (err) {
+        console.error(`[auth] Failed to send "${subject}" to ${to}:`, err);
+    }
+}
+
+// In-memory brute-force lockout for the email/password sign-in endpoint.
+// This complements better-auth's IP-based rate limiting with a per-account
+// limit. It is intentionally process-local; a multi-instance deployment should
+// move this counter to shared storage (e.g. secondaryStorage/Redis).
+// The counting window doubles as the lockout duration: once the threshold is
+// reached the entry blocks sign-in until it expires.
+const LOCKOUT_MAX_ATTEMPTS = Number(process.env.AUTH_LOCKOUT_MAX_ATTEMPTS) || 5;
+const LOCKOUT_WINDOW_MS =
+    (Number(process.env.AUTH_LOCKOUT_WINDOW_SECONDS) || 900) * 1000;
+const MAX_LOCKOUT_ENTRIES = 10_000;
+
+const failedLogins = new Map<string, { count: number; expiresAt: number }>();
+
+function pruneFailedLogins(now: number) {
+    for (const [key, entry] of failedLogins) {
+        if (now >= entry.expiresAt) failedLogins.delete(key);
+    }
+    // Bound memory: evict oldest insertions when the cap is exceeded.
+    if (failedLogins.size <= MAX_LOCKOUT_ENTRIES) return;
+    for (const key of failedLogins.keys()) {
+        failedLogins.delete(key);
+        if (failedLogins.size <= MAX_LOCKOUT_ENTRIES) break;
+    }
+}
+
+function registerFailedLogin(key: string, now: number) {
+    const existing = failedLogins.get(key);
+    const count = existing && now < existing.expiresAt ? existing.count + 1 : 1;
+    failedLogins.set(key, { count, expiresAt: now + LOCKOUT_WINDOW_MS });
+    return count;
+}
+
+function normalizeEmail(value: unknown): string | null {
+    return typeof value === "string" && value.trim()
+        ? value.trim().toLowerCase()
+        : null;
+}
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
@@ -52,6 +142,20 @@ export const auth = betterAuth({
     },
     emailAndPassword: {
         enabled: true,
+        // Require a verified address before a session is issued. Gated by env
+        // so dev instances without a mail provider are not locked out.
+        requireEmailVerification: EMAIL_VERIFICATION_ENABLED,
+    },
+    emailVerification: {
+        sendVerificationEmail: async ({ user, url }) => {
+            await sendMail({
+                to: user.email,
+                subject: "تأكيد بريدك الإلكتروني في إطناب",
+                text: `لتأكيد بريدك الإلكتروني، افتح الرابط التالي:\n${url}`,
+            });
+        },
+        sendOnSignUp: EMAIL_VERIFICATION_ENABLED,
+        autoSignInAfterVerification: true,
     },
     user: {
         additionalFields: {
@@ -60,6 +164,62 @@ export const auth = betterAuth({
                 required: false,
             },
         },
+    },
+    // Rate limiting is always on (not only in production) to blunt credential
+    // stuffing and sign-up/enumeration abuse. Sign-in/sign-up default to
+    // 3 requests / 10s per IP; the account lockout below adds per-identity
+    // protection on top.
+    rateLimit: {
+        enabled: true,
+        window: 60,
+        max: 100,
+        storage: "memory",
+    },
+    hooks: {
+        before: createAuthMiddleware(async (ctx) => {
+            // Reject locked-out identities before their credentials are even
+            // checked, so a valid password cannot slip through mid-lockout.
+            if (!ctx.path?.startsWith("/sign-in")) return;
+
+            const email = normalizeEmail(
+                (ctx.body as { email?: unknown })?.email,
+            );
+            if (!email) return;
+
+            const now = Date.now();
+            pruneFailedLogins(now);
+            const entry = failedLogins.get(`email:${email}`);
+            if (
+                entry &&
+                now < entry.expiresAt &&
+                entry.count >= LOCKOUT_MAX_ATTEMPTS
+            ) {
+                throw APIError.from("TOO_MANY_REQUESTS", {
+                    code: "ACCOUNT_LOCKED",
+                    message:
+                        "تم قفل الحساب مؤقتًا بسبب محاولات دخول متكررة. حاول مرة أخرى بعد 15 دقيقة",
+                });
+            }
+        }),
+        after: createAuthMiddleware(async (ctx) => {
+            if (!ctx.path?.startsWith("/sign-in")) return;
+
+            const email = normalizeEmail(
+                (ctx.body as { email?: unknown })?.email,
+            );
+            if (!email) return;
+
+            const now = Date.now();
+            pruneFailedLogins(now);
+            const lockKey = `email:${email}`;
+
+            if (ctx.context.returned instanceof APIError) {
+                registerFailedLogin(lockKey, now);
+            } else if (ctx.context.returned) {
+                // Successful sign-in clears the failure counter.
+                failedLogins.delete(lockKey);
+            }
+        }),
     },
     plugins: [
         localization({
