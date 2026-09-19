@@ -29,6 +29,10 @@ export const deleteAccountSchema = z.object({
         .min(1, "كلمة المرور مطلوبة"),
 });
 
+export const checkEmailSchema = z.object({
+    email: z.string().email("صيغة البريد الإلكتروني غير صحيحة"),
+});
+
 export const socialLinksSchema = z.object({
     socialLinks: z.object({
         website: z.string().nullable().optional(),

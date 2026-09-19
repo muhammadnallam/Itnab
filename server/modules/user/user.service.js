@@ -2,6 +2,14 @@ import prisma from "../../lib/prisma.js";
 import { auth } from "../../lib/auth.js";
 import { ValidationError, handlePrismaError } from "../../lib/errors.js";
 
+export async function emailExists(email) {
+    const user = await prisma.user.findUnique({
+        where: { email: email.toLowerCase() },
+        select: { id: true },
+    });
+    return Boolean(user);
+}
+
 export async function getProfile(username) {
     let user;
     try {

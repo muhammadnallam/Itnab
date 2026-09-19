@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import PasswordInput from "./PasswordInput";
 import { EMAIL_RE, headingStyle, linkBtnStyle, subTextStyle } from "./styles";
 import { handleSignup } from "@/lib/handlers";
+import { checkEmail } from "@/lib/api/user";
 
 export default function SignupForm({ onSwitchMode, onSuccess }) {
     const [email, setEmail] = useState("");
@@ -42,6 +43,28 @@ export default function SignupForm({ onSwitchMode, onSuccess }) {
         setApiError("");
         if (!validate()) return;
         setLoading(true);
+
+        let exists = false;
+        try {
+            const check = await checkEmail(email.trim());
+            exists = Boolean(check?.exists);
+        } catch (err) {
+            setLoading(false);
+            setApiError(
+                err?.message || "تعذر التحقق من البريد الإلكتروني",
+            );
+            return;
+        }
+
+        if (exists) {
+            setLoading(false);
+            setErrors((p) => ({
+                ...p,
+                email: "هذا البريد الإلكتروني مسجّل بالفعل. جرّب تسجيل الدخول أو استخدم بريدًا آخر",
+            }));
+            return;
+        }
+
         const result = await handleSignup(email.trim(), password, setUser);
         setLoading(false);
         if (!result.success) {

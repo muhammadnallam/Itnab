@@ -32,6 +32,14 @@ export const otpLimiter = rateLimit({
     handler: authRateLimitHandler,
 });
 
+export const emailCheckLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 10,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: MESSAGE,
+});
+
 export const viewLimiter = rateLimit({
   windowMs: 60 * 1000,
   limit: 60,

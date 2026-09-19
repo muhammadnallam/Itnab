@@ -1,6 +1,14 @@
 import { fetcher } from "@/lib/fetcher";
 import { parseArticle, parseList } from "./feed";
 
+export async function checkEmail(email) {
+    return fetcher("/api/user/check-email", {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ email }),
+    });
+}
+
 export async function getProfile(username) {
     return fetcher(`/api/user/${username}/profile`);
 }

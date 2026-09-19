@@ -4,6 +4,7 @@ import requireAuth from "../../middleware/requireAuth";
 import asyncErrorHandler from "../../middleware/asyncErrorHandler";
 import {
     getProfile,
+    emailExists,
     updateProfile,
     updatePassword,
     deleteUserAccount,
@@ -19,9 +20,27 @@ import {
     socialLinksSchema,
     libraryQuerySchema,
     deleteAccountSchema,
+    checkEmailSchema,
 } from "./user.schema.js";
+import { emailCheckLimiter } from "../../middleware/rateLimit.js";
 
 const router = Router();
+
+router.post(
+    "/check-email",
+    emailCheckLimiter,
+    asyncErrorHandler(async (req, res) => {
+        const result = checkEmailSchema.safeParse(req.body);
+        if (!result.success) {
+            return res
+                .status(400)
+                .json({ error: result.error.issues[0].message });
+        }
+
+        const exists = await emailExists(result.data.email);
+        res.json({ exists });
+    }),
+);
 
 router.get(
     "/:username/profile",
