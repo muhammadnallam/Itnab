@@ -1,46 +1,67 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Modal from "@/components/ui/Modal";
 import BrandBadge from "./auth/BrandBadge";
 import LoginForm from "./auth/LoginForm";
 import SignupForm from "./auth/SignupForm";
+import VerifyOtpForm from "./auth/VerifyOtpForm";
 
 export { default as BrandBadge } from "./auth/BrandBadge";
 export { default as LoginForm } from "./auth/LoginForm";
 export { default as SignupForm } from "./auth/SignupForm";
+export { default as VerifyOtpForm } from "./auth/VerifyOtpForm";
+
+const RESENT_NOTICE = "البريد الإلكتروني غير مُتحقق. أرسلنا رمزًا جديدًا إلى بريدك.";
 
 export default function AuthModal({ open, onClose, defaultMode = "login" }) {
     const [mode, setMode] = useState(defaultMode);
-    const router = useRouter();
+    const [verifyEmail, setVerifyEmail] = useState("");
+    const [notice, setNotice] = useState("");
 
     const [prevOpen, setPrevOpen] = useState(open);
     if (prevOpen !== open) {
         setPrevOpen(open);
-        if (open) setMode(defaultMode);
+        if (open) {
+            setMode(defaultMode);
+            setVerifyEmail("");
+            setNotice("");
+        }
     }
 
     const handleSuccess = (result) => {
-        onClose?.();
         if (result?.needsVerification) {
-            router.push(
-                `/verify-email?email=${encodeURIComponent(result.email)}`,
-            );
+            setVerifyEmail(result.email);
+            setNotice(result.error ? RESENT_NOTICE : "");
+            setMode("verify");
+            return;
         }
+        onClose?.();
     };
 
     return (
         <Modal open={open} onClose={onClose}>
             <BrandBadge />
-            {mode === "login" ? (
+            {mode === "login" && (
                 <LoginForm
                     onSwitchMode={() => setMode("signup")}
                     onSuccess={handleSuccess}
                 />
-            ) : (
+            )}
+            {mode === "signup" && (
                 <SignupForm
                     onSwitchMode={() => setMode("login")}
                     onSuccess={handleSuccess}
+                />
+            )}
+            {mode === "verify" && (
+                <VerifyOtpForm
+                    email={verifyEmail}
+                    notice={notice}
+                    onVerified={() => onClose?.()}
+                    onBack={() => {
+                        setMode("login");
+                        setNotice("");
+                    }}
                 />
             )}
         </Modal>

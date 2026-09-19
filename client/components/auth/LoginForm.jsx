@@ -38,6 +38,10 @@ export default function LoginForm({ onSwitchMode, onSuccess }) {
         const result = await handleLogin(email.trim(), password, setUser);
         setLoading(false);
         if (!result.success) {
+            if (result.needsVerification) {
+                onSuccess?.(result);
+                return;
+            }
             setApiError(result.error || "فشل تسجيل الدخول");
             return;
         }
