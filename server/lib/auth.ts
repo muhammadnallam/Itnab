@@ -56,6 +56,9 @@ export const auth = betterAuth({
             domain: ".itnab.com",
         },
     },
+    rateLimit: {
+        enabled: false,
+    },
     emailAndPassword: {
         enabled: true,
         minPasswordLength: 8,

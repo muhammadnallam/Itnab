@@ -19,6 +19,7 @@ import {
     recomputeAuthorScores,
 } from "./lib/author-score.js";
 import logger from "./middleware/logger.js";
+import { authLimiter, otpLimiter } from "./middleware/rateLimit.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -42,6 +43,13 @@ app.use(logger);
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
 });
+
+app.post("/api/auth/sign-in/email", authLimiter);
+app.post("/api/auth/sign-up/email", authLimiter);
+app.post("/api/auth/email-otp/send-verification-otp", otpLimiter);
+app.post("/api/auth/email-otp/verify-email", otpLimiter);
+app.post("/api/auth/request-password-reset", otpLimiter);
+app.post("/api/auth/reset-password", otpLimiter);
 
 app.all("/api/auth/{*any}", logger, toNodeHandler(auth));
 
