@@ -7,11 +7,9 @@ const resend = apiKey ? new Resend(apiKey) : null;
 
 async function sendEmail({ to, subject, html }) {
     if (!resend || !mailFrom) {
-        console.warn(
-            "[email] RESEND_API_KEY or MAIL_FROM is not configured; skipping email to",
-            to,
+        throw new Error(
+            "Email is not configured: RESEND_API_KEY and MAIL_FROM are required",
         );
-        return;
     }
 
     const { error } = await resend.emails.send({
@@ -41,14 +39,34 @@ const layout = (content) => `
     </body>
 </html>`;
 
-export async function sendVerificationOtpEmail({ email, otp }) {
+export function assertEmailConfigured() {
+    if (!resend || !mailFrom) {
+        throw new Error(
+            "Email is not configured: RESEND_API_KEY and MAIL_FROM are required",
+        );
+    }
+}
+
+export async function sendOtpEmail({ email, otp, type }) {
+    const isVerification = type === "email-verification";
+
+    const subject = isVerification
+        ? "رمز التحقق من بريدك الإلكتروني"
+        : "رمز إعادة تعيين كلمة المرور";
+    const heading = isVerification
+        ? "تأكيد البريد الإلكتروني"
+        : "إعادة تعيين كلمة المرور";
+    const body = isVerification
+        ? "استخدم الرمز التالي لتأكيد بريدك الإلكتروني. الرمز صالح لمدة 5 دقائق."
+        : "استخدم الرمز التالي لإعادة تعيين كلمة المرور. الرمز صالح لمدة 5 دقائق.";
+
     await sendEmail({
         to: email,
-        subject: "رمز التحقق من بريدك الإلكتروني",
+        subject,
         html: layout(`
-            <h1 style="font-size:20px;margin:0 0 12px;">تأكيد البريد الإلكتروني</h1>
+            <h1 style="font-size:20px;margin:0 0 12px;">${heading}</h1>
             <p style="font-size:14px;line-height:1.7;color:#4b5563;margin:0 0 24px;">
-                استخدم الرمز التالي لتأكيد بريدك الإلكتروني. الرمز صالح لمدة 5 دقائق.
+                ${body}
             </p>
             <div style="font-size:32px;font-weight:700;letter-spacing:8px;direction:ltr;background:#f4f4f5;border-radius:10px;padding:16px 0;">
                 ${otp}

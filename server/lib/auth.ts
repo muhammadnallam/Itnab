@@ -10,7 +10,11 @@ import { generateFromEmail } from "unique-username-generator";
 import { localization } from "better-auth-localization";
 import { emailOTP } from "better-auth/plugins/email-otp";
 
-import { sendPasswordResetEmail, sendVerificationOtpEmail } from "./email.js";
+import {
+    sendPasswordResetEmail,
+    sendOtpEmail,
+    assertEmailConfigured,
+} from "./email.js";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
@@ -20,6 +24,10 @@ const prisma = new PrismaClient({ adapter });
 
 const emailVerificationEnabled =
     process.env.EMAIL_VERIFICATION_ENABLED === "true";
+
+if (emailVerificationEnabled) {
+    assertEmailConfigured();
+}
 
 const baseAdapter = prismaAdapter(prisma, { provider: "postgresql" });
 
@@ -101,7 +109,7 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         minPasswordLength: 8,
-        maxPasswordLength: 20,
+        maxPasswordLength: 64,
         requireEmailVerification: emailVerificationEnabled,
         resetPasswordTokenExpiresIn: 900,
         revokeSessionsOnPasswordReset: true,
@@ -138,9 +146,7 @@ export const auth = betterAuth({
                       allowedAttempts: 3,
                       overrideDefaultEmailVerification: true,
                       sendVerificationOTP: async ({ email, otp, type }) => {
-                          if (type === "email-verification") {
-                              await sendVerificationOtpEmail({ email, otp });
-                          }
+                          await sendOtpEmail({ email, otp, type });
                       },
                   }),
               ]
@@ -199,7 +205,7 @@ export const auth = betterAuth({
                     PASSWORD_TOO_SHORT:
                         "كلمة المرور قصيرة جدًا. استخدم 8 أحرف على الأقل",
                     PASSWORD_TOO_LONG:
-                        "كلمة المرور طويلة جدًا. الحد الأقصى 20 حرفًا",
+                        "كلمة المرور طويلة جدًا. الحد الأقصى ٦٤ حرفًا",
                     PASSWORD_WEAK:
                         "كلمة المرور ضعيفة. استخدم حروفًا كبيرة وصغيرة وأرقامًا ورموزًا خاصة",
                     USER_ALREADY_HAS_PASSWORD:

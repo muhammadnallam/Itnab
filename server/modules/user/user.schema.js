@@ -10,9 +10,15 @@ export const profileSchema = z.object({
             "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط",
         )
         .optional(),
-    bio: z.string().nullable().optional(),
-    image: z.string().nullable().optional(),
-    bannerUrl: z.string().nullable().optional(),
+    bio: z.string().max(500, "النبذة طويلة جدًا").nullable().optional(),
+    image: z
+        .union([z.string().url("رابط الصورة غير صالح"), z.literal("")])
+        .nullable()
+        .optional(),
+    bannerUrl: z
+        .union([z.string().url("رابط الصورة غير صالح"), z.literal("")])
+        .nullable()
+        .optional(),
 });
 
 export const passwordSchema = z.object({
@@ -20,13 +26,14 @@ export const passwordSchema = z.object({
     newPassword: z
         .string()
         .min(8, "كلمة المرور يجب أن تكون ٨ أحرف على الأقل")
-        .max(20, "كلمة المرور يجب أن تكون ٢٠ حرفًا كحد أقصى"),
+        .max(64, "كلمة المرور يجب أن تكون ٦٤ حرفًا كحد أقصى"),
 });
 
 export const deleteAccountSchema = z.object({
     password: z
         .string({ error: "كلمة المرور مطلوبة" })
-        .min(1, "كلمة المرور مطلوبة"),
+        .min(1, "كلمة المرور مطلوبة")
+        .max(64, "كلمة المرور طويلة جدًا"),
 });
 
 export const checkEmailSchema = z.object({
@@ -35,9 +42,18 @@ export const checkEmailSchema = z.object({
 
 export const socialLinksSchema = z.object({
     socialLinks: z.object({
-        website: z.string().nullable().optional(),
-        youtube: z.string().nullable().optional(),
-        x: z.string().nullable().optional(),
+        website: z
+            .union([z.string().url("الرابط غير صالح"), z.literal("")])
+            .nullable()
+            .optional(),
+        youtube: z
+            .union([z.string().url("الرابط غير صالح"), z.literal("")])
+            .nullable()
+            .optional(),
+        x: z
+            .union([z.string().url("الرابط غير صالح"), z.literal("")])
+            .nullable()
+            .optional(),
     }),
 });
 
