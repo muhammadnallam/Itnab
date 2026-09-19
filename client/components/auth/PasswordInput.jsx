@@ -29,6 +29,7 @@ export default function PasswordInput({
                 <button
                     type="button"
                     onClick={() => setShow((s) => !s)}
+                    aria-label={show ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
                     className="text-mid hover:text-ink"
                     style={iconBtnStyle}
                 >
