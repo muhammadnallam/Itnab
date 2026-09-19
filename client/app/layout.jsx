@@ -20,8 +20,26 @@ const wordmarkFont = localFont({
 });
 
 export const metadata = {
-    title: "إطناب",
+    metadataBase: new URL(
+        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:5000",
+    ),
+    title: { default: "إطناب", template: "%s | إطناب" },
     description: "نافذة على الفكر والقلم العربي",
+    openGraph: {
+        type: "website",
+        siteName: "إطناب",
+        locale: "ar_AR",
+        url: "/",
+        title: "إطناب",
+        description: "نافذة على الفكر والقلم العربي",
+        images: [{ url: "/logo.png", width: 912, height: 776, alt: "إطناب" }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "إطناب",
+        description: "نافذة على الفكر والقلم العربي",
+        images: ["/logo.png"],
+    },
 };
 
 export default function RootLayout({ children }) {

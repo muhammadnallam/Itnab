@@ -6,21 +6,46 @@ import ArticleView from "@/app/article/[slug]/ArticleView";
 import { getQueryClient } from "@/lib/query-client";
 import { queryKeys } from "@/lib/query-keys";
 import { getArticleBySlug } from "@/lib/data/articles";
+import { resolveOgImage } from "@/lib/og-image";
 import "./styles.css";
 
 export async function generateMetadata({ params }) {
     const { slug } = await params;
     try {
         const article = await getArticleBySlug(slug);
+        const image = resolveOgImage(article.coverImage, article.title);
+        const url = `/article/${article.slug}`;
+
         return {
             title: article.seoTitle,
             description: article.seoSubtitle,
+            keywords: [article.topic],
+            alternates: { canonical: url },
+            authors: article.author?.name
+                ? [{ name: article.author.name }]
+                : undefined,
             openGraph: {
+                type: "article",
+                url,
                 title: article.seoTitle,
                 description: article.seoSubtitle,
-                images: [{ url: article.coverImage }],
+                siteName: "إطناب",
+                locale: "ar_AR",
+                publishedTime: article.createdAt,
+                modifiedTime: article.updatedAt,
+                authors: article.author?.name
+                    ? [article.author.name]
+                    : undefined,
+                section: article.topic,
+                tags: [article.topic],
+                images: [image],
             },
-            keywords: [article.topic],
+            twitter: {
+                card: "summary_large_image",
+                title: article.seoTitle,
+                description: article.seoSubtitle,
+                images: [image.url],
+            },
         };
     } catch {
         return {};
