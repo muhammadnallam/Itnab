@@ -24,7 +24,9 @@ export const passwordSchema = z.object({
 });
 
 export const deleteAccountSchema = z.object({
-    password: z.string().min(1, "كلمة المرور مطلوبة"),
+    password: z
+        .string({ error: "كلمة المرور مطلوبة" })
+        .min(1, "كلمة المرور مطلوبة"),
 });
 
 export const socialLinksSchema = z.object({

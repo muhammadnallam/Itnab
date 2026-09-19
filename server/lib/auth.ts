@@ -83,9 +83,10 @@ export const auth = betterAuth({
         database: {
             generateId: "uuid",
         },
-        // Only share cookies across subdomains when a domain is configured
-        // (empty in local development, where host-only cookies are required).
-        ...(process.env.AUTH_COOKIE_DOMAIN
+        // Only share cookies across subdomains in production when a domain is
+        // configured; local development must use host-only cookies.
+        ...(process.env.NODE_ENV === "production" &&
+        process.env.AUTH_COOKIE_DOMAIN
             ? {
                   crossSubDomainCookies: {
                       enabled: true,
