@@ -9,7 +9,10 @@ import {
 import { toast } from "sonner";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
+import TextareaField from "@/components/ui/TextareaField";
 import { submitReport } from "@/lib/api/reports";
+
+const MAX_DETAILS = 500;
 
 const HEADINGS = {
     article: "الإبلاغ عن المقال",
@@ -30,6 +33,7 @@ export default function ReportModal({
 
     const [category, setCategory] = useState("");
     const [details, setDetails] = useState("");
+    const [detailsError, setDetailsError] = useState("");
     const [prevOpen, setPrevOpen] = useState(open);
 
     if (open !== prevOpen) {
@@ -37,13 +41,13 @@ export default function ReportModal({
         if (open) {
             setCategory("");
             setDetails("");
+            setDetailsError("");
         }
     }
 
     const selected = reasons.find((reason) => reason.id === category);
     const needsDetails = Boolean(selected?.requiresDetails);
-    const canSubmit =
-        Boolean(category) && (!needsDetails || details.trim().length > 0);
+    const canSubmit = Boolean(category);
 
     const mutation = useMutation({
         mutationFn: () =>
@@ -68,6 +72,19 @@ export default function ReportModal({
     const handleSubmit = (event) => {
         event.preventDefault();
         if (!canSubmit || mutation.isPending) return;
+
+        if (needsDetails) {
+            if (!details.trim()) {
+                setDetailsError("يرجى كتابة سبب الإبلاغ");
+                return;
+            }
+            if (details.length > MAX_DETAILS) {
+                setDetailsError(`الحد الأقصى ${MAX_DETAILS} حرف`);
+                return;
+            }
+        }
+
+        setDetailsError("");
         mutation.mutate();
     };
 
@@ -165,26 +182,18 @@ export default function ReportModal({
             </div>
 
             {needsDetails && (
-                <textarea
+                <TextareaField
                     value={details}
-                    onChange={(e) => setDetails(e.target.value)}
-                    placeholder="اكتب سبب الإبلاغ"
-                    rows={4}
-                    maxLength={1000}
-                    style={{
-                        width: "100%",
-                        minHeight: 96,
-                        flexShrink: 0,
-                        boxSizing: "border-box",
-                        resize: "vertical",
-                        border: "1px solid var(--color-border)",
-                        borderRadius: "var(--border-radius)",
-                        padding: 10,
-                        fontSize: 14,
-                        fontFamily: "inherit",
-                        background: "var(--color-bg)",
-                        color: "var(--color-ink)",
+                    onChange={(e) => {
+                        setDetails(e.target.value);
+                        if (detailsError) setDetailsError("");
                     }}
+                    placeholder="اكتب سبب الإبلاغ"
+                    max={MAX_DETAILS}
+                    minHeight={96}
+                    error={detailsError}
+                    rows={4}
+                    style={{ flexShrink: 0 }}
                 />
             )}
         </Modal>

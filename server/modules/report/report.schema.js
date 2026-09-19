@@ -9,7 +9,11 @@ export const reportSchema = z
         articleId: z.string().uuid("معرف المقال غير صالح").optional(),
         profileId: z.string().uuid("معرف المستخدم غير صالح").optional(),
         category: z.string().trim().min(1, "يرجى اختيار سبب الإبلاغ"),
-        details: z.string().trim().max(1000, "النص طويل جدًا").optional(),
+        details: z
+            .string()
+            .trim()
+            .max(500, "الحد الأقصى لسبب الإبلاغ هو 500 حرف")
+            .optional(),
     })
     .superRefine((data, ctx) => {
         const hasArticle = Boolean(data.articleId);

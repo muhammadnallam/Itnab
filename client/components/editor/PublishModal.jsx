@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
+import TextareaField from "@/components/ui/TextareaField";
 import {
     validateArticleFields,
     prepareArticlePayload,
@@ -246,42 +247,17 @@ export default function PublishModal({
                 </div>
             </Input>
 
-            <Input label="وصف محركات البحث" error={seoDescriptionError}>
-                <div
-                    style={{ display: "flex", flexDirection: "column", gap: 6 }}
-                >
-                    <textarea
-                        name="description"
-                        style={{
-                            ...inputBase,
-                            resize: "vertical",
-                            minHeight: 80,
-                            fontFamily: "inherit",
-                            lineHeight: 1.6,
-                            ...(seoDescriptionError
-                                ? { border: "1px solid var(--color-error)" }
-                                : {}),
-                        }}
-                        value={seoDescription}
-                        onChange={(e) => setSeoDescription(e.target.value)}
-                        placeholder="أدخل وصف تحسين محركات البحث"
-                    />
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                            fontSize: 12,
-                            color:
-                                seoDescription.length >= 100 &&
-                                seoDescription.length <= 160
-                                    ? "var(--color-success)"
-                                    : "var(--color-error)",
-                        }}
-                    >
-                        {seoDescription.length}/160
-                    </div>
-                </div>
-            </Input>
+            <TextareaField
+                label="وصف محركات البحث"
+                error={seoDescriptionError}
+                value={seoDescription}
+                onChange={(e) => setSeoDescription(e.target.value)}
+                placeholder="أدخل وصف تحسين محركات البحث"
+                min={100}
+                max={160}
+                minHeight={80}
+                name="description"
+            />
 
             <Input label="اختر الموضوع" error={tagError}>
                 <select
