@@ -713,7 +713,7 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                             setNewPass(e.target.value);
                             setErrors((p) => ({ ...p, newPass: "" }));
                         }}
-                        placeholder="٨ أحرف على الأقل"
+                        placeholder="٨ إلى ٦٤ حرفًا"
                         error={errors.newPass}
                     />
                 </div>

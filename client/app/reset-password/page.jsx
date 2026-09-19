@@ -27,8 +27,8 @@ function ResetPasswordContent() {
         if (!password) e.password = "كلمة المرور مطلوبة";
         else if (password.length < 8)
             e.password = "كلمة المرور ضعيفة. استخدم 8 أحرف على الأقل";
-        else if (password.length > 20)
-            e.password = "كلمة المرور طويلة جدًا. يجب ألا تتجاوز 20 حرفًا";
+        else if (password.length > 64)
+            e.password = "كلمة المرور طويلة جدًا. يجب ألا تتجاوز 64 حرفًا";
 
         if (!confirmPassword) e.confirmPassword = "تأكيد كلمة المرور مطلوب";
         else if (password !== confirmPassword)

@@ -201,8 +201,8 @@ export function validatePasswordFields({
     if (!newPassword?.trim()) errors.newPass = "كلمة المرور الجديدة مطلوبة";
     else if (newPassword.length < 8)
         errors.newPass = "كلمة المرور يجب أن تكون ٨ أحرف على الأقل";
-    else if (newPassword.length > 20)
-        errors.newPass = "كلمة المرور يجب أن تكون ٢٠ حرفًا كحد أقصى";
+    else if (newPassword.length > 64)
+        errors.newPass = "كلمة المرور يجب أن تكون ٦٤ حرفًا كحد أقصى";
     if (!confirmPass?.trim()) errors.confirmPass = "تأكيد كلمة المرور مطلوب";
     else if (newPassword !== confirmPass)
         errors.confirmPass = "كلمتا المرور غير متطابقتين";
