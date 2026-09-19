@@ -7,6 +7,7 @@ import AuthModalProvider from "@/context/AuthModalContext";
 import SidebarProvider from "@/context/SidebarContext";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
+import NavigationProgress from "@/components/NavigationProgress";
 import { SITE_URL } from "@/lib/site-url";
 
 const wordmarkFont = localFont({
@@ -74,6 +75,7 @@ export default function RootLayout({ children }) {
                         </SidebarProvider>
                     </ScreenProvider>
                 </QueryProvider>
+                <NavigationProgress />
                 <Toaster />
             </body>
         </html>

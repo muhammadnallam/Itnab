@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import AppLayout from "@/components/AppLayout";
+import PageContent from "@/components/PageContent";
 import ArticleCard from "@/components/ArticleCard";
 import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
 import Avatar from "@/components/ui/Avatar";
@@ -36,7 +36,7 @@ export default function ListPage({ params }) {
     if (error) {
         if (error.status === 404) return notFound();
         return (
-            <AppLayout>
+            <PageContent>
                 <p
                     style={{
                         textAlign: "center",
@@ -46,12 +46,12 @@ export default function ListPage({ params }) {
                 >
                     حدث خطأ أثناء تحميل القائمة
                 </p>
-            </AppLayout>
+            </PageContent>
         );
     }
 
     return (
-        <AppLayout>
+        <PageContent>
             {isLoading ? (
                 <div>
                     {[1, 2, 3].map((i) => (
@@ -75,7 +75,7 @@ export default function ListPage({ params }) {
                         </h1>
 
                         <a
-                            href={`/@${list.author?.username}`}
+                            as={`/@${list.author?.username}`} href={`/profile/${list.author?.username}`}
                             style={{
                                 display: "inline-flex",
                                 alignItems: "center",
@@ -140,6 +140,6 @@ export default function ListPage({ params }) {
                     )}
                 </div>
             ) : null}
-        </AppLayout>
+        </PageContent>
     );
 }

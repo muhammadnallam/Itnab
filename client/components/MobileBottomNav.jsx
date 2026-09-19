@@ -9,7 +9,9 @@ import RequireAuth from "@/components/RequireAuth";
 const MobileBottomNav = () => {
     const pathname = usePathname();
     const { user } = useContext(UserContext);
-    const profileLink = user?.username ? `/@${user.username}` : "/auth";
+    const profile = user?.username
+        ? { as: `/@${user.username}`, href: `/profile/${user.username}` }
+        : { href: "/auth" };
     const items = [
         { icon: House, label: "الرئيسية", link: "/" },
         {
@@ -20,7 +22,13 @@ const MobileBottomNav = () => {
         },
         { icon: Search, label: "استكشف", link: "/explore", protected: false },
         { icon: Bookmark, label: "المكتبة", link: "/library", protected: true },
-        { icon: UserRound, label: "أنت", link: profileLink, protected: true },
+        {
+            icon: UserRound,
+            label: "أنت",
+            link: profile.as ?? profile.href,
+            prefetchHref: profile.href,
+            protected: true,
+        },
     ];
     return (
         <nav
@@ -45,7 +53,8 @@ const MobileBottomNav = () => {
                 const link = (
                     <Link
                         key={item.label}
-                        href={item.link}
+                        href={item.prefetchHref ?? item.link}
+                        as={item.prefetchHref ? item.link : undefined}
                         className={
                             active ? "text-accent" : "text-mid hover:text-ink"
                         }

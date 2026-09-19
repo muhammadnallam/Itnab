@@ -26,7 +26,7 @@ export default function AuthorRow({ author, isSelf = false }) {
                 gap: 12,
             }}
         >
-            <Link href={`/@${author.username}`} className="flex items-center gap-2">
+            <Link as={`/@${author.username}`} href={`/profile/${author.username}`} className="flex items-center gap-2">
                 <Avatar
                     img={author.image}
                     initials={getInitials(author.name)}

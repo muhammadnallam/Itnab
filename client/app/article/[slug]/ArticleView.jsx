@@ -101,7 +101,7 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
                 <p className="mb-8 md:mb-10">
                     من{" "}
                     <Link
-                        href={`/@${article.author?.username}`}
+                        as={`/@${article.author?.username}`} href={`/profile/${article.author?.username}`}
                         className="underline hover:text-accent"
                     >
                         {article.author?.name}

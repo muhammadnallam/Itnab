@@ -1,5 +1,5 @@
 "use client";
-import AppLayout from "@/components/AppLayout";
+import PageContent from "@/components/PageContent";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Toggle from "@/components/ui/Toggle";
@@ -867,7 +867,7 @@ export default function SettingsPage() {
     const activePanel = TABS.find((t) => t.id === activeTab)?.panel;
 
     return (
-        <AppLayout leftPanel={<HelpPanel />}>
+        <PageContent leftPanel={<HelpPanel />}>
             <>
                 <div>
                     <div
@@ -891,6 +891,6 @@ export default function SettingsPage() {
                     </div>
                 </div>
             </>
-        </AppLayout>
+        </PageContent>
     );
 }

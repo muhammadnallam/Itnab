@@ -1,7 +1,7 @@
 "use client";
 import { useState, useContext } from "react";
 import Tabs from "@/components/ui/Tabs";
-import AppLayout from "@/components/AppLayout";
+import PageContent from "@/components/PageContent";
 import ArticleCard from "@/components/ArticleCard";
 import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
 import ListCard from "@/components/ListCard";
@@ -49,7 +49,7 @@ export default function Library() {
         activeTab === "lists";
 
     return (
-        <AppLayout>
+        <PageContent>
             <Tabs
                 active={activeTab}
                 setActive={setActiveTab}
@@ -119,6 +119,6 @@ export default function Library() {
                     </>
                 )
             )}
-        </AppLayout>
+        </PageContent>
     );
 }

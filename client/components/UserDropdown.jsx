@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, useContext } from "react";
+import { useRouter } from "next/navigation";
 import { UserContext } from "@/context/UserContext";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { signOut } from "@/lib/api/auth";
@@ -25,6 +26,7 @@ const getInitials = (name) => {
 
 const UserDropdown = ({ open, onClose }) => {
     const menuRef = useRef(null);
+    const router = useRouter();
     const { user, setUser } = useContext(UserContext);
     const { openAuth } = useAuthModal();
     const [theme, setTheme] = useState("light");
@@ -57,7 +59,7 @@ const UserDropdown = ({ open, onClose }) => {
 
     const handleItemClick = (item) => {
         if (item.href) {
-            window.location.assign(item.href);
+            router.push(item.href);
             onClose();
             return;
         }

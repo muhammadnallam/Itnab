@@ -84,7 +84,7 @@ const ArticleCardVertical = ({ article, isMobile }) => {
             }}
         >
             {article.image && (
-                <a href={`/article/${article.slug}`}>
+                <Link href={`/article/${article.slug}`}>
                     <img
                         src={article.image}
                         alt={article.excerpt}
@@ -95,11 +95,11 @@ const ArticleCardVertical = ({ article, isMobile }) => {
                             marginBottom: 14,
                         }}
                     />
-                </a>
+                </Link>
             )}
 
             <Link
-                href={`/@${article.authorUsername}`}
+                as={`/@${article.authorUsername}`} href={`/profile/${article.authorUsername}`}
                 className="flex items-center gap-2 mb-2.5 text-sm"
             >
                 <Avatar
@@ -113,7 +113,7 @@ const ArticleCardVertical = ({ article, isMobile }) => {
                 </span>
             </Link>
 
-            <a href={`/article/${article.slug}`}>
+            <Link href={`/article/${article.slug}`}>
                 <h2
                     className="font-semibold leading-normal mb-1.5 cursor-pointer overflow-hidden line-clamp-2 text-sm"
                     style={{
@@ -124,7 +124,7 @@ const ArticleCardVertical = ({ article, isMobile }) => {
                 >
                     {article.title}
                 </h2>
-            </a>
+            </Link>
 
             <p
                 className="leading-relaxed text-xs text-(--color-light) overflow-hidden line-clamp-2 mb-3"

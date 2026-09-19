@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useContext } from "react";
-import AppLayout from "@/components/AppLayout";
+import PageContent from "@/components/PageContent";
 import ArticleCard from "@/components/ArticleCard";
 import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
 import Avatar from "@/components/ui/Avatar";
@@ -89,7 +89,7 @@ export default function SubscriptionsPage() {
     const hasFollows = !following.loading && following.writers.length > 0;
 
     return (
-        <AppLayout>
+        <PageContent>
             {hasFollows && <WritersSlider writers={following.writers} />}
             {hasFollows && (
                 <div
@@ -158,6 +158,6 @@ export default function SubscriptionsPage() {
                     )}
                 </div>
             )}
-        </AppLayout>
+        </PageContent>
     );
 }

@@ -29,7 +29,7 @@ function renderContent(content) {
     return (
         <span style={{ whiteSpace: "pre-wrap" }}>
             <Link
-                href={`/@${username}`}
+                as={`/@${username}`} href={`/profile/${username}`}
                 style={{
                     color: "var(--color-accent)",
                     textDecoration: "none",
@@ -137,7 +137,7 @@ export default function CommentItem({
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2 flex-wrap">
                             <Link
-                                href={`/@${comment.author?.username}`}
+                                as={`/@${comment.author?.username}`} href={`/profile/${comment.author?.username}`}
                                 style={{
                                     fontWeight: 600,
                                     fontSize: 15,

@@ -131,7 +131,7 @@ const ArticleCard = ({ article }) => {
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="flex items-center gap-2 mb-2.5 text-sm">
                         <Link
-                            href={`/@${article.authorUsername}`}
+                            as={`/@${article.authorUsername}`} href={`/profile/${article.authorUsername}`}
                             className="flex items-center gap-2"
                         >
                             <Avatar
@@ -150,11 +150,11 @@ const ArticleCard = ({ article }) => {
                         </span>
                     </div>
 
-                    <a href={`/article/${article.slug}`}>
+                    <Link href={`/article/${article.slug}`}>
                         <h2 className="article-title font-semibold leading-normal mb-1.5 cursor-pointer">
                             {article.title}
                         </h2>
-                    </a>
+                    </Link>
 
                     <p
                         className="leading-relaxed text-sm text-(--color-light) overflow-hidden line-clamp-2"

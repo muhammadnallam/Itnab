@@ -213,7 +213,7 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                     }}
                 >
                     <Link
-                        href={`/@${list.authorUsername}`}
+                        as={`/@${list.authorUsername}`} href={`/profile/${list.authorUsername}`}
                         className="flex items-center gap-2"
                     >
                         <Avatar

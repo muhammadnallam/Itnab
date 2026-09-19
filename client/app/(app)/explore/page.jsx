@@ -3,7 +3,7 @@
 import { Suspense, useState, useMemo, useCallback, useContext, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import AppLayout from "@/components/AppLayout";
+import PageContent from "@/components/PageContent";
 import { Compass, Search } from "lucide-react";
 import { TAGS } from "@itnab/constants";
 import Avatar from "@/components/ui/Avatar";
@@ -126,7 +126,7 @@ const AuthorCard = ({ author }) => {
                 alignItems: "center",
             }}
         >
-            <Link href={`/@${author.username}`}>
+            <Link as={`/@${author.username}`} href={`/profile/${author.username}`}>
                 <Avatar
                     img={author.image}
                     initials={getInitials(author.name)}
@@ -135,7 +135,7 @@ const AuthorCard = ({ author }) => {
             </Link>
 
             <Link
-                href={`/@${author.username}`}
+                as={`/@${author.username}`} href={`/profile/${author.username}`}
                 className="hover:underline"
                 style={{
                     marginTop: 12,
@@ -447,7 +447,7 @@ function SearchView({ query, isDebouncing, activeTab, onTabChange, isMobile }) {
                             {search.authors.map((author) => (
                                 <a
                                     key={author.id}
-                                    href={`/@${author.username}`}
+                                    as={`/@${author.username}`} href={`/profile/${author.username}`}
                                     style={{
                                         display: "flex",
                                         alignItems: "center",
@@ -567,7 +567,7 @@ function ExploreContent() {
     };
 
     return (
-        <AppLayout>
+        <PageContent>
             <div
                 style={{
                     position: "sticky",
@@ -635,7 +635,7 @@ function ExploreContent() {
                     isMobile={isMobile}
                 />
             )}
-        </AppLayout>
+        </PageContent>
     );
 }
 
@@ -643,7 +643,7 @@ export default function ExplorePage() {
     return (
         <Suspense
             fallback={
-                <AppLayout>
+                <PageContent>
                     <div
                         style={{
                             display: "flex",
@@ -657,7 +657,7 @@ export default function ExplorePage() {
                             جاري التحميل...
                         </span>
                     </div>
-                </AppLayout>
+                </PageContent>
             }
         >
             <ExploreContent />

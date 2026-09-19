@@ -13,7 +13,7 @@ import {
     CircleAlert,
 } from "lucide-react";
 import { X, YouTube } from "@/components/ui/icons";
-import AppLayout from "@/components/AppLayout";
+import PageContent from "@/components/PageContent";
 import Tabs from "@/components/ui/Tabs";
 import ArticleCard from "@/components/ArticleCard";
 import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
@@ -22,7 +22,7 @@ import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import RequireAuth from "@/components/RequireAuth";
 import MoreMenu from "@/components/MoreMenu";
-import FollowListModal from "@/app/profile/[username]/FollowListModal";
+import FollowListModal from "./FollowListModal";
 import ShareModal from "@/components/ShareModal";
 import ReportModal from "@/components/ReportModal";
 import { useAuthModal } from "@/context/AuthModalContext";
@@ -292,7 +292,7 @@ export default function ProfilePage() {
 
     if (isLoading || !profile) {
         return (
-            <AppLayout
+            <PageContent
                 leftPanel={
                     <div className="card w-full p-7">
                         <div className="flex justify-center">
@@ -354,12 +354,12 @@ export default function ProfilePage() {
                 {[1, 2, 3].map((i) => (
                     <ArticleCardSkeleton key={i} />
                 ))}
-            </AppLayout>
+            </PageContent>
         );
     }
 
     return (
-        <AppLayout
+        <PageContent
             leftPanel={
                 <ProfilePanel
                     profile={profile}
@@ -564,6 +564,6 @@ export default function ProfilePage() {
                 targetType="profile"
                 profileId={profile.id}
             />
-        </AppLayout>
+        </PageContent>
     );
 }

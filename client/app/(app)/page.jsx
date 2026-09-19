@@ -2,7 +2,7 @@
 
 import { useState, useContext } from "react";
 import Link from "next/link";
-import AppLayout from "@/components/AppLayout";
+import PageContent from "@/components/PageContent";
 import ArticleCard from "@/components/ArticleCard";
 import ArticleCardSkeleton from "@/components/ArticleCardSkeleton";
 import AuthorRow from "@/components/AuthorRow";
@@ -263,7 +263,7 @@ export default function App() {
 
     return (
         <>
-            <AppLayout
+            <PageContent
                 leftPanel={
                     <LeftPanel
                         onLogin={() => openAuth("login")}
@@ -306,7 +306,7 @@ export default function App() {
                         )}
                     </>
                 )}
-            </AppLayout>
+            </PageContent>
         </>
     );
 }
