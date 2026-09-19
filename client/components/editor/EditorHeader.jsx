@@ -1,4 +1,4 @@
-import { ArrowLeft, Trash } from "lucide-react";
+import { ArrowLeft, Eraser, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 
@@ -6,6 +6,8 @@ export default function EditorHeader({
     setPublishModal,
     setConfirmModal,
     wordCount,
+    isUpdate,
+    onClear,
 }) {
     const router = useRouter();
 
@@ -35,7 +37,13 @@ export default function EditorHeader({
                         التالي
                     </Button>
                     <button
-                        className="text-mid hover:text-error"
+                        aria-label={isUpdate ? "حذف المقال" : "مسح المحتوى"}
+                        title={isUpdate ? "حذف المقال" : "مسح المحتوى"}
+                        className={
+                            isUpdate
+                                ? "text-mid hover:text-error"
+                                : "text-mid hover:text-ink"
+                        }
                         style={{
                             display: "flex",
                             alignItems: "center",
@@ -48,10 +56,14 @@ export default function EditorHeader({
                             transition: "color 0.15s",
                         }}
                         onClick={() => {
-                            setConfirmModal(true);
+                            if (isUpdate) {
+                                setConfirmModal(true);
+                            } else {
+                                onClear();
+                            }
                         }}
                     >
-                        <Trash size={20} />
+                        {isUpdate ? <Trash size={20} /> : <Eraser size={20} />}
                     </button>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

@@ -183,7 +183,7 @@ const UserDropdown = ({ open, onClose }) => {
                         </button>
                     );
                 })}
-
+{/* 
                 <div
                     style={{
                         height: 1,
@@ -250,7 +250,7 @@ const UserDropdown = ({ open, onClose }) => {
                             );
                         })}
                     </div>
-                </div>
+                </div> */}
 
                 {user && (
                     <>

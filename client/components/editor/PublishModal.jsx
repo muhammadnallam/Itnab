@@ -303,36 +303,6 @@ export default function PublishModal({
                     ))}
                 </select>
             </Input>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <label
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        fontSize: 14,
-                        color: "var(--color-ink)",
-                        cursor: "pointer",
-                    }}
-                >
-                    <input
-                        name="sendEmail"
-                        type="checkbox"
-                        checked={sendEmail}
-                        onChange={(e) => setSendEmail(e.target.checked)}
-                        style={{
-                            width: 18,
-                            height: 18,
-                            accentColor: "var(--color-accent)",
-                            cursor: "pointer",
-                            flexShrink: 0,
-                        }}
-                    />
-                    <span>
-                        إرسال المقال عبر البريد الإلكتروني إلى جميع المشتركين
-                    </span>
-                </label>
-            </div>
         </Modal>
     );
 }

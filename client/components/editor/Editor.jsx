@@ -184,6 +184,14 @@ const MobileToolbarContent = ({ type, onBack }) => {
     );
 };
 
+const EMPTY_DOC = {
+    type: "doc",
+    content: [
+        { type: "articleTitle", content: [] },
+        { type: "articleDescription", content: [] },
+    ],
+};
+
 export function Editor({ articleContent, articleData, mode } = {}) {
     const isUpdate = mode === "update";
     const router = useRouter();
@@ -237,13 +245,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                 } catch {}
             }
         }
-        return {
-            type: "doc",
-            content: [
-                { type: "articleTitle", content: [] },
-                { type: "articleDescription", content: [] },
-            ],
-        };
+        return EMPTY_DOC;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -311,6 +313,15 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         },
     });
 
+    const handleClear = () => {
+        if (!editor) return;
+        editor.chain()
+            .focus()
+            .setContent(EMPTY_DOC, { emitUpdate: true })
+            .run();
+        saveContent.flush();
+    };
+
     const [prevIsMobile, setPrevIsMobile] = useState(isMobile);
     if (prevIsMobile !== isMobile) {
         setPrevIsMobile(isMobile);
@@ -326,6 +337,8 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     setPublishModal={setPublishModal}
                     setConfirmModal={setConfirmModal}
                     wordCount={stats.words}
+                    isUpdate={isUpdate}
+                    onClear={handleClear}
                 />
                 <PublishModal
                     isOpen={publishModal}
