@@ -79,7 +79,6 @@ function buildMainText(n, actors, count) {
         return (
             <>
                 <Name>{first}</Name> رد على تعليقك
-                {preview ? `: «${preview}»` : ""}
             </>
         );
     }
@@ -88,7 +87,6 @@ function buildMainText(n, actors, count) {
         return (
             <>
                 <Name>{first}</Name> علّق على «{title}»
-                {preview ? `: «${preview}»` : ""}
             </>
         );
     }
