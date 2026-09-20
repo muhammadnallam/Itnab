@@ -546,7 +546,7 @@ function ExploreContent() {
     const handleSearchChange = (value) => {
         setRawQ(value);
         if (value.trim()) {
-            updateURL({ q: value.trim(), tab: "articles", tag: null });
+            updateURL({ q: value.trim(), tag: null });
         } else {
             updateURL({ q: null });
         }
