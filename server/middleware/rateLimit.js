@@ -80,3 +80,11 @@ export const reportLimiter = rateLimit({
     legacyHeaders: false,
     message: MESSAGE,
 });
+
+export const draftLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 60,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: MESSAGE,
+});

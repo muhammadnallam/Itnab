@@ -196,6 +196,24 @@ const FileCornerIcon = () => (
     </svg>
 );
 
+const ImageIcon = () => (
+    <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <path d="M21 15l-5-5L5 21" />
+    </svg>
+);
+
 /**
  * A component that creates a drag-and-drop area for image uploads
  */
@@ -326,8 +344,68 @@ const DropZoneContent = ({ maxSize, limit }) => (
     </>
 );
 
+const PlaceholderContent = ({ originalName }) => (
+    <div
+        dir="rtl"
+        style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            width: "100%",
+            padding: "14px 16px",
+            border: "1px dashed var(--tt-color-border, #d4d4d4)",
+            borderRadius: "8px",
+            backgroundColor: "var(--tt-color-surface, #fafafa)",
+            color: "var(--tt-color-text-muted, #737373)",
+            textAlign: "right",
+        }}
+    >
+        <span
+            style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                width: "36px",
+                height: "36px",
+                borderRadius: "8px",
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+            }}
+        >
+            <ImageIcon />
+        </span>
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "2px",
+                minWidth: 0,
+            }}
+        >
+            <span style={{ fontSize: "14px", fontWeight: 600 }}>
+                كانت هناك صورة
+            </span>
+            {originalName && (
+                <span
+                    style={{
+                        fontSize: "12px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    {originalName}
+                </span>
+            )}
+            <span style={{ fontSize: "12px" }}>
+                أعد إدراجها — ستُحذف عند النشر
+            </span>
+        </div>
+    </div>
+);
+
 export const ImageUploadNode = (props) => {
-    const { accept, limit, maxSize } = props.node.attrs;
+    const { accept, limit, maxSize, pending, originalName } = props.node.attrs;
     const inputRef = useRef(null);
     const extension = props.extension;
 
@@ -403,7 +481,11 @@ export const ImageUploadNode = (props) => {
         >
             {!hasFiles && (
                 <ImageUploadDragArea onFile={handleUpload}>
-                    <DropZoneContent maxSize={maxSize} limit={limit} />
+                    {pending ? (
+                        <PlaceholderContent originalName={originalName} />
+                    ) : (
+                        <DropZoneContent maxSize={maxSize} limit={limit} />
+                    )}
                 </ImageUploadDragArea>
             )}
             {hasFiles && (

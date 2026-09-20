@@ -1,11 +1,14 @@
 import { upload } from "./api/upload";
 import { getPendingImageFiles, clearPendingImageFiles } from "./tiptap-utils";
+import { stripPlaceholderImages } from "./draft-content";
 
 export async function processContentImages(content) {
-    const pendingFiles = getPendingImageFiles();
-    if (pendingFiles.size === 0) return content;
+    const { content: base } = stripPlaceholderImages(content);
 
-    const cloned = JSON.parse(JSON.stringify(content));
+    const pendingFiles = getPendingImageFiles();
+    if (pendingFiles.size === 0) return base;
+
+    const cloned = JSON.parse(JSON.stringify(base));
 
     async function walk(node) {
         if (node.type === "image" && node.attrs?.src?.startsWith("blob:")) {

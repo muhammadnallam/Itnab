@@ -4,7 +4,7 @@ import EditorHeader from "@/components/editor/EditorHeader";
 import PublishModal from "@/components/editor/PublishModal";
 import ConfirmModal from "@/components/ConfirmModal";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
 import { useDebouncedCallback } from "use-debounce";
 import { useRouter } from "next/navigation";
@@ -77,9 +77,12 @@ import { QuranIcon } from "@/components/tiptap-icons/quran-icon";
 
 // --- Hooks ---
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint";
+import { useDrafts } from "@/hooks/useDrafts";
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
+import { serializeDraftContent } from "@/lib/draft-content";
+import { getDraft } from "@/lib/api/draft";
 
 // --- Styles ---
 import "./styles.scss";
@@ -192,8 +195,25 @@ const EMPTY_DOC = {
     ],
 };
 
+function normalizeDraftContent(content) {
+    const next =
+        content?.content && Array.isArray(content.content)
+            ? { ...content, content: [...content.content] }
+            : { ...EMPTY_DOC, content: [...EMPTY_DOC.content] };
+
+    if (next.content[0]?.type !== "articleTitle") {
+        next.content.splice(0, 0, { type: "articleTitle", content: [] });
+    }
+    if (next.content[1]?.type !== "articleDescription") {
+        next.content.splice(1, 0, { type: "articleDescription", content: [] });
+    }
+
+    return next;
+}
+
 export function Editor({ articleContent, articleData, mode } = {}) {
     const isUpdate = mode === "update";
+    const articleId = articleData?.id;
     const router = useRouter();
     const isMobile = useIsBreakpoint();
     const { remove } = useArticle(articleData?.slug);
@@ -207,45 +227,107 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     const [coverError, setCoverError] = useState("");
     const [stats, setStats] = useState({ words: 0, characters: 0 });
 
-    const saveContent = useDebouncedCallback((content) => {
-        if (!isUpdate) {
-            window.localStorage.setItem(
-                "editor-content",
-                JSON.stringify(content),
-            );
-        }
-    }, 2000);
+    const {
+        drafts,
+        isLoading: draftsLoading,
+        createDraft,
+        saveDraft,
+        deleteDraft,
+    } = useDrafts({ articleId });
 
-    useEffect(() => {
-        return () => {
-            saveContent.flush();
-        };
-    }, [saveContent]);
+    const [seoTitle, setSeoTitle] = useState(
+        isUpdate && articleData?.seoTitle ? articleData.seoTitle : "",
+    );
+    const [seoDescription, setSeoDescription] = useState(
+        isUpdate && articleData?.seoDescription
+            ? articleData.seoDescription
+            : "",
+    );
+    const [tag, setTag] = useState(
+        isUpdate && articleData?.tag ? articleData.tag : "",
+    );
+
+    const [activeDraftId, setActiveDraftId] = useState(null);
+    const [saveStatus, setSaveStatus] = useState("idle");
+    const [lastSavedAt, setLastSavedAt] = useState(null);
+    const [resumePrompt, setResumePrompt] = useState(null);
+
+    const editorRef = useRef(null);
+    const saveDraftRef = useRef(saveDraft);
+    const createDraftRef = useRef(createDraft);
+    const activeDraftIdRef = useRef(null);
+    const metaRef = useRef({ seoTitle, seoDescription, tag });
+    const savingRef = useRef(false);
+    const queuedRef = useRef(false);
+    const draftPromptHandledRef = useRef(false);
+    const metaSkipRef = useRef(true);
+
+    const applyMeta = ({
+        seoTitle: nextTitle,
+        seoDescription: nextDesc,
+        tag: nextTag,
+    }) => {
+        if (
+            nextTitle !== metaRef.current.seoTitle ||
+            nextDesc !== metaRef.current.seoDescription ||
+            nextTag !== metaRef.current.tag
+        ) {
+            metaSkipRef.current = true;
+        }
+        setSeoTitle(nextTitle);
+        setSeoDescription(nextDesc);
+        setTag(nextTag);
+    };
+
+    const doSave = useCallback(async () => {
+        if (!editorRef.current) return;
+        if (savingRef.current) {
+            queuedRef.current = true;
+            return;
+        }
+        savingRef.current = true;
+        setSaveStatus("saving");
+
+        try {
+            do {
+                queuedRef.current = false;
+                const payload = {
+                    content: serializeDraftContent(editorRef.current.getJSON()),
+                    seoTitle: metaRef.current.seoTitle || null,
+                    seoDescription: metaRef.current.seoDescription || null,
+                    topic: metaRef.current.tag || null,
+                };
+
+                if (activeDraftIdRef.current) {
+                    await saveDraftRef.current.mutateAsync({
+                        id: activeDraftIdRef.current,
+                        ...payload,
+                    });
+                } else {
+                    const d = await createDraftRef.current.mutateAsync({
+                        ...payload,
+                        articleId,
+                    });
+                    activeDraftIdRef.current = d.id;
+                    setActiveDraftId(d.id);
+                }
+            } while (queuedRef.current);
+
+            setSaveStatus("saved");
+            setLastSavedAt(new Date());
+        } catch {
+            queuedRef.current = false;
+            setSaveStatus("error");
+        } finally {
+            savingRef.current = false;
+        }
+    }, [articleId]);
+
+    const debouncedSave = useDebouncedCallback(doSave, 4000);
 
     // Intentional mount-only init: editor content should not swap when async props arrive late.
     const initialContent = useMemo(() => {
-        if (isUpdate && articleContent) {
-            return articleContent;
-        }
-        if (typeof window !== "undefined") {
-            const saved = window.localStorage.getItem("editor-content");
-            if (saved && saved !== "{}" && saved !== "") {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (
-                        parsed?.content?.length > 0 &&
-                        parsed.content[0]?.type !== "articleTitle"
-                    ) {
-                        parsed.content.unshift(
-                            { type: "articleTitle", content: [] },
-                            { type: "articleDescription", content: [] },
-                        );
-                    }
-                    return parsed;
-                } catch {}
-            }
-        }
-        return EMPTY_DOC;
+        return isUpdate && articleContent ? articleContent : EMPTY_DOC;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -309,17 +391,162 @@ export function Editor({ articleContent, articleData, mode } = {}) {
             setStats({
                 words: editor.storage.characterCount.words(),
             });
-            saveContent(editor.getJSON());
+            setSaveStatus("saving");
+            debouncedSave();
         },
     });
+
+    useEffect(() => {
+        editorRef.current = editor;
+    }, [editor]);
+
+    useEffect(() => {
+        saveDraftRef.current = saveDraft;
+        createDraftRef.current = createDraft;
+    }, [saveDraft, createDraft]);
+
+    useEffect(() => {
+        metaRef.current = { seoTitle, seoDescription, tag };
+    }, [seoTitle, seoDescription, tag]);
+
+    useEffect(() => {
+        if (metaSkipRef.current) {
+            metaSkipRef.current = false;
+            return;
+        }
+        setSaveStatus("saving");
+        debouncedSave();
+    }, [seoTitle, seoDescription, tag, debouncedSave]);
+
+    useEffect(() => {
+        const flush = () => debouncedSave.flush();
+        const onVisibility = () => {
+            if (document.visibilityState === "hidden") flush();
+        };
+
+        window.addEventListener("blur", flush);
+        window.addEventListener("pagehide", flush);
+        document.addEventListener("visibilitychange", onVisibility);
+
+        return () => {
+            window.removeEventListener("blur", flush);
+            window.removeEventListener("pagehide", flush);
+            document.removeEventListener("visibilitychange", onVisibility);
+            debouncedSave.flush();
+        };
+    }, [debouncedSave]);
+
+    useEffect(() => {
+        if (!isUpdate) return;
+        if (draftPromptHandledRef.current) return;
+        if (draftsLoading) return;
+        draftPromptHandledRef.current = true;
+        if (drafts?.[0]) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setResumePrompt(drafts[0]);
+        }
+    }, [isUpdate, drafts, draftsLoading]);
+
+    const handleResumeDraft = async () => {
+        if (!resumePrompt) return;
+        try {
+            const full = await getDraft(resumePrompt.id);
+            const normalized = normalizeDraftContent(full.content);
+            editorRef.current.commands.setContent(normalized, {
+                emitUpdate: false,
+            });
+            setStats({
+                words: editorRef.current.storage.characterCount.words(),
+            });
+            applyMeta({
+                seoTitle: full.seoTitle || "",
+                seoDescription: full.seoDescription || "",
+                tag: full.topic || "",
+            });
+            activeDraftIdRef.current = full.id;
+            setActiveDraftId(full.id);
+            setResumePrompt(null);
+        } catch (err) {
+            toast.error(err?.message || "تعذر استئناف المسودة");
+        }
+    };
+
+    const handleIgnoreResume = () => {
+        if (!resumePrompt) return;
+        activeDraftIdRef.current = resumePrompt.id;
+        setActiveDraftId(resumePrompt.id);
+        setResumePrompt(null);
+    };
+
+    const handleSelectDraft = async (id) => {
+        debouncedSave.flush();
+        try {
+            const full = await getDraft(id);
+            const normalized = normalizeDraftContent(full.content);
+            editorRef.current
+                .chain()
+                .focus()
+                .setContent(normalized, { emitUpdate: false })
+                .run();
+            setStats({
+                words: editorRef.current.storage.characterCount.words(),
+            });
+            applyMeta({
+                seoTitle: full.seoTitle || "",
+                seoDescription: full.seoDescription || "",
+                tag: full.topic || "",
+            });
+            activeDraftIdRef.current = full.id;
+            setActiveDraftId(full.id);
+        } catch (err) {
+            toast.error(err?.message || "تعذر فتح المسودة");
+        }
+    };
+
+    const handleNewDraft = () => {
+        debouncedSave.flush();
+        editorRef.current
+            .chain()
+            .focus()
+            .setContent(EMPTY_DOC, { emitUpdate: false })
+            .run();
+        setStats({ words: 0 });
+        applyMeta({ seoTitle: "", seoDescription: "", tag: "" });
+        activeDraftIdRef.current = null;
+        setActiveDraftId(null);
+        setSaveStatus("idle");
+        setLastSavedAt(null);
+    };
+
+    const handleDeleteDraft = async (id) => {
+        try {
+            await deleteDraft.mutateAsync(id);
+            if (activeDraftIdRef.current === id) {
+                activeDraftIdRef.current = null;
+                setActiveDraftId(null);
+            }
+            toast.success("تم حذف المسودة");
+        } catch (err) {
+            toast.error(err?.message || "تعذر حذف المسودة");
+        }
+    };
 
     const handleClear = () => {
         if (!editor) return;
         editor.chain()
             .focus()
-            .setContent(EMPTY_DOC, { emitUpdate: true })
+            .setContent(EMPTY_DOC, { emitUpdate: false })
             .run();
-        saveContent.flush();
+        setStats({ words: 0 });
+        applyMeta({ seoTitle: "", seoDescription: "", tag: "" });
+        activeDraftIdRef.current = null;
+        setActiveDraftId(null);
+        setSaveStatus("idle");
+    };
+
+    const onRetrySave = () => {
+        setSaveStatus("saving");
+        debouncedSave();
     };
 
     const [prevIsMobile, setPrevIsMobile] = useState(isMobile);
@@ -339,6 +566,14 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     wordCount={stats.words}
                     isUpdate={isUpdate}
                     onClear={handleClear}
+                    drafts={drafts}
+                    activeDraftId={activeDraftId}
+                    saveStatus={saveStatus}
+                    lastSavedAt={lastSavedAt}
+                    onSelectDraft={handleSelectDraft}
+                    onNewDraft={handleNewDraft}
+                    onDeleteDraft={handleDeleteDraft}
+                    onRetrySave={onRetrySave}
                 />
                 <PublishModal
                     isOpen={publishModal}
@@ -353,6 +588,20 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     wordCount={stats.words}
                     mode={mode}
                     articleData={articleData}
+                    seoTitle={seoTitle}
+                    setSeoTitle={setSeoTitle}
+                    seoDescription={seoDescription}
+                    setSeoDescription={setSeoDescription}
+                    tag={tag}
+                    setTag={setTag}
+                    onPublished={async () => {
+                        if (activeDraftIdRef.current) {
+                            await deleteDraft.mutateAsync(
+                                activeDraftIdRef.current,
+                            );
+                            activeDraftIdRef.current = null;
+                        }
+                    }}
                 />
                 <ConfirmModal
                     isOpen={confirmModal}
@@ -392,6 +641,64 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                 </Toolbar>
 
                 <div className="simple-editor-scroll">
+                    {resumePrompt && (
+                        <div
+                            style={{
+                                maxWidth: 740,
+                                width: "calc(100% - 32px)",
+                                margin: "16px auto 0",
+                                padding: "12px 16px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                gap: 12,
+                                direction: "rtl",
+                                background: "var(--color-white)",
+                                border: "1px solid var(--color-border)",
+                                borderRadius: 8,
+                                boxSizing: "border-box",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    fontSize: 14,
+                                    color: "var(--color-ink)",
+                                }}
+                            >
+                                توجد مسودة غير منشورة
+                            </span>
+                            <div style={{ display: "flex", gap: 8 }}>
+                                <button
+                                    onClick={handleResumeDraft}
+                                    style={{
+                                        background: "var(--color-accent)",
+                                        color: "var(--color-white)",
+                                        border: "none",
+                                        borderRadius: 6,
+                                        padding: "6px 14px",
+                                        fontSize: 13,
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    استئناف
+                                </button>
+                                <button
+                                    onClick={handleIgnoreResume}
+                                    style={{
+                                        background: "var(--color-bg)",
+                                        color: "var(--color-ink)",
+                                        border: "1px solid var(--color-border)",
+                                        borderRadius: 6,
+                                        padding: "6px 14px",
+                                        fontSize: 13,
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    تجاهل
+                                </button>
+                            </div>
+                        </div>
+                    )}
                     <div className="simple-editor-content">
                         <CoverImage
                             coverImage={coverImage}

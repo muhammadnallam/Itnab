@@ -11,6 +11,7 @@ import {
 } from "@/lib/handlers";
 import { useArticle } from "@/hooks/useArticle";
 import { queryKeys } from "@/lib/query-keys";
+import { countPlaceholderImages } from "@/lib/draft-content";
 import { toast } from "sonner";
 
 function Input({ label, error, children }) {
@@ -53,27 +54,31 @@ export default function PublishModal({
     wordCount,
     mode,
     articleData,
+    seoTitle,
+    setSeoTitle,
+    seoDescription,
+    setSeoDescription,
+    tag,
+    setTag,
+    onPublished,
 }) {
     const isUpdate = mode === "update";
-    const [seoTitle, setSeoTitle] = useState(
-        isUpdate && articleData?.seoTitle ? articleData.seoTitle : "",
-    );
     const [seoTitleError, setSeoTitleError] = useState("");
-    const [seoDescription, setSeoDescription] = useState(
-        isUpdate && articleData?.seoDescription
-            ? articleData.seoDescription
-            : "",
-    );
     const [seoDescriptionError, setSeoDescriptionError] = useState("");
-    const [tag, setTag] = useState(
-        isUpdate && articleData?.tag ? articleData.tag : "",
-    );
     const [tagError, setTagError] = useState("");
     const [sendEmail, setSendEmail] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [placeholderAck, setPlaceholderAck] = useState(false);
     const router = useRouter();
     const qc = useQueryClient();
     const { publish, update } = useArticle(articleData?.slug);
+
+    const placeholderCount = countPlaceholderImages(content);
+
+    const handleClose = () => {
+        setPlaceholderAck(false);
+        onClose?.();
+    };
 
     const inputBase = {
         width: "100%",
@@ -109,14 +114,18 @@ export default function PublishModal({
     return (
         <Modal
             open={isOpen}
-            onClose={onClose}
+            onClose={handleClose}
             header={isUpdate ? "تعديل" : "نشر"}
             footer={
                 <>
                     <Button loading={loading} type="submit">
-                        {isUpdate ? "تعديل المقال" : "نشر المقال"}
+                        {isUpdate
+                            ? "تعديل المقال"
+                            : placeholderAck && placeholderCount > 0
+                              ? "نشر على أي حال"
+                              : "نشر المقال"}
                     </Button>
-                    <Button onClick={onClose} variant="secondary">
+                    <Button onClick={handleClose} variant="secondary">
                         إلغاء
                     </Button>
                 </>
@@ -136,21 +145,25 @@ export default function PublishModal({
                     content,
                     wordCount,
                 };
+                const errors = validateArticleFields(payload);
+                if (errors.coverImage) setCoverError(errors.coverImage);
+                if (errors.seoTitle) setSeoTitleError(errors.seoTitle);
+                if (errors.seoDescription)
+                    setSeoDescriptionError(errors.seoDescription);
+                if (errors.tag) setTagError(errors.tag);
+                if (errors.wordCount) toast.error(errors.wordCount);
+                if (errors.articleTitle) toast.error(errors.articleTitle);
+                if (errors.articleDescription)
+                    toast.error(errors.articleDescription);
+                if (Object.keys(errors).length > 0) return;
+
+                if (placeholderCount > 0 && !placeholderAck) {
+                    setPlaceholderAck(true);
+                    return;
+                }
+
                 setLoading(true);
                 try {
-                    const errors = validateArticleFields(payload);
-                    if (errors.coverImage)
-                        setCoverError(errors.coverImage);
-                    if (errors.seoTitle)
-                        setSeoTitleError(errors.seoTitle);
-                    if (errors.seoDescription)
-                        setSeoDescriptionError(errors.seoDescription);
-                    if (errors.tag) setTagError(errors.tag);
-                    if (errors.wordCount) toast.error(errors.wordCount);
-                    if (errors.articleTitle) toast.error(errors.articleTitle);
-                    if (errors.articleDescription) toast.error(errors.articleDescription);
-                    if (Object.keys(errors).length > 0) return;
-
                     const prepared = await prepareArticlePayload(payload);
                     const mutation = isUpdate ? update : publish;
                     const result = await mutation.mutateAsync(
@@ -169,15 +182,40 @@ export default function PublishModal({
                         toast.success("تم نشر المقال");
                         router.push(`/article/${result.slug}`);
                     }
-                    onClose();
+                    await onPublished?.();
+                    handleClose();
                 } catch (err) {
                     toast.error(err?.message || "حدث خطأ أثناء حفظ المقال");
                 } finally {
                     setLoading(false);
-                    localStorage.removeItem("editor-content");
                 }
             }}
         >
+            {placeholderAck && placeholderCount > 0 && (
+                <div
+                    style={{
+                        background: "var(--color-error-light)",
+                        border: "1px solid var(--color-error)",
+                        borderRadius: 8,
+                        padding: "12px 14px",
+                        color: "var(--color-error)",
+                        fontSize: 13,
+                        lineHeight: 1.7,
+                    }}
+                >
+                    تحتوي مسودتك على {placeholderCount} صورة نائبة لم يتم إعادة
+                    إدراجها. سيتم حذفها عند النشر.
+                    <div
+                        style={{
+                            marginTop: 4,
+                            color: "var(--color-mid)",
+                        }}
+                    >
+                        اضغط على زر النشر مرة أخرى للنشر على أي حال.
+                    </div>
+                </div>
+            )}
+
             <Input label="صورة الغلاف" error={coverError}>
                 <label style={FILE_UPLOAD}>
                     <input

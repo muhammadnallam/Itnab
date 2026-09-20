@@ -22,4 +22,6 @@ export const queryKeys = {
     topTags: (limit) => ["topTags", limit],
     notificationsList: (params = {}) => ["notifications", "list", params],
     notificationsUnread: () => ["notifications", "unread"],
+    drafts: (articleId) => ["drafts", articleId ?? "new"],
+    draft: (id) => ["draft", id],
 };

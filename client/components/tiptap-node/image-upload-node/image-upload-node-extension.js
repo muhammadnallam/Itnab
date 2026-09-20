@@ -41,6 +41,12 @@ export const ImageUploadNode = Node.create({
       maxSize: {
         default: this.options.maxSize,
       },
+      pending: {
+        default: false,
+      },
+      originalName: {
+        default: null,
+      },
     }
   },
 

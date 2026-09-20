@@ -88,6 +88,8 @@ export const ImageUpload = Node.create({
             accept: { default: "image/*" },
             limit: { default: 1 },
             maxSize: { default: 0 },
+            pending: { default: false },
+            originalName: { default: null },
         };
     },
 });

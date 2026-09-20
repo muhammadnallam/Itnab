@@ -1,6 +1,255 @@
-import { ArrowLeft, Eraser, Trash } from "lucide-react";
+import {
+    AlertCircle,
+    ArrowLeft,
+    Check,
+    ChevronDown,
+    Eraser,
+    Layers,
+    Loader2,
+    Trash,
+} from "lucide-react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+import { formatRelativeTime } from "@/lib/format-date";
+
+function SavePill({ saveStatus, lastSavedAt, onRetrySave }) {
+    const base = {
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        fontSize: 13,
+        whiteSpace: "nowrap",
+        userSelect: "none",
+        background: "var(--color-bg)",
+        borderRadius: 99,
+        padding: "3px 10px",
+    };
+
+    if (saveStatus === "saving") {
+        return (
+            <div style={{ ...base, color: "var(--color-mid)" }}>
+                <Loader2
+                    size={14}
+                    style={{ animation: "spin 0.8s linear infinite" }}
+                />
+                جارٍ الحفظ…
+            </div>
+        );
+    }
+
+    if (saveStatus === "saved") {
+        return (
+            <div style={{ ...base, color: "var(--color-success)" }}>
+                <Check size={14} />
+                {`تم الحفظ${
+                    lastSavedAt ? ` · ${formatRelativeTime(lastSavedAt)}` : ""
+                }`}
+            </div>
+        );
+    }
+
+    if (saveStatus === "error") {
+        return (
+            <button
+                onClick={onRetrySave}
+                style={{
+                    ...base,
+                    color: "var(--color-error)",
+                    border: "none",
+                    cursor: "pointer",
+                }}
+            >
+                <AlertCircle size={14} />
+                فشل الحفظ — إعادة المحاولة
+            </button>
+        );
+    }
+
+    return (
+        <div style={{ ...base, color: "var(--color-mid)" }}>لا تغييرات</div>
+    );
+}
+
+function DraftsMenu({
+    drafts,
+    activeDraftId,
+    isUpdate,
+    onSelectDraft,
+    onNewDraft,
+    onDeleteDraft,
+}) {
+    return (
+        <DropdownMenu.Root dir="rtl">
+            <DropdownMenu.Trigger asChild>
+                <button
+                    type="button"
+                    className="text-mid hover:text-ink"
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        background: "var(--color-bg)",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: 8,
+                        padding: "7px 12px",
+                        cursor: "pointer",
+                        fontSize: 14,
+                        color: "var(--color-ink)",
+                        whiteSpace: "nowrap",
+                    }}
+                >
+                    <Layers size={18} />
+                    المسودات
+                    {drafts.length > 0 && (
+                        <span
+                            style={{
+                                background: "var(--color-accent)",
+                                color: "var(--color-white)",
+                                borderRadius: 99,
+                                fontSize: 11,
+                                padding: "1px 6px",
+                                lineHeight: 1.5,
+                            }}
+                        >
+                            {drafts.length}
+                        </span>
+                    )}
+                    <ChevronDown size={16} />
+                </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                    align="start"
+                    sideOffset={6}
+                    dir="rtl"
+                    style={{
+                        minWidth: 280,
+                        direction: "rtl",
+                        background: "var(--color-white)",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: 8,
+                        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+                        padding: 6,
+                        zIndex: 100,
+                    }}
+                >
+                    {drafts.length === 0 ? (
+                        <div
+                            style={{
+                                padding: "10px 12px",
+                                fontSize: 13,
+                                color: "var(--color-mid)",
+                            }}
+                        >
+                            لا توجد مسودات
+                        </div>
+                    ) : (
+                        drafts.map((draft) => (
+                            <DropdownMenu.Item
+                                key={draft.id}
+                                onSelect={() => onSelectDraft(draft.id)}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    padding: "8px 10px",
+                                    borderRadius: 6,
+                                    cursor: "pointer",
+                                    outline: "none",
+                                    background:
+                                        draft.id === activeDraftId
+                                            ? "var(--color-bg)"
+                                            : "transparent",
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        flex: 1,
+                                        minWidth: 0,
+                                        textAlign: "right",
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            fontSize: 14,
+                                            color: "var(--color-ink)",
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        }}
+                                    >
+                                        {draft.title || "مسودة بدون عنوان"}
+                                    </div>
+                                    <div
+                                        style={{
+                                            fontSize: 12,
+                                            color: "var(--color-mid)",
+                                            marginTop: 2,
+                                        }}
+                                    >
+                                        {`${formatRelativeTime(
+                                            draft.updatedAt,
+                                        )} · ${draft.wordCount} كلمة`}
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    aria-label="حذف المسودة"
+                                    title="حذف المسودة"
+                                    className="text-mid hover:text-error"
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDeleteDraft(draft.id);
+                                    }}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        background: "none",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        padding: 4,
+                                        borderRadius: 6,
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    <Trash size={15} />
+                                </button>
+                            </DropdownMenu.Item>
+                        ))
+                    )}
+                    {!isUpdate && (
+                        <>
+                            <DropdownMenu.Separator
+                                style={{
+                                    height: 1,
+                                    background: "var(--color-border)",
+                                    margin: "6px 0",
+                                }}
+                            />
+                            <DropdownMenu.Item
+                                onSelect={() => onNewDraft()}
+                                style={{
+                                    padding: "8px 10px",
+                                    borderRadius: 6,
+                                    cursor: "pointer",
+                                    outline: "none",
+                                    fontSize: 14,
+                                    color: "var(--color-ink)",
+                                    textAlign: "right",
+                                }}
+                            >
+                                مسودة جديدة
+                            </DropdownMenu.Item>
+                        </>
+                    )}
+                </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+        </DropdownMenu.Root>
+    );
+}
 
 export default function EditorHeader({
     setPublishModal,
@@ -8,6 +257,14 @@ export default function EditorHeader({
     wordCount,
     isUpdate,
     onClear,
+    drafts,
+    activeDraftId,
+    saveStatus,
+    lastSavedAt,
+    onSelectDraft,
+    onNewDraft,
+    onDeleteDraft,
+    onRetrySave,
 }) {
     const router = useRouter();
 
@@ -36,6 +293,14 @@ export default function EditorHeader({
                     >
                         التالي
                     </Button>
+                    <DraftsMenu
+                        drafts={drafts}
+                        activeDraftId={activeDraftId}
+                        isUpdate={isUpdate}
+                        onSelectDraft={onSelectDraft}
+                        onNewDraft={onNewDraft}
+                        onDeleteDraft={onDeleteDraft}
+                    />
                     <button
                         aria-label={isUpdate ? "حذف المقال" : "مسح المحتوى"}
                         title={isUpdate ? "حذف المقال" : "مسح المحتوى"}
@@ -67,6 +332,11 @@ export default function EditorHeader({
                     </button>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <SavePill
+                        saveStatus={saveStatus}
+                        lastSavedAt={lastSavedAt}
+                        onRetrySave={onRetrySave}
+                    />
                     <div
                         style={{
                             fontSize: 13,
