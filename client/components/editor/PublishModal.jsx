@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import TextareaField from "@/components/ui/TextareaField";
+import TopicSelect from "@/components/editor/TopicSelect";
 import {
     validateArticleFields,
     prepareArticlePayload,
@@ -298,24 +299,14 @@ export default function PublishModal({
             />
 
             <Input label="اختر الموضوع" error={tagError}>
-                <select
-                    name="tags"
-                    style={{ ...inputBase, cursor: "pointer" }}
+                <TopicSelect
                     value={tag}
-                    onChange={(e) => {
-                        setTag(e.target.value);
+                    options={TAGS}
+                    onChange={(value) => {
+                        setTag(value);
                         setTagError("");
                     }}
-                >
-                    <option value="" disabled>
-                        اختر موضوعًا
-                    </option>
-                    {TAGS.map((tag) => (
-                        <option key={tag} value={tag}>
-                            {tag}
-                        </option>
-                    ))}
-                </select>
+                />
             </Input>
         </Modal>
     );
