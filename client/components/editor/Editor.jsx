@@ -607,6 +607,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     setConfirmModal={setConfirmModal}
                     wordCount={stats.words}
                     isUpdate={isUpdate}
+                    isMobile={isMobile}
                     onClear={handleClear}
                     drafts={drafts}
                     activeDraftId={activeDraftId}

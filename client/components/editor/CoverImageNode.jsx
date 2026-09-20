@@ -7,7 +7,7 @@ export default function CoverImage({
     coverError = "",
 }) {
     return (
-        <div style={{ padding: "3rem 3rem 0" }}>
+        <div style={{ padding: "1rem 1.5rem 0" }}>
             <ImagePicker
                 image={coverImage}
                 setImage={setCoverImage}

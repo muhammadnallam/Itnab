@@ -4,7 +4,6 @@ import {
     Check,
     ChevronDown,
     Eraser,
-    Layers,
     Loader2,
     Trash,
 } from "lucide-react";
@@ -14,39 +13,23 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { formatRelativeTime } from "@/lib/format-date";
 
-function SavePill({ saveStatus, lastSavedAt, onRetrySave }) {
-    const base = {
-        display: "flex",
+function SaveStatus({ saveStatus, lastSavedAt, onRetrySave }) {
+    const contentStyle = {
+        display: "inline-flex",
         alignItems: "center",
         gap: 6,
-        fontSize: 13,
         whiteSpace: "nowrap",
-        userSelect: "none",
-        background: "var(--color-bg)",
-        borderRadius: 99,
-        padding: "3px 10px",
     };
 
     if (saveStatus === "saving") {
         return (
-            <div style={{ ...base, color: "var(--color-mid)" }}>
+            <span style={{ ...contentStyle, color: "var(--color-mid)" }}>
                 <Loader2
                     size={14}
                     style={{ animation: "spin 0.8s linear infinite" }}
                 />
-                جارٍ الحفظ…
-            </div>
-        );
-    }
-
-    if (saveStatus === "saved") {
-        return (
-            <div style={{ ...base, color: "var(--color-success)" }}>
-                <Check size={14} />
-                {`تم الحفظ${
-                    lastSavedAt ? ` · ${formatRelativeTime(lastSavedAt)}` : ""
-                }`}
-            </div>
+                يحفظ…
+            </span>
         );
     }
 
@@ -54,21 +37,96 @@ function SavePill({ saveStatus, lastSavedAt, onRetrySave }) {
         return (
             <button
                 onClick={onRetrySave}
+                title="إعادة المحاولة"
                 style={{
-                    ...base,
+                    ...contentStyle,
                     color: "var(--color-error)",
+                    background: "none",
                     border: "none",
+                    padding: 0,
+                    fontSize: "inherit",
                     cursor: "pointer",
                 }}
             >
                 <AlertCircle size={14} />
-                فشل الحفظ — إعادة المحاولة
+                فشل الحفظ
             </button>
         );
     }
 
     return (
-        <div style={{ ...base, color: "var(--color-mid)" }}>لا تغييرات</div>
+        <span
+            title={lastSavedAt ? formatRelativeTime(lastSavedAt) : undefined}
+            style={{
+                ...contentStyle,
+                color:
+                    saveStatus === "saved"
+                        ? "var(--color-success)"
+                        : "var(--color-mid)",
+            }}
+        >
+            <Check size={14} />
+            تم الحفظ
+        </span>
+    );
+}
+
+function SavePill(props) {
+    return (
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",
+                fontSize: 13,
+                whiteSpace: "nowrap",
+                userSelect: "none",
+                background: "var(--color-bg)",
+                borderRadius: 99,
+                padding: "3px 10px",
+            }}
+        >
+            <SaveStatus {...props} />
+        </div>
+    );
+}
+
+function MobileStatusBar({ wordCount, saveStatus, lastSavedAt, onRetrySave }) {
+    return (
+        <div
+            style={{
+                position: "fixed",
+                left: 12,
+                bottom: "calc(12px + env(safe-area-inset-bottom, 0px))",
+                zIndex: 55,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "6px 12px",
+                borderRadius: 10,
+                background: "var(--color-white)",
+                border: "1px solid var(--color-border)",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+                fontSize: 12,
+                color: "var(--color-mid)",
+                direction: "rtl",
+                userSelect: "none",
+                whiteSpace: "nowrap",
+            }}
+        >
+            <span>{wordCount} كلمة</span>
+            <span
+                style={{
+                    width: 1,
+                    height: 14,
+                    background: "var(--color-border)",
+                }}
+            />
+            <SaveStatus
+                saveStatus={saveStatus}
+                lastSavedAt={lastSavedAt}
+                onRetrySave={onRetrySave}
+            />
+        </div>
     );
 }
 
@@ -102,22 +160,7 @@ function DraftsMenu({
                         whiteSpace: "nowrap",
                     }}
                 >
-                    <Layers size={18} />
                     المسودات
-                    {drafts.length > 0 && (
-                        <span
-                            style={{
-                                background: "var(--color-accent)",
-                                color: "var(--color-white)",
-                                borderRadius: 99,
-                                fontSize: 11,
-                                padding: "1px 6px",
-                                lineHeight: 1.5,
-                            }}
-                        >
-                            {drafts.length}
-                        </span>
-                    )}
                     <ChevronDown size={16} />
                 </button>
             </DropdownMenu.Trigger>
@@ -267,6 +310,7 @@ export default function EditorHeader({
     setConfirmModal,
     wordCount,
     isUpdate,
+    isMobile,
     onClear,
     drafts,
     activeDraftId,
@@ -312,55 +356,30 @@ export default function EditorHeader({
                         onNewDraft={onNewDraft}
                         onRequestDeleteDraft={onRequestDeleteDraft}
                     />
-                    <button
-                        aria-label={isUpdate ? "حذف المقال" : "مسح المحتوى"}
-                        title={isUpdate ? "حذف المقال" : "مسح المحتوى"}
-                        className={
-                            isUpdate
-                                ? "text-mid hover:text-error"
-                                : "text-mid hover:text-ink"
-                        }
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            padding: 8,
-                            borderRadius: 6,
-                            transition: "color 0.15s",
-                        }}
-                        onClick={() => {
-                            if (isUpdate) {
-                                setConfirmModal(true);
-                            } else {
-                                onClear();
-                            }
-                        }}
-                    >
-                        {isUpdate ? <Trash size={20} /> : <Eraser size={20} />}
-                    </button>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <SavePill
-                        saveStatus={saveStatus}
-                        lastSavedAt={lastSavedAt}
-                        onRetrySave={onRetrySave}
-                    />
-                    <div
-                        style={{
-                            fontSize: 13,
-                            color: "var(--color-mid)",
-                            whiteSpace: "nowrap",
-                            userSelect: "none",
-                            background: "var(--color-bg)",
-                            borderRadius: 99,
-                            padding: "3px 10px",
-                        }}
-                    >
-                        {wordCount} كلمة
-                    </div>
+                    {!isMobile && (
+                        <SavePill
+                            saveStatus={saveStatus}
+                            lastSavedAt={lastSavedAt}
+                            onRetrySave={onRetrySave}
+                        />
+                    )}
+                    {!isMobile && (
+                        <div
+                            style={{
+                                fontSize: 13,
+                                color: "var(--color-mid)",
+                                whiteSpace: "nowrap",
+                                userSelect: "none",
+                                background: "var(--color-bg)",
+                                borderRadius: 99,
+                                padding: "3px 10px",
+                            }}
+                        >
+                            {wordCount} كلمة
+                        </div>
+                    )}
                     <button
                         onClick={() => router.back()}
                         className="text-mid hover:text-ink"
@@ -383,6 +402,14 @@ export default function EditorHeader({
                     </button>
                 </div>
             </header>
+            {isMobile && (
+                <MobileStatusBar
+                    wordCount={wordCount}
+                    saveStatus={saveStatus}
+                    lastSavedAt={lastSavedAt}
+                    onRetrySave={onRetrySave}
+                />
+            )}
         </>
     );
 }
