@@ -33,7 +33,7 @@ import {
 import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
 import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension";
 import { QuranVerseNode } from "@/components/tiptap-node/quran-verse-node/quran-verse-node-extension";
-import { ArticleTitle, ArticleDescription } from "@itnab/tiptap";
+import { ArticleTitle, ArticleDescription, hasContent } from "@itnab/tiptap";
 import { ProtectedNodes } from "@/components/tiptap-extension/protected-nodes-extension";
 import "@/components/tiptap-node/blockquote-node/blockquote-node.scss";
 import "@/components/tiptap-node/code-block-node/code-block-node.scss";
@@ -255,11 +255,14 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     const editorRef = useRef(null);
     const saveDraftRef = useRef(saveDraft);
     const createDraftRef = useRef(createDraft);
+    const deleteDraftRef = useRef(deleteDraft);
     const activeDraftIdRef = useRef(null);
     const metaRef = useRef({ seoTitle, seoDescription, tag });
     const savingRef = useRef(false);
     const queuedRef = useRef(false);
     const draftPromptHandledRef = useRef(false);
+    const autoLoadedDraftRef = useRef(false);
+    const hasUserEditedRef = useRef(false);
     const metaSkipRef = useRef(true);
 
     const applyMeta = ({
@@ -291,8 +294,28 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         try {
             do {
                 queuedRef.current = false;
+                const content = serializeDraftContent(
+                    editorRef.current.getJSON(),
+                );
+
+                if (!hasContent(content)) {
+                    if (activeDraftIdRef.current) {
+                        const emptyDraftId = activeDraftIdRef.current;
+                        activeDraftIdRef.current = null;
+                        setActiveDraftId(null);
+                        try {
+                            await deleteDraftRef.current.mutateAsync(
+                                emptyDraftId,
+                            );
+                        } catch {}
+                    }
+                    setSaveStatus("idle");
+                    setLastSavedAt(null);
+                    return;
+                }
+
                 const payload = {
-                    content: serializeDraftContent(editorRef.current.getJSON()),
+                    content,
                     seoTitle: metaRef.current.seoTitle || null,
                     seoDescription: metaRef.current.seoDescription || null,
                     topic: metaRef.current.tag || null,
@@ -388,6 +411,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         ],
         content: initialContent,
         onUpdate: ({ editor }) => {
+            hasUserEditedRef.current = true;
             setStats({
                 words: editor.storage.characterCount.words(),
             });
@@ -403,7 +427,8 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     useEffect(() => {
         saveDraftRef.current = saveDraft;
         createDraftRef.current = createDraft;
-    }, [saveDraft, createDraft]);
+        deleteDraftRef.current = deleteDraft;
+    }, [saveDraft, createDraft, deleteDraft]);
 
     useEffect(() => {
         metaRef.current = { seoTitle, seoDescription, tag };
@@ -498,10 +523,24 @@ export function Editor({ articleContent, articleData, mode } = {}) {
             });
             activeDraftIdRef.current = full.id;
             setActiveDraftId(full.id);
+            setSaveStatus("saved");
+            setLastSavedAt(full.updatedAt ? new Date(full.updatedAt) : new Date());
         } catch (err) {
             toast.error(err?.message || "تعذر فتح المسودة");
         }
     };
+
+    useEffect(() => {
+        if (isUpdate) return;
+        if (draftsLoading) return;
+        if (autoLoadedDraftRef.current) return;
+        if (!editorRef.current) return;
+        autoLoadedDraftRef.current = true;
+        if (hasUserEditedRef.current) return;
+        const last = drafts?.[0];
+        if (last) handleSelectDraft(last.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isUpdate, drafts, draftsLoading, editor]);
 
     const handleNewDraft = () => {
         debouncedSave.flush();
@@ -539,9 +578,14 @@ export function Editor({ articleContent, articleData, mode } = {}) {
             .run();
         setStats({ words: 0 });
         applyMeta({ seoTitle: "", seoDescription: "", tag: "" });
+        const draftId = activeDraftIdRef.current;
         activeDraftIdRef.current = null;
         setActiveDraftId(null);
         setSaveStatus("idle");
+        setLastSavedAt(null);
+        if (draftId) {
+            deleteDraft.mutateAsync(draftId).catch(() => {});
+        }
     };
 
     const onRetrySave = () => {

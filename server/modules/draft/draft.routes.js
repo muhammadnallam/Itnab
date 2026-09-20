@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { Node as PMNode } from "prosemirror-model";
+import { hasContent } from "@itnab/tiptap";
 import asyncErrorHandler from "../../middleware/asyncErrorHandler.js";
 import requireAuth from "../../middleware/requireAuth.js";
 import { draftLimiter } from "../../middleware/rateLimit.js";
@@ -29,11 +30,18 @@ function sanitizeContent(content) {
         throw new ValidationError("بُنية المسودة غير صالحة");
     }
 
+    let sanitized;
     try {
-        return sanitizeDoc(content);
+        sanitized = sanitizeDoc(content);
     } catch (err) {
         throw new ValidationError(err.message);
     }
+
+    if (!hasContent(sanitized)) {
+        throw new ValidationError("لا يمكن حفظ مسودة فارغة");
+    }
+
+    return sanitized;
 }
 
 router.get(
