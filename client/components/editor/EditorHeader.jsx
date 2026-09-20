@@ -8,6 +8,7 @@ import {
     Loader2,
     Trash,
 } from "lucide-react";
+import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
@@ -77,10 +78,12 @@ function DraftsMenu({
     isUpdate,
     onSelectDraft,
     onNewDraft,
-    onDeleteDraft,
+    onRequestDeleteDraft,
 }) {
+    const [open, setOpen] = useState(false);
+
     return (
-        <DropdownMenu.Root dir="rtl">
+        <DropdownMenu.Root dir="rtl" open={open} onOpenChange={setOpen}>
             <DropdownMenu.Trigger asChild>
                 <button
                     type="button"
@@ -146,62 +149,70 @@ function DraftsMenu({
                         </div>
                     ) : (
                         drafts.map((draft) => (
-                            <DropdownMenu.Item
+                            <div
                                 key={draft.id}
-                                onSelect={() => onSelectDraft(draft.id)}
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: 8,
-                                    padding: "8px 10px",
                                     borderRadius: 6,
-                                    cursor: "pointer",
-                                    outline: "none",
                                     background:
                                         draft.id === activeDraftId
                                             ? "var(--color-bg)"
                                             : "transparent",
                                 }}
                             >
-                                <div
+                                <DropdownMenu.Item
+                                    onSelect={() => onSelectDraft(draft.id)}
                                     style={{
+                                        display: "flex",
+                                        alignItems: "center",
                                         flex: 1,
                                         minWidth: 0,
-                                        textAlign: "right",
+                                        padding: "8px 10px",
+                                        borderRadius: 6,
+                                        cursor: "pointer",
+                                        outline: "none",
                                     }}
                                 >
                                     <div
                                         style={{
-                                            fontSize: 14,
-                                            color: "var(--color-ink)",
-                                            whiteSpace: "nowrap",
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
+                                            flex: 1,
+                                            minWidth: 0,
+                                            textAlign: "right",
                                         }}
                                     >
-                                        {draft.title || "مسودة بدون عنوان"}
+                                        <div
+                                            style={{
+                                                fontSize: 14,
+                                                color: "var(--color-ink)",
+                                                whiteSpace: "nowrap",
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                            }}
+                                        >
+                                            {draft.title || "مسودة بدون عنوان"}
+                                        </div>
+                                        <div
+                                            style={{
+                                                fontSize: 12,
+                                                color: "var(--color-mid)",
+                                                marginTop: 2,
+                                            }}
+                                        >
+                                            {`${formatRelativeTime(
+                                                draft.updatedAt,
+                                            )} · ${draft.wordCount} كلمة`}
+                                        </div>
                                     </div>
-                                    <div
-                                        style={{
-                                            fontSize: 12,
-                                            color: "var(--color-mid)",
-                                            marginTop: 2,
-                                        }}
-                                    >
-                                        {`${formatRelativeTime(
-                                            draft.updatedAt,
-                                        )} · ${draft.wordCount} كلمة`}
-                                    </div>
-                                </div>
+                                </DropdownMenu.Item>
                                 <button
                                     type="button"
                                     aria-label="حذف المسودة"
                                     title="حذف المسودة"
                                     className="text-mid hover:text-error"
-                                    onPointerDown={(e) => e.stopPropagation()}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDeleteDraft(draft.id);
+                                    onClick={() => {
+                                        setOpen(false);
+                                        onRequestDeleteDraft(draft);
                                     }}
                                     style={{
                                         display: "flex",
@@ -210,14 +221,14 @@ function DraftsMenu({
                                         background: "none",
                                         border: "none",
                                         cursor: "pointer",
-                                        padding: 4,
+                                        padding: 8,
                                         borderRadius: 6,
                                         flexShrink: 0,
                                     }}
                                 >
                                     <Trash size={15} />
                                 </button>
-                            </DropdownMenu.Item>
+                            </div>
                         ))
                     )}
                     {!isUpdate && (
@@ -263,7 +274,7 @@ export default function EditorHeader({
     lastSavedAt,
     onSelectDraft,
     onNewDraft,
-    onDeleteDraft,
+    onRequestDeleteDraft,
     onRetrySave,
 }) {
     const router = useRouter();
@@ -299,7 +310,7 @@ export default function EditorHeader({
                         isUpdate={isUpdate}
                         onSelectDraft={onSelectDraft}
                         onNewDraft={onNewDraft}
-                        onDeleteDraft={onDeleteDraft}
+                        onRequestDeleteDraft={onRequestDeleteDraft}
                     />
                     <button
                         aria-label={isUpdate ? "حذف المقال" : "مسح المحتوى"}

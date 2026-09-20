@@ -251,6 +251,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     const [saveStatus, setSaveStatus] = useState("idle");
     const [lastSavedAt, setLastSavedAt] = useState(null);
     const [resumePrompt, setResumePrompt] = useState(null);
+    const [draftToDelete, setDraftToDelete] = useState(null);
 
     const editorRef = useRef(null);
     const saveDraftRef = useRef(saveDraft);
@@ -542,10 +543,9 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUpdate, drafts, draftsLoading, editor]);
 
-    const handleNewDraft = () => {
-        debouncedSave.flush();
+    const resetEditorState = () => {
         editorRef.current
-            .chain()
+            ?.chain()
             .focus()
             .setContent(EMPTY_DOC, { emitUpdate: false })
             .run();
@@ -557,32 +557,30 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         setLastSavedAt(null);
     };
 
-    const handleDeleteDraft = async (id) => {
+    const handleNewDraft = () => {
+        debouncedSave.flush();
+        resetEditorState();
+    };
+
+    const confirmDeleteDraft = async () => {
+        const draft = draftToDelete;
+        if (!draft) return;
         try {
-            await deleteDraft.mutateAsync(id);
-            if (activeDraftIdRef.current === id) {
-                activeDraftIdRef.current = null;
-                setActiveDraftId(null);
+            await deleteDraft.mutateAsync(draft.id);
+            if (activeDraftIdRef.current === draft.id) {
+                resetEditorState();
             }
             toast.success("تم حذف المسودة");
         } catch (err) {
             toast.error(err?.message || "تعذر حذف المسودة");
+        } finally {
+            setDraftToDelete(null);
         }
     };
 
     const handleClear = () => {
-        if (!editor) return;
-        editor.chain()
-            .focus()
-            .setContent(EMPTY_DOC, { emitUpdate: false })
-            .run();
-        setStats({ words: 0 });
-        applyMeta({ seoTitle: "", seoDescription: "", tag: "" });
         const draftId = activeDraftIdRef.current;
-        activeDraftIdRef.current = null;
-        setActiveDraftId(null);
-        setSaveStatus("idle");
-        setLastSavedAt(null);
+        resetEditorState();
         if (draftId) {
             deleteDraft.mutateAsync(draftId).catch(() => {});
         }
@@ -616,7 +614,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     lastSavedAt={lastSavedAt}
                     onSelectDraft={handleSelectDraft}
                     onNewDraft={handleNewDraft}
-                    onDeleteDraft={handleDeleteDraft}
+                    onRequestDeleteDraft={setDraftToDelete}
                     onRetrySave={onRetrySave}
                 />
                 <PublishModal
@@ -665,6 +663,20 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                         }
                     }}
                     onCancel={() => setConfirmModal(false)}
+                />
+                <ConfirmModal
+                    isOpen={!!draftToDelete}
+                    icon={Trash}
+                    color={"var(--color-error)"}
+                    icoBackground={"#F5D5D8"}
+                    title={"هل تريد حذف هذه المسودة؟"}
+                    description={`سيتم حذف المسودة "${
+                        draftToDelete?.title || "بدون عنوان"
+                    }" ولن تستطيع استرجاعها.`}
+                    buttonText={"حذف"}
+                    loading={deleteDraft.isPending}
+                    onConfirm={confirmDeleteDraft}
+                    onCancel={() => setDraftToDelete(null)}
                 />
                 <Toolbar ref={toolbarRef}>
                     {mobileView === "main" ? (
