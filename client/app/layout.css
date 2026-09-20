@@ -383,3 +383,24 @@ html:not([data-hydrated]) .app-sidebar {
         max-height: calc(100vh - var(--header-h) - 24px);
     }
 }
+
+/* Desktop: popover anchored to the drafts trigger. */
+.drafts-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    width: 300px;
+}
+
+/* Mobile: full-width panel pinned below the editor header, 16px gutters. */
+@media (max-width: 767px) {
+    .drafts-dropdown {
+        position: fixed;
+        top: calc(var(--header-h) + 8px);
+        left: 16px;
+        right: 16px;
+        width: auto;
+        margin-top: 0;
+    }
+}

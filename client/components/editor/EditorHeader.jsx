@@ -7,8 +7,7 @@ import {
     Loader2,
     Trash,
 } from "lucide-react";
-import { useState } from "react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { formatRelativeTime } from "@/lib/format-date";
@@ -139,169 +138,201 @@ function DraftsMenu({
     onRequestDeleteDraft,
 }) {
     const [open, setOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    useEffect(() => {
+        if (!open) return;
+        const handleKey = (e) => {
+            if (e.key === "Escape") setOpen(false);
+        };
+        const handleClick = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener("keydown", handleKey);
+        document.addEventListener("mousedown", handleClick);
+        return () => {
+            document.removeEventListener("keydown", handleKey);
+            document.removeEventListener("mousedown", handleClick);
+        };
+    }, [open]);
 
     return (
-        <DropdownMenu.Root dir="rtl" open={open} onOpenChange={setOpen}>
-            <DropdownMenu.Trigger asChild>
-                <button
-                    type="button"
-                    className="text-mid hover:text-ink"
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 6,
-                        background: "var(--color-bg)",
-                        border: "1px solid var(--color-border)",
-                        borderRadius: 8,
-                        padding: "7px 12px",
-                        cursor: "pointer",
-                        fontSize: 14,
-                        color: "var(--color-ink)",
-                        whiteSpace: "nowrap",
-                    }}
-                >
-                    المسودات
-                    <ChevronDown size={16} />
-                </button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                    align="start"
-                    sideOffset={6}
-                    dir="rtl"
-                    style={{
-                        minWidth: 280,
-                        direction: "rtl",
-                        background: "var(--color-white)",
-                        border: "1px solid var(--color-border)",
-                        borderRadius: 8,
-                        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-                        padding: 6,
-                        zIndex: 100,
-                    }}
-                >
-                    {drafts.length === 0 ? (
-                        <div
-                            style={{
-                                padding: "10px 12px",
-                                fontSize: 13,
-                                color: "var(--color-mid)",
-                            }}
-                        >
-                            لا توجد مسودات
-                        </div>
-                    ) : (
-                        drafts.map((draft) => (
+        <div ref={menuRef} style={{ position: "relative" }}>
+            <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                className="text-mid hover:text-ink"
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: "var(--color-bg)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 8,
+                    padding: "7px 12px",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    color: "var(--color-ink)",
+                    whiteSpace: "nowrap",
+                }}
+            >
+                المسودات
+                <ChevronDown size={16} />
+            </button>
+            {open && (
+                <>
+                    <div
+                        style={{ position: "fixed", inset: 0, zIndex: 79 }}
+                        onClick={() => setOpen(false)}
+                    />
+                    <div
+                        className="card drafts-dropdown"
+                        style={{
+                            zIndex: 80,
+                            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+                            overflow: "hidden",
+                            padding: 6,
+                        }}
+                    >
+                        {drafts.length === 0 ? (
                             <div
-                                key={draft.id}
                                 style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    borderRadius: 6,
-                                    background:
-                                        draft.id === activeDraftId
-                                            ? "var(--color-bg)"
-                                            : "transparent",
+                                    padding: "10px 12px",
+                                    fontSize: 13,
+                                    color: "var(--color-mid)",
                                 }}
                             >
-                                <DropdownMenu.Item
-                                    onSelect={() => onSelectDraft(draft.id)}
+                                لا توجد مسودات
+                            </div>
+                        ) : (
+                            drafts.map((draft) => (
+                                <div
+                                    key={draft.id}
                                     style={{
                                         display: "flex",
                                         alignItems: "center",
-                                        flex: 1,
-                                        minWidth: 0,
-                                        padding: "8px 10px",
                                         borderRadius: 6,
-                                        cursor: "pointer",
-                                        outline: "none",
+                                        background:
+                                            draft.id === activeDraftId
+                                                ? "var(--color-bg)"
+                                                : "transparent",
                                     }}
                                 >
-                                    <div
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setOpen(false);
+                                            onSelectDraft(draft.id);
+                                        }}
                                         style={{
+                                            display: "flex",
+                                            alignItems: "center",
                                             flex: 1,
                                             minWidth: 0,
+                                            padding: "8px 10px",
+                                            borderRadius: 6,
+                                            cursor: "pointer",
+                                            background: "none",
+                                            border: "none",
                                             textAlign: "right",
                                         }}
                                     >
                                         <div
                                             style={{
-                                                fontSize: 14,
-                                                color: "var(--color-ink)",
-                                                whiteSpace: "nowrap",
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
+                                                flex: 1,
+                                                minWidth: 0,
+                                                textAlign: "right",
                                             }}
                                         >
-                                            {draft.title || "مسودة بدون عنوان"}
+                                            <div
+                                                style={{
+                                                    fontSize: 14,
+                                                    color: "var(--color-ink)",
+                                                    whiteSpace: "nowrap",
+                                                    overflow: "hidden",
+                                                    textOverflow: "ellipsis",
+                                                }}
+                                            >
+                                                {draft.title ||
+                                                    "مسودة بدون عنوان"}
+                                            </div>
+                                            <div
+                                                style={{
+                                                    fontSize: 12,
+                                                    color: "var(--color-mid)",
+                                                    marginTop: 2,
+                                                }}
+                                            >
+                                                {`${formatRelativeTime(
+                                                    draft.updatedAt,
+                                                )} · ${draft.wordCount} كلمة`}
+                                            </div>
                                         </div>
-                                        <div
-                                            style={{
-                                                fontSize: 12,
-                                                color: "var(--color-mid)",
-                                                marginTop: 2,
-                                            }}
-                                        >
-                                            {`${formatRelativeTime(
-                                                draft.updatedAt,
-                                            )} · ${draft.wordCount} كلمة`}
-                                        </div>
-                                    </div>
-                                </DropdownMenu.Item>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        aria-label="حذف المسودة"
+                                        title="حذف المسودة"
+                                        className="text-mid hover:text-error"
+                                        onClick={() => {
+                                            setOpen(false);
+                                            onRequestDeleteDraft(draft);
+                                        }}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            background: "none",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            padding: 8,
+                                            borderRadius: 6,
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        <Trash size={15} />
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                        {!isUpdate && (
+                            <>
+                                <div
+                                    style={{
+                                        height: 1,
+                                        background: "var(--color-border)",
+                                        margin: "6px 0",
+                                    }}
+                                />
                                 <button
                                     type="button"
-                                    aria-label="حذف المسودة"
-                                    title="حذف المسودة"
-                                    className="text-mid hover:text-error"
                                     onClick={() => {
                                         setOpen(false);
-                                        onRequestDeleteDraft(draft);
+                                        onNewDraft();
                                     }}
                                     style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
+                                        display: "block",
+                                        width: "100%",
+                                        padding: "8px 10px",
+                                        borderRadius: 6,
+                                        cursor: "pointer",
                                         background: "none",
                                         border: "none",
-                                        cursor: "pointer",
-                                        padding: 8,
-                                        borderRadius: 6,
-                                        flexShrink: 0,
+                                        fontSize: 14,
+                                        color: "var(--color-ink)",
+                                        textAlign: "right",
                                     }}
                                 >
-                                    <Trash size={15} />
+                                    مسودة جديدة
                                 </button>
-                            </div>
-                        ))
-                    )}
-                    {!isUpdate && (
-                        <>
-                            <DropdownMenu.Separator
-                                style={{
-                                    height: 1,
-                                    background: "var(--color-border)",
-                                    margin: "6px 0",
-                                }}
-                            />
-                            <DropdownMenu.Item
-                                onSelect={() => onNewDraft()}
-                                style={{
-                                    padding: "8px 10px",
-                                    borderRadius: 6,
-                                    cursor: "pointer",
-                                    outline: "none",
-                                    fontSize: 14,
-                                    color: "var(--color-ink)",
-                                    textAlign: "right",
-                                }}
-                            >
-                                مسودة جديدة
-                            </DropdownMenu.Item>
-                        </>
-                    )}
-                </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+                            </>
+                        )}
+                    </div>
+                </>
+            )}
+        </div>
     );
 }
 
