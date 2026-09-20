@@ -6,6 +6,29 @@ const OVERLAY = "rgba(15,15,20,0.6)";
 const FOCUSABLE_SELECTOR =
     'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+let lockCount = 0;
+let savedOverflow = "";
+let savedOverscrollBehavior = "";
+
+function lockBodyScroll() {
+    if (lockCount === 0) {
+        savedOverflow = document.body.style.overflow;
+        savedOverscrollBehavior = document.body.style.overscrollBehavior;
+        document.body.style.overflow = "hidden";
+        document.body.style.overscrollBehavior = "none";
+    }
+    lockCount += 1;
+}
+
+function unlockBodyScroll() {
+    if (lockCount === 0) return;
+    lockCount -= 1;
+    if (lockCount === 0) {
+        document.body.style.overflow = savedOverflow;
+        document.body.style.overscrollBehavior = savedOverscrollBehavior;
+    }
+}
+
 export default function Modal({
     open,
     onClose,
@@ -26,6 +49,12 @@ export default function Modal({
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
     }, [open, onClose]);
+
+    useEffect(() => {
+        if (!open) return;
+        lockBodyScroll();
+        return () => unlockBodyScroll();
+    }, [open]);
 
     useEffect(() => {
         if (!open) return;
