@@ -94,7 +94,7 @@ function MobileStatusBar({ wordCount, saveStatus, lastSavedAt, onRetrySave }) {
     return (
         <div
             style={{
-                position: "fixed",
+                position: "absolute",
                 left: 12,
                 bottom: "calc(12px + env(safe-area-inset-bottom, 0px))",
                 zIndex: 55,

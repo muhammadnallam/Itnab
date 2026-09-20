@@ -78,6 +78,7 @@ import { QuranIcon } from "@/components/tiptap-icons/quran-icon";
 // --- Hooks ---
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint";
 import { useDrafts } from "@/hooks/useDrafts";
+import { useEditorViewport } from "@/hooks/use-editor-viewport";
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
@@ -219,6 +220,8 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     const { remove } = useArticle(articleData?.slug);
     const [mobileView, setMobileView] = useState("main");
     const toolbarRef = useRef(null);
+    const shellRef = useRef(null);
+    useEditorViewport(shellRef);
     const [publishModal, setPublishModal] = useState(false);
     const [confirmModal, setConfirmModal] = useState(false);
     const [coverImage, setCoverImage] = useState(
@@ -600,7 +603,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     }
 
     return (
-        <div className="simple-editor-wrapper">
+        <div className="simple-editor-wrapper" ref={shellRef}>
             <EditorContext.Provider value={{ editor }}>
                 <EditorHeader
                     setPublishModal={setPublishModal}
