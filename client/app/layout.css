@@ -388,7 +388,7 @@ html:not([data-hydrated]) .app-sidebar {
 .drafts-dropdown {
     position: absolute;
     top: 100%;
-    left: 0;
+    right: 0;
     margin-top: 8px;
     width: 300px;
 }
