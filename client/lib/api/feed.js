@@ -113,11 +113,12 @@ export async function getSubscriptionArticles({ page = 1, limit = 20, signal } =
 
 export async function getUserLists(
     author,
-    { page = 1, limit = 20, articleId } = {},
+    { page = 1, limit = 20, articleId, q } = {},
 ) {
     const json = await fetchFeed("lists", {
         ...(author ? { author } : {}),
         ...(articleId ? { articleId } : {}),
+        ...(q ? { q } : {}),
         page,
         limit,
     });

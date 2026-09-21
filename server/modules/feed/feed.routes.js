@@ -52,13 +52,14 @@ router.get(
         if (!parsed.success) {
             throw new ValidationError(parsed.error.issues[0].message);
         }
-        const { author, articleId, page, limit } = parsed.data;
+        const { author, articleId, page, limit, q } = parsed.data;
         const result = await getUserLists({
             author,
             articleId,
             page,
             pageSize: limit,
             userId: req.user?.id,
+            q,
         });
         res.json(result);
     }),

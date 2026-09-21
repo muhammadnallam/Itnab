@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TAGS } from "@itnab/constants";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -6,6 +6,8 @@ import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import TextareaField from "@/components/ui/TextareaField";
 import TopicSelect from "@/components/editor/TopicSelect";
+import UserSelect from "@/components/editor/UserSelect";
+import ListSelect from "@/components/editor/ListSelect";
 import {
     validateArticleFields,
     prepareArticlePayload,
@@ -44,6 +46,12 @@ function Input({ label, error, children }) {
     );
 }
 
+function todayLocalIso() {
+    const now = new Date();
+    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60 * 1000);
+    return local.toISOString().slice(0, 10);
+}
+
 export default function PublishModal({
     isOpen,
     onClose,
@@ -55,6 +63,7 @@ export default function PublishModal({
     wordCount,
     mode,
     articleData,
+    isAdmin,
     seoTitle,
     setSeoTitle,
     seoDescription,
@@ -70,11 +79,32 @@ export default function PublishModal({
     const [sendEmail, setSendEmail] = useState(false);
     const [loading, setLoading] = useState(false);
     const [placeholderAck, setPlaceholderAck] = useState(false);
+    const [publishTo, setPublishTo] = useState(
+        isAdmin && articleData?.authorId
+            ? {
+                  id: articleData.authorId,
+                  username: articleData.authorUsername,
+                  name: articleData.authorName,
+                  image: articleData.authorImage,
+              }
+            : null,
+    );
+    const [originalDate, setOriginalDate] = useState(() => {
+        if (isAdmin && articleData?.createdAt)
+            return new Date(articleData.createdAt).toISOString().slice(0, 10);
+        return todayLocalIso();
+    });
+    const [listTarget, setListTarget] = useState(null);
     const router = useRouter();
     const qc = useQueryClient();
     const { publish, update } = useArticle(articleData?.slug);
 
     const placeholderCount = countPlaceholderImages(content);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setListTarget(null);
+    }, [publishTo?.id]);
 
     const handleClose = () => {
         setPlaceholderAck(false);
@@ -145,6 +175,17 @@ export default function PublishModal({
                     sendEmail,
                     content,
                     wordCount,
+                    ...(isAdmin
+                        ? {
+                              publishTo: publishTo?.id,
+                              originalDate,
+                              ...(listTarget?.id
+                                  ? { listId: listTarget.id }
+                                  : listTarget?.name
+                                    ? { listName: listTarget.name }
+                                    : {}),
+                          }
+                        : {}),
                 };
                 const errors = validateArticleFields(payload);
                 if (errors.coverImage) setCoverError(errors.coverImage);
@@ -305,6 +346,32 @@ export default function PublishModal({
                     }}
                 />
             </Input>
+
+            {isAdmin && (
+                <>
+                    <Input label="انشر باسم">
+                        <UserSelect value={publishTo} onChange={setPublishTo} />
+                    </Input>
+                    {isAdmin && publishTo && (
+                        <Input label="القائمة">
+                            <ListSelect
+                                key={publishTo.id}
+                                authorId={publishTo.id}
+                                value={listTarget}
+                                onChange={setListTarget}
+                            />
+                        </Input>
+                    )}
+                    <Input label="تاريخ النشر الأصلي">
+                        <input
+                            type="date"
+                            value={originalDate}
+                            onChange={(e) => setOriginalDate(e.target.value)}
+                            style={{ ...inputBase }}
+                        />
+                    </Input>
+                </>
+            )}
         </Modal>
     );
 }

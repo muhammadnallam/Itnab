@@ -1,6 +1,21 @@
 import prisma from "../../lib/prisma.js";
 import { auth } from "../../lib/auth.js";
 import { ValidationError, handlePrismaError } from "../../lib/errors.js";
+import { isAdmin } from "../../lib/admin.js";
+
+export async function getUserMe(user) {
+    return { id: user.id, username: user.username, isAdmin: isAdmin(user) };
+}
+
+export async function searchUsers(q, limit) {
+    const users = await prisma.user.findMany({
+        where: { username: { contains: q.trim(), mode: "insensitive" } },
+        select: { id: true, username: true, name: true, image: true },
+        orderBy: { username: "asc" },
+        take: limit,
+    });
+    return { users };
+}
 
 export async function emailExists(email) {
     const user = await prisma.user.findUnique({

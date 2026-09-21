@@ -41,6 +41,11 @@ export default async function EditPage({ params }) {
         seoDescription: article.seoSubtitle,
         tag: article.topic,
         coverImage: article.coverImage,
+        authorId: article.authorId ?? article.author?.id,
+        authorUsername: article.author?.username,
+        authorName: article.author?.name,
+        authorImage: article.author?.image,
+        createdAt: article.createdAt,
     };
 
     return (

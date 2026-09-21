@@ -9,6 +9,19 @@ export async function checkEmail(email) {
     });
 }
 
+export async function getMe() {
+    return fetcher("/api/user/me", { credentials: "include" });
+}
+
+export async function searchUsers(q, { limit = 10, signal } = {}) {
+    const query = new URLSearchParams({ q, limit: String(limit) }).toString();
+    const json = await fetcher(`/api/user/search?${query}`, {
+        credentials: "include",
+        signal,
+    });
+    return json.users || [];
+}
+
 export async function getProfile(username) {
     return fetcher(`/api/user/${username}/profile`);
 }

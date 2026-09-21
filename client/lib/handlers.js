@@ -17,6 +17,8 @@ export function validateArticleFields({
     seoTitle,
     seoDescription,
     tag,
+    originalDate,
+    listName,
 }) {
     const errors = {};
 
@@ -48,6 +50,11 @@ export function validateArticleFields({
 
     if (!tag) errors.tag = "الموضوع مطلوب";
 
+    if (originalDate && !/^\d{4}-\d{2}-\d{2}$/.test(originalDate))
+        errors.originalDate = "صيغة التاريخ غير صحيحة";
+
+    if (listName && listName.length > 60) errors.listName = "الاسم طويل جدًا";
+
     return errors;
 }
 
@@ -59,6 +66,10 @@ export async function prepareArticlePayload({
     tag,
     sendEmail,
     wordCount,
+    publishTo,
+    originalDate,
+    listId,
+    listName,
 }) {
     let coverImageUrl = coverImage;
     if (typeof coverImage !== "string") {
@@ -77,6 +88,10 @@ export async function prepareArticlePayload({
             sendEmail,
             coverImage: coverImageUrl,
             wordCount,
+            ...(publishTo ? { publishTo } : {}),
+            ...(originalDate ? { originalDate } : {}),
+            ...(listId ? { listId } : {}),
+            ...(listName ? { listName } : {}),
         },
     };
 }

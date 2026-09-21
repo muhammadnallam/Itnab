@@ -113,11 +113,14 @@ export async function getFeed({ sort, author, topic, filter, page, pageSize, use
     return result;
 }
 
-export async function getUserLists({ author, articleId, page, pageSize, userId }) {
+export async function getUserLists({ author, articleId, page, pageSize, userId, q }) {
     if (!author) throw new ValidationError("معرف المؤلف مطلوب");
     await assertAuthorExists(author);
 
-    const where = { authorId: author };
+    const where = {
+        authorId: author,
+        ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
+    };
     const [lists, total] = await Promise.all([
         prisma.list.findMany({
             where,

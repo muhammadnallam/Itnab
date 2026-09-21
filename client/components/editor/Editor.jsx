@@ -79,6 +79,7 @@ import { QuranIcon } from "@/components/tiptap-icons/quran-icon";
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint";
 import { useDrafts } from "@/hooks/useDrafts";
 import { useEditorViewport } from "@/hooks/use-editor-viewport";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
@@ -217,6 +218,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     const articleId = articleData?.id;
     const router = useRouter();
     const isMobile = useIsBreakpoint();
+    const { isAdmin } = useIsAdmin();
     const { remove } = useArticle(articleData?.slug);
     const [mobileView, setMobileView] = useState("main");
     const toolbarRef = useRef(null);
@@ -640,6 +642,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     wordCount={stats.words}
                     mode={mode}
                     articleData={articleData}
+                    isAdmin={isAdmin}
                     seoTitle={seoTitle}
                     setSeoTitle={setSeoTitle}
                     seoDescription={seoDescription}

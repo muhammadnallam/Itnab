@@ -11,6 +11,8 @@ import {
     updateArticle,
     deleteArticle,
 } from "./article.service.js";
+import { isAdmin } from "../../lib/admin.js";
+import { AuthorizationError } from "../../lib/errors.js";
 
 const router = Router();
 
@@ -20,10 +22,21 @@ router.post(
     validateArticle,
     asyncErrorHandler(async (req, res) => {
         const { validatedContent, articleData } = req;
+        const admin = isAdmin(req.user);
+        if (
+            !admin &&
+            (articleData.publishTo ||
+                articleData.originalDate ||
+                articleData.listId ||
+                articleData.listName)
+        ) {
+            throw new AuthorizationError("ليس لديك صلاحية");
+        }
         const slug = await createArticle(
             validatedContent,
             articleData,
             req.user.id,
+            admin,
         );
         res.status(200).json({ slug });
     }),
@@ -43,11 +56,22 @@ router.put(
     validateArticle,
     asyncErrorHandler(async (req, res) => {
         const { validatedContent, articleData } = req;
+        const admin = isAdmin(req.user);
+        if (
+            !admin &&
+            (articleData.publishTo ||
+                articleData.originalDate ||
+                articleData.listId ||
+                articleData.listName)
+        ) {
+            throw new AuthorizationError("ليس لديك صلاحية");
+        }
         await updateArticle(
             req.params.id,
             validatedContent,
             articleData,
             req.user.id,
+            admin,
         );
         res.status(200).json({ success: true });
     }),
@@ -57,7 +81,7 @@ router.delete(
     "/:id/delete",
     requireAuth,
     asyncErrorHandler(async (req, res) => {
-        await deleteArticle(req.params.id, req.user.id);
+        await deleteArticle(req.params.id, req.user.id, isAdmin(req.user));
         res.status(200).json({ success: true });
     }),
 );

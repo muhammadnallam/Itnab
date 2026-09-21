@@ -65,3 +65,8 @@ export const libraryQuerySchema = z.object({
     page: z.coerce.number().int().min(1).default(1),
     limit: z.coerce.number().int().min(1).max(50).default(20),
 });
+
+export const userSearchSchema = z.object({
+    q: z.string().trim().min(1, "أدخل اسم مستخدم للبحث").max(50),
+    limit: z.coerce.number().int().min(1).max(20).default(10),
+});

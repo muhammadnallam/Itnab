@@ -4,6 +4,8 @@ import requireAuth from "../../middleware/requireAuth";
 import asyncErrorHandler from "../../middleware/asyncErrorHandler";
 import {
     getProfile,
+    getUserMe,
+    searchUsers,
     emailExists,
     updateProfile,
     updatePassword,
@@ -21,8 +23,14 @@ import {
     libraryQuerySchema,
     deleteAccountSchema,
     checkEmailSchema,
+    userSearchSchema,
 } from "./user.schema.js";
 import { emailCheckLimiter } from "../../middleware/rateLimit.js";
+import { isAdmin } from "../../lib/admin.js";
+import {
+    AuthorizationError,
+    ValidationError,
+} from "../../lib/errors.js";
 
 const router = Router();
 
@@ -39,6 +47,29 @@ router.post(
 
         const exists = await emailExists(result.data.email);
         res.json({ exists });
+    }),
+);
+
+router.get(
+    "/me",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        res.json(await getUserMe(req.user));
+    }),
+);
+
+router.get(
+    "/search",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        if (!isAdmin(req.user)) {
+            throw new AuthorizationError("غير مصرح لك");
+        }
+        const parsed = userSearchSchema.safeParse(req.query);
+        if (!parsed.success) {
+            throw new ValidationError(parsed.error.issues[0].message);
+        }
+        res.json(await searchUsers(parsed.data.q, parsed.data.limit));
     }),
 );
 

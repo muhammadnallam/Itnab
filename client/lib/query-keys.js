@@ -1,4 +1,6 @@
 export const queryKeys = {
+    me: () => ["me"],
+    userSearch: (q) => ["user-search", q],
     user: (username) => ["user", username],
     allUsers: () => ["user"],
     follow: (userId) => ["follow", userId],
@@ -10,6 +12,7 @@ export const queryKeys = {
     likes: (articleId) => ["likes", articleId],
     save: (articleId) => ["save", articleId],
     lists: (authorId, articleId) => ["lists", authorId, articleId ?? null],
+    listSearch: (authorId, q) => ["lists", authorId, "search", q],
     userSaves: (userId) => ["userSaves", userId],
     userViews: (userId) => ["userViews", userId],
     userSavedLists: (userId) => ["userSavedLists", userId],

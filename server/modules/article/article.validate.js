@@ -15,7 +15,28 @@ const articleSchema = z.object({
         sendEmail: z.boolean().optional(),
         coverImage: z.string().url(),
         wordCount: z.number().int().nonnegative(),
-    }),
+        publishTo: z.string().uuid("معرّف المستخدم غير صالح").optional(),
+        originalDate: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/, "صيغة التاريخ غير صحيحة")
+            .refine(
+                (value) =>
+                    new Date(`${value}T12:00:00.000Z`).getTime() <=
+                    Date.now() + 24 * 60 * 60 * 1000,
+                { message: "التاريخ لا يمكن أن يكون في المستقبل" },
+            )
+            .optional(),
+        listId: z.string().uuid("معرّف القائمة غير صالح").optional(),
+        listName: z
+            .string()
+            .trim()
+            .min(1, "اسم القائمة مطلوب")
+            .max(60, "الاسم طويل جدًا")
+            .optional(),
+    })
+        .refine((data) => !(data.listId && data.listName), {
+            message: "لا يمكن تحديد قائمة موجودة وإنشاء قائمة جديدة معًا",
+        }),
 });
 
 function validateArticle(req, res, next) {

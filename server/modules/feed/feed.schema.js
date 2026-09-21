@@ -15,6 +15,7 @@ export const listsQuerySchema = z.object({
     articleId: z.string().uuid("معرف المقال غير صالح").optional(),
     page: z.coerce.number().int().min(1).default(1),
     limit: z.coerce.number().int().min(1).max(50).default(20),
+    q: z.string().trim().max(60, "الاسم طويل جدًا").optional(),
 });
 
 export const createListSchema = z.object({

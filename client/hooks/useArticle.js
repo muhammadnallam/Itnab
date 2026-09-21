@@ -23,6 +23,7 @@ export function useArticle(slug) {
         mutationFn: publishArticle,
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: queryKeys.allArticles() });
+            qc.invalidateQueries({ queryKey: ["lists"] });
         },
     });
 
