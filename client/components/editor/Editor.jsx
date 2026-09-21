@@ -289,6 +289,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
 
     const doSave = useCallback(async () => {
         if (!editorRef.current) return;
+        if (publishedRef.current) return;
         if (savingRef.current) {
             queuedRef.current = true;
             return;
@@ -299,6 +300,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         try {
             do {
                 queuedRef.current = false;
+                if (publishedRef.current) break;
                 const content = serializeDraftContent(
                     editorRef.current.getJSON(),
                 );
@@ -464,7 +466,8 @@ export function Editor({ articleContent, articleData, mode } = {}) {
             window.removeEventListener("blur", flush);
             window.removeEventListener("pagehide", flush);
             document.removeEventListener("visibilitychange", onVisibility);
-            debouncedSave.flush();
+
+            if (!publishedRef.current) debouncedSave.flush();
         };
     }, [debouncedSave]);
 
@@ -644,11 +647,15 @@ export function Editor({ articleContent, articleData, mode } = {}) {
                     tag={tag}
                     setTag={setTag}
                     onPublished={async () => {
-                        if (activeDraftIdRef.current) {
-                            await deleteDraft.mutateAsync(
-                                activeDraftIdRef.current,
-                            );
-                            activeDraftIdRef.current = null;
+                        publishedRef.current = true;
+                        debouncedSave.cancel();
+                        const draftId = activeDraftIdRef.current;
+                        activeDraftIdRef.current = null;
+                        setActiveDraftId(null);
+                        if (draftId) {
+                            try {
+                                await deleteDraft.mutateAsync(draftId);
+                            } catch {}
                         }
                     }}
                 />

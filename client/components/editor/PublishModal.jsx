@@ -169,6 +169,7 @@ export default function PublishModal({
                             ? { ...prepared, articleId: articleData?.id }
                             : prepared,
                     );
+                    await onPublished?.();
                     if (isUpdate) {
                         toast.success("تم تحديث المقال");
                         qc.invalidateQueries({
@@ -180,7 +181,6 @@ export default function PublishModal({
                         toast.success("تم نشر المقال");
                         router.push(`/article/${result.slug}`);
                     }
-                    await onPublished?.();
                     handleClose();
                 } catch (err) {
                     toast.error(err?.message || "حدث خطأ أثناء حفظ المقال");
