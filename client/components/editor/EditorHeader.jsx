@@ -4,6 +4,7 @@ import {
     Check,
     ChevronDown,
     Eraser,
+    Layers,
     Loader2,
     Trash,
 } from "lucide-react";
@@ -178,7 +179,22 @@ function DraftsMenu({
                     whiteSpace: "nowrap",
                 }}
             >
+                <Layers size={18} />
                 المسودات
+                {drafts.length > 0 && (
+                    <span
+                        style={{
+                            background: "var(--color-accent)",
+                            color: "var(--color-white)",
+                            borderRadius: 99,
+                            fontSize: 11,
+                            padding: "1px 6px",
+                            lineHeight: 1.5,
+                        }}
+                    >
+                        {drafts.length}
+                    </span>
+                )}
                 <ChevronDown size={16} />
             </button>
             {open && (
