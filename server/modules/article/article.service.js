@@ -22,19 +22,48 @@ async function slugify(title) {
     return slug;
 }
 
+const MAX_SUBTITLE_LENGTH = 200;
+
+function extractBodyText(doc) {
+    const parts = [];
+
+    function walk(node) {
+        if (node.type === "text") {
+            parts.push(node.text);
+            return;
+        }
+        if (Array.isArray(node.content)) {
+            for (const child of node.content) {
+                walk(child);
+            }
+            parts.push(" ");
+        }
+    }
+
+    walk(doc);
+    return parts.join("").replace(/\s+/g, " ").trim();
+}
+
+function resolveSubtitle(validatedContent, bodyContent) {
+    const rawSubtitle =
+        validatedContent.content?.[1]?.content?.[0]?.text?.trim() || "";
+    if (rawSubtitle) return rawSubtitle;
+
+    return extractBodyText(bodyContent).slice(0, MAX_SUBTITLE_LENGTH);
+}
+
 export async function createArticle(validatedContent, articleData, userId) {
     const { seoTitle, seoDescription, tag, sendEmail, coverImage, wordCount } =
         articleData;
     const title =
         validatedContent.content?.[0]?.content?.[0]?.text?.trim() || "";
-    const subtitle =
-        validatedContent.content?.[1]?.content?.[0]?.text?.trim() || "";
     const slug = await slugify(title);
     const searchVector = normalizeArabic(extractText(validatedContent));
     const readTime = Math.max(1, Math.ceil(wordCount / 120));
 
     const contentClone = JSON.parse(JSON.stringify(validatedContent));
     contentClone.content.splice(0, 2);
+    const subtitle = resolveSubtitle(validatedContent, contentClone);
 
     try {
         const result = await prisma.article.create({
@@ -91,13 +120,12 @@ export async function updateArticle(
         articleData;
     const title =
         validatedContent.content?.[0]?.content?.[0]?.text?.trim() || "";
-    const subtitle =
-        validatedContent.content?.[1]?.content?.[0]?.text?.trim() || "";
     const searchVector = normalizeArabic(extractText(validatedContent));
     const readTime = Math.max(1, Math.ceil(wordCount / 120));
 
     const contentClone = JSON.parse(JSON.stringify(validatedContent));
     contentClone.content.splice(0, 2);
+    const subtitle = resolveSubtitle(validatedContent, contentClone);
 
     try {
         await prisma.article.update({

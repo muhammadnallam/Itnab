@@ -152,10 +152,7 @@ export default function PublishModal({
                 if (errors.seoDescription)
                     setSeoDescriptionError(errors.seoDescription);
                 if (errors.tag) setTagError(errors.tag);
-                if (errors.wordCount) toast.error(errors.wordCount);
                 if (errors.articleTitle) toast.error(errors.articleTitle);
-                if (errors.articleDescription)
-                    toast.error(errors.articleDescription);
                 if (Object.keys(errors).length > 0) return;
 
                 if (placeholderCount > 0 && !placeholderAck) {

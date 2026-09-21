@@ -14,7 +14,7 @@ const articleSchema = z.object({
         tag: z.enum(VALID_TAGS),
         sendEmail: z.boolean().optional(),
         coverImage: z.string().url(),
-        wordCount: z.number().int().positive(),
+        wordCount: z.number().int().nonnegative(),
     }),
 });
 
@@ -39,11 +39,6 @@ function validateArticle(req, res, next) {
         sanitized = sanitizeDoc(content);
     } catch (err) {
         next(new ValidationError(err.message));
-        return;
-    }
-
-    if (data.wordCount < 500) {
-        next(new ValidationError("يجب أن يحتوي المقال على 500 كلمة على الأقل"));
         return;
     }
 

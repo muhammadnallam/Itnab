@@ -19,12 +19,8 @@ function validateDoc(json) {
     }
 
     const second = doc.child(1);
-    if (
-        !second ||
-        second.type.name !== "articleDescription" ||
-        !second.textContent.trim()
-    ) {
-        throw new ValidationError("وصف المقال لا يمكن أن يكون خاليًا");
+    if (!second || second.type.name !== "articleDescription") {
+        throw new ValidationError("بُنية المستند غير صالحة");
     }
 
     return doc;

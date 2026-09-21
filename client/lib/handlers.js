@@ -17,14 +17,12 @@ export function validateArticleFields({
     seoTitle,
     seoDescription,
     tag,
-    wordCount,
 }) {
     const errors = {};
 
     if (!coverImage) errors.coverImage = "صورة الغلاف مطلوبة";
 
     const firstNode = content?.content?.[0];
-    const secondNode = content?.content?.[1];
 
     const getText = (node) =>
         node?.content
@@ -40,14 +38,6 @@ export function validateArticleFields({
         errors.articleTitle = "عنوان المقال مطلوب";
     }
 
-    if (
-        !secondNode ||
-        secondNode.type !== "articleDescription" ||
-        !getText(secondNode)
-    ) {
-        errors.articleDescription = "وصف المقال مطلوب";
-    }
-
     if (!seoTitle) errors.seoTitle = "عنوان محركات البحث مطلوب";
     else if (seoTitle.length > 60 || seoTitle.length < 30)
         errors.seoTitle = "العنوان يجب أن يكون بين 30 إلى 60 حرفًا";
@@ -57,10 +47,6 @@ export function validateArticleFields({
         errors.seoDescription = "الوصف يجب أن يكون بين 100 إلى 160 حرفًا";
 
     if (!tag) errors.tag = "الموضوع مطلوب";
-
-    if (wordCount && wordCount < 500) {
-        errors.wordCount = "يجب أن يحتوي المقال على 500 كلمة على الأقل";
-    }
 
     return errors;
 }

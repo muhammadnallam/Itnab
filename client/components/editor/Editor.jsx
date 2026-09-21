@@ -268,6 +268,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
     const autoLoadedDraftRef = useRef(false);
     const hasUserEditedRef = useRef(false);
     const metaSkipRef = useRef(true);
+    const publishedRef = useRef(false);
 
     const applyMeta = ({
         seoTitle: nextTitle,
