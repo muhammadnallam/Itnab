@@ -421,7 +421,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
             setStats({
                 words: editor.storage.characterCount.words(),
             });
-            setSaveStatus("saving");
+            setSaveStatus("unsaved");
             debouncedSave();
         },
     });
@@ -445,7 +445,7 @@ export function Editor({ articleContent, articleData, mode } = {}) {
             metaSkipRef.current = false;
             return;
         }
-        setSaveStatus("saving");
+        setSaveStatus("unsaved");
         debouncedSave();
     }, [seoTitle, seoDescription, tag, debouncedSave]);
 

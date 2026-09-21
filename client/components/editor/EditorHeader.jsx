@@ -3,6 +3,7 @@ import {
     ArrowLeft,
     Check,
     ChevronDown,
+    Circle,
     Eraser,
     Layers,
     Loader2,
@@ -20,6 +21,17 @@ function SaveStatus({ saveStatus, lastSavedAt, onRetrySave }) {
         gap: 6,
         whiteSpace: "nowrap",
     };
+
+    if (saveStatus === "idle") return null;
+
+    if (saveStatus === "unsaved") {
+        return (
+            <span style={{ ...contentStyle, color: "var(--color-mid)" }}>
+                <Circle size={8} fill="currentColor" />
+                تغييرات
+            </span>
+        );
+    }
 
     if (saveStatus === "saving") {
         return (
@@ -59,10 +71,7 @@ function SaveStatus({ saveStatus, lastSavedAt, onRetrySave }) {
             title={lastSavedAt ? formatRelativeTime(lastSavedAt) : undefined}
             style={{
                 ...contentStyle,
-                color:
-                    saveStatus === "saved"
-                        ? "var(--color-success)"
-                        : "var(--color-mid)",
+                color: "var(--color-success)",
             }}
         >
             <Check size={14} />
@@ -72,6 +81,7 @@ function SaveStatus({ saveStatus, lastSavedAt, onRetrySave }) {
 }
 
 function SavePill(props) {
+    if (props.saveStatus === "idle") return null;
     return (
         <div
             style={{
@@ -114,18 +124,22 @@ function MobileStatusBar({ wordCount, saveStatus, lastSavedAt, onRetrySave }) {
             }}
         >
             <span>{wordCount} كلمة</span>
-            <span
-                style={{
-                    width: 1,
-                    height: 14,
-                    background: "var(--color-border)",
-                }}
-            />
-            <SaveStatus
-                saveStatus={saveStatus}
-                lastSavedAt={lastSavedAt}
-                onRetrySave={onRetrySave}
-            />
+            {saveStatus !== "idle" && (
+                <>
+                    <span
+                        style={{
+                            width: 1,
+                            height: 14,
+                            background: "var(--color-border)",
+                        }}
+                    />
+                    <SaveStatus
+                        saveStatus={saveStatus}
+                        lastSavedAt={lastSavedAt}
+                        onRetrySave={onRetrySave}
+                    />
+                </>
+            )}
         </div>
     );
 }
