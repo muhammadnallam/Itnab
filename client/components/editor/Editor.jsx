@@ -350,7 +350,9 @@ export function Editor({ articleContent, articleData, mode } = {}) {
         }
     }, [articleId]);
 
-    const debouncedSave = useDebouncedCallback(doSave, 4000);
+    const debouncedSave = useDebouncedCallback(doSave, 10000, {
+        maxWait: 30000,
+    });
 
     // Intentional mount-only init: editor content should not swap when async props arrive late.
     const initialContent = useMemo(() => {
