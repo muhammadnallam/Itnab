@@ -35,13 +35,13 @@ export const metadata = {
         url: "/",
         title: "إطناب",
         description: "نافذة على الفكر والقلم العربي",
-        images: [{ url: "/logo.png", width: 912, height: 776, alt: "إطناب" }],
+        images: [{ url: "/og.jpg", width: 912, height: 776, alt: "إطناب" }],
     },
     twitter: {
         card: "summary_large_image",
         title: "إطناب",
         description: "نافذة على الفكر والقلم العربي",
-        images: ["/logo.png"],
+        images: ["/og.jpg"],
     },
 };
 
@@ -53,7 +53,12 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
     return (
-        <html dir="rtl" lang="ar" className={wordmarkFont.variable} suppressHydrationWarning>
+        <html
+            dir="rtl"
+            lang="ar"
+            className={wordmarkFont.variable}
+            suppressHydrationWarning
+        >
             <head>
                 <script
                     dangerouslySetInnerHTML={{
@@ -76,7 +81,9 @@ export default function RootLayout({ children }) {
                     <ScreenProvider>
                         <SidebarProvider>
                             <UserProvider>
-                                <AuthModalProvider>{children}</AuthModalProvider>
+                                <AuthModalProvider>
+                                    {children}
+                                </AuthModalProvider>
                             </UserProvider>
                         </SidebarProvider>
                     </ScreenProvider>
