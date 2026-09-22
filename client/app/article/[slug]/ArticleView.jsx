@@ -4,6 +4,7 @@ import { useArticle } from "@/hooks/useArticle";
 import { useLikes } from "@/hooks/useLikes";
 import { useSave } from "@/hooks/useSave";
 import { useView } from "@/hooks/useView";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useState, useRef, useEffect, useContext } from "react";
 import RequireAuth from "@/components/RequireAuth";
 import ShareModal from "@/components/ShareModal";
@@ -38,14 +39,16 @@ export default function ArticleView({ slug, article: initialArticle, html }) {
     const save = useSave(article?.id);
     useView(article?.id);
     const { user, loading: userLoading } = useContext(UserContext);
+    const { isAdmin } = useIsAdmin();
     const [shareOpen, setShareOpen] = useState(false);
     const commentsRef = useRef(null);
 
     const isOwner =
-        !userLoading &&
-        Boolean(user) &&
-        article?.author?.username &&
-        user.username === article.author.username;
+        isAdmin ||
+        (!userLoading &&
+            Boolean(user) &&
+            article?.author?.username &&
+            user.username === article.author.username);
 
     // Deep-link support: /article/{slug}#comment-{commentId}
     // Comments load async, so retry until the anchor appears.

@@ -10,6 +10,7 @@ import { Bookmark, Ellipsis } from "lucide-react";
 import { queryKeys } from "@/lib/query-keys";
 import { saveArticle, unsaveArticle } from "@/lib/api/interactions";
 import { UserContext } from "@/context/UserContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -53,11 +54,13 @@ const ArticleCard = ({ article }) => {
     const qc = useQueryClient();
 
     const { user, loading: userLoading } = useContext(UserContext);
+    const { isAdmin } = useIsAdmin();
 
     const isOwner =
-        !userLoading &&
-        Boolean(user) &&
-        user.username === article.authorUsername;
+        isAdmin ||
+        (!userLoading &&
+            Boolean(user) &&
+            user.username === article.authorUsername);
 
     const mutation = useMutation({
         mutationFn: (save) => (save ? saveArticle(id) : unsaveArticle(id)),
