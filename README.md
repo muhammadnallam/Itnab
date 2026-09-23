@@ -2,6 +2,8 @@
 
 An Arabic-first publishing platform for readers and writers to share culture and knowledge.
 
+<img width="1215" height="864" alt="Mockup" src="https://github.com/user-attachments/assets/18726ca4-84d7-4622-b3af-703e0a38643e" />
+
 ## Overview
 
 Itnab is a web platform where Arabic writers publish long-form articles and readers discover,
@@ -10,8 +12,6 @@ content, and is deployed in production at [itnab.com](https://itnab.com) for rea
 
 The project is a pnpm monorepo with three parts: a Next.js frontend, an Express API, and a set
 of shared packages (editor schema, constants, and Arabic text normalization) consumed by both.
-
-<img width="1024" height="728" alt="image" src="https://github.com/user-attachments/assets/e03ba378-213e-46a9-9a56-092d9c7623c9" />
 
 ## Features
 
