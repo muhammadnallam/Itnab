@@ -12,7 +12,7 @@ import {
     Share2,
     CircleAlert,
 } from "lucide-react";
-import { X, YouTube } from "@/components/ui/icons";
+import { X, YouTube, Substack } from "@/components/ui/icons";
 import PageContent from "@/components/PageContent";
 import Tabs from "@/components/ui/Tabs";
 import ArticleCard from "@/components/ArticleCard";
@@ -45,6 +45,7 @@ const SOCIAL_LINKS = [
     { key: "website", icon: Globe },
     { key: "youtube", icon: YouTube },
     { key: "x", icon: X },
+    { key: "substack", icon: Substack },
 ];
 
 const ICON_BUTTON_CLASS =

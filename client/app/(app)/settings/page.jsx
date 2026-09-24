@@ -21,7 +21,7 @@ import { signOut } from "@/lib/api/auth";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useUser } from "@/hooks/useUser";
 import { Trash } from "lucide-react";
-import { X, YouTube } from "@/components/ui/icons";
+import { X, YouTube, Substack } from "@/components/ui/icons";
 
 const SettingRow = ({
     label,
@@ -115,6 +115,9 @@ const TabAccount = ({
     const [website, setWebsite] = useState(profile.socialLinks?.website || "");
     const [youtube, setYoutube] = useState(profile.socialLinks?.youtube || "");
     const [xAccount, setXAccount] = useState(profile.socialLinks?.x || "");
+    const [substack, setSubstack] = useState(
+        profile.socialLinks?.substack || "",
+    );
     const [linksError, setLinksError] = useState({});
     const [profileError, setProfileError] = useState({});
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -181,6 +184,7 @@ const TabAccount = ({
             website,
             youtube,
             x: xAccount,
+            substack,
         });
         setLinksError(errors);
         if (Object.keys(errors).length > 0) return;
@@ -190,6 +194,7 @@ const TabAccount = ({
             setWebsite(values.website);
             setYoutube(values.youtube);
             setXAccount(values.x);
+            setSubstack(values.substack);
             toast.success("تم تحديث الروابط");
         } catch (err) {
             toast.error(err?.message || "حدث خطأ أثناء تحديث الروابط");
@@ -414,6 +419,16 @@ const TabAccount = ({
                     }}
                     rightIcon={<X />}
                     error={linksError.x}
+                />
+                <Input
+                    placeholder="yourname.substack.com"
+                    value={substack}
+                    onChange={(e) => {
+                        setSubstack(e.target.value);
+                        setLinksError((p) => ({ ...p, substack: "" }));
+                    }}
+                    rightIcon={<Substack />}
+                    error={linksError.substack}
                 />
             </div>
             <Button

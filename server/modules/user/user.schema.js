@@ -58,6 +58,7 @@ export const socialLinksSchema = z.object({
         website: socialLinkField("website"),
         youtube: socialLinkField("youtube"),
         x: socialLinkField("x"),
+        substack: socialLinkField("substack"),
     }),
 });
 

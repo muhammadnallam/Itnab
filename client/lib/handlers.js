@@ -231,7 +231,7 @@ export function validateProfileFields({ name, username, bio, avatar, banner }) {
     return errors;
 }
 
-export function validateSocialLinks({ website, youtube, x }) {
+export function validateSocialLinks({ website, youtube, x, substack }) {
     const errors = {};
     const values = {};
 
@@ -239,6 +239,7 @@ export function validateSocialLinks({ website, youtube, x }) {
         ["website", website],
         ["youtube", youtube],
         ["x", x],
+        ["substack", substack],
     ]) {
         const { value, error } = normalizeSocialUrl(raw, key);
         if (error) errors[key] = error;

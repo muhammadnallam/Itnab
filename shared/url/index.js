@@ -31,6 +31,12 @@ const PLATFORMS = {
         canonicalHost: "x.com",
         error: "الرابط يجب أن يكون رابط X صالحًا",
     },
+    substack: {
+        hosts: ["substack.com"],
+        hostSuffix: ".substack.com",
+        canonicalHost: null,
+        error: "الرابط يجب أن يكون رابط Substack صالحًا",
+    },
 };
 
 function parse(raw) {
@@ -57,7 +63,7 @@ function parse(raw) {
  * Validates and normalizes a social/website link.
  *
  * @param {string} raw - The raw value entered by the user.
- * @param {"website" | "youtube" | "x"} platform - The field the link belongs to.
+ * @param {"website" | "youtube" | "x" | "substack"} platform - The field the link belongs to.
  * @returns {{ value: string } | { error: string }}
  */
 export function normalizeSocialUrl(raw, platform) {
@@ -75,8 +81,11 @@ export function normalizeSocialUrl(raw, platform) {
 
     const hostname = url.hostname.toLowerCase();
 
-    if (config.hosts) {
-        if (!config.hosts.includes(hostname)) {
+    if (config.hosts || config.hostSuffix) {
+        const allowed =
+            config.hosts?.includes(hostname) ||
+            (config.hostSuffix && hostname.endsWith(config.hostSuffix));
+        if (!allowed) {
             return { error: config.error };
         }
     } else if (!HOSTNAME_PATTERN.test(hostname)) {
