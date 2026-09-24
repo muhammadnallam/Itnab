@@ -3,6 +3,7 @@
 import { useState, useContext } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
+import Toggle from "@/components/ui/Toggle";
 import { toast } from "sonner";
 import { UserContext } from "@/context/UserContext";
 import { useLists, useCreateList, useSaveToList, useUnsaveFromList } from "@/hooks/useLists";
@@ -18,6 +19,7 @@ const ListPicker = ({ open, onClose, articleId }) => {
     const unsaveFromList = useUnsaveFromList(articleId);
     const createList = useCreateList();
     const [newName, setNewName] = useState("");
+    const [isPrivate, setIsPrivate] = useState(false);
 
     const handleToggle = async (listId, containsArticle) => {
         try {
@@ -52,9 +54,10 @@ const ListPicker = ({ open, onClose, articleId }) => {
         const name = newName.trim();
         if (!name) return;
         try {
-            const list = await createList.mutateAsync(name);
+            const list = await createList.mutateAsync({ name, isPrivate });
             await saveToList.mutateAsync(list.id);
             setNewName("");
+            setIsPrivate(false);
             toast.success("تم إنشاء القائمة وحفظ المقال");
         } catch (err) {
             toast.error(err?.message || "حدث خطأ أثناء تنفيذ العملية");
@@ -118,7 +121,17 @@ const ListPicker = ({ open, onClose, articleId }) => {
                 )}
             </div>
 
-            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+            <div
+                dir="rtl"
+                className="flex items-center justify-between mt-4 pt-4 border-t border-border"
+            >
+                <span className="text-sm text-(--color-light)">
+                    قائمة خاصة
+                </span>
+                <Toggle checked={isPrivate} onChange={setIsPrivate} />
+            </div>
+
+            <div className="flex items-center gap-2 mt-3">
                 <input
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}

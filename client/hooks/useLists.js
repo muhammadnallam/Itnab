@@ -40,7 +40,7 @@ export function useLists({ author, articleId, enabled = true } = {}) {
 export function useCreateList() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: (name) => createList(name),
+        mutationFn: ({ name, isPrivate }) => createList(name, isPrivate),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["lists"] });
         },
