@@ -318,6 +318,7 @@ export async function saveArticle(articleId, userId, listId) {
               name: "قراءة لاحقًا",
               authorId: userId,
               isDefault: true,
+              isPrivate: true,
             },
             select: { id: true },
           });
