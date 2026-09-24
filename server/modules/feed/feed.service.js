@@ -119,6 +119,7 @@ export async function getUserLists({ author, articleId, page, pageSize, userId, 
 
     const where = {
         authorId: author,
+        ...(userId && userId === author ? {} : { isPrivate: false }),
         ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
     };
     const [lists, total] = await Promise.all([
@@ -128,6 +129,7 @@ export async function getUserLists({ author, articleId, page, pageSize, userId, 
             select: {
                 id: true,
                 name: true,
+                isPrivate: true,
                 authorId: true,
                 createdAt: true,
                 updatedAt: true,
@@ -199,12 +201,13 @@ export async function getUserLists({ author, articleId, page, pageSize, userId, 
     return { lists: annotated, ...buildMeta(total, page, pageSize) };
 }
 
-export async function createUserList({ userId, name }) {
+export async function createUserList({ userId, name, isPrivate = false }) {
     return prisma.list.create({
-        data: { name, authorId: userId, isDefault: false },
+        data: { name, authorId: userId, isDefault: false, isPrivate },
         select: {
             id: true,
             name: true,
+            isPrivate: true,
             createdAt: true,
             updatedAt: true,
             _count: { select: { savedArticles: true } },
@@ -218,6 +221,7 @@ export async function getList({ listId, userId }) {
         select: {
             id: true,
             name: true,
+            isPrivate: true,
             authorId: true,
             createdAt: true,
             updatedAt: true,
@@ -242,6 +246,9 @@ export async function getList({ listId, userId }) {
     });
 
     if (!list) throw new NotFoundError("القائمة غير موجودة");
+    if (list.isPrivate && list.authorId !== userId) {
+        throw new NotFoundError("القائمة غير موجودة");
+    }
 
     let saved = false;
     if (userId) {
@@ -276,20 +283,25 @@ export async function getList({ listId, userId }) {
     };
 }
 
-export async function renameList({ listId, userId, name }) {
+export async function updateList({ listId, userId, name, isPrivate }) {
     const list = await prisma.list.findUnique({
         where: { id: listId },
         select: { id: true, authorId: true },
     });
     if (!list) throw new NotFoundError("القائمة غير موجودة");
-    if (list.authorId !== userId) throw new NotFoundError("غير مصرح לך بتعديل هذه القائمة");
+    if (list.authorId !== userId)
+        throw new NotFoundError("غير مصرح لك بتعديل هذه القائمة");
 
     return prisma.list.update({
         where: { id: listId },
-        data: { name },
+        data: {
+            name,
+            ...(isPrivate === undefined ? {} : { isPrivate }),
+        },
         select: {
             id: true,
             name: true,
+            isPrivate: true,
             updatedAt: true,
         },
     });
@@ -311,9 +323,12 @@ export async function deleteList({ listId, userId }) {
 export async function saveList({ listId, userId }) {
     const list = await prisma.list.findUnique({
         where: { id: listId },
-        select: { id: true },
+        select: { id: true, authorId: true, isPrivate: true },
     });
     if (!list) throw new NotFoundError("القائمة غير موجودة");
+    if (list.isPrivate && list.authorId !== userId) {
+        throw new NotFoundError("القائمة غير موجودة");
+    }
 
     await prisma.savedList.upsert({
         where: { userId_listId: { userId, listId } },

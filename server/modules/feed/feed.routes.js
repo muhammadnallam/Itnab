@@ -8,7 +8,7 @@ import {
     getUserLists,
     createUserList,
     getList,
-    renameList,
+    updateList,
     deleteList,
     saveList,
     unsaveList,
@@ -17,7 +17,7 @@ import {
     feedQuerySchema,
     listsQuerySchema,
     createListSchema,
-    renameListSchema,
+    updateListSchema,
 } from "./feed.schema.js";
 
 const router = Router();
@@ -76,6 +76,7 @@ router.post(
         const list = await createUserList({
             userId: req.user.id,
             name: parsed.data.name,
+            isPrivate: parsed.data.isPrivate,
         });
         res.status(201).json(list);
     }),
@@ -97,14 +98,15 @@ router.put(
     "/lists/:listId",
     requireAuth,
     asyncErrorHandler(async (req, res) => {
-        const parsed = renameListSchema.safeParse(req.body);
+        const parsed = updateListSchema.safeParse(req.body);
         if (!parsed.success) {
             throw new ValidationError(parsed.error.issues[0].message);
         }
-        const result = await renameList({
+        const result = await updateList({
             listId: req.params.listId,
             userId: req.user.id,
             name: parsed.data.name,
+            isPrivate: parsed.data.isPrivate,
         });
         res.json(result);
     }),

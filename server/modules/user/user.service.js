@@ -290,7 +290,7 @@ export async function getUserViews(userId, { page, pageSize }) {
 }
 
 export async function getUserSavedLists(userId, { page, pageSize }) {
-    const where = { userId };
+    const where = { userId, list: { isPrivate: false } };
     const [saves, total] = await Promise.all([
         prisma.savedList.findMany({
             where,
@@ -300,6 +300,7 @@ export async function getUserSavedLists(userId, { page, pageSize }) {
                     select: {
                         id: true,
                         name: true,
+                        isPrivate: true,
                         authorId: true,
                         createdAt: true,
                         author: {

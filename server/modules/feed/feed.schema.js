@@ -20,8 +20,10 @@ export const listsQuerySchema = z.object({
 
 export const createListSchema = z.object({
     name: z.string().trim().min(1, "اسم القائمة مطلوب").max(60, "الاسم طويل جدًا"),
+    isPrivate: z.boolean().optional().default(false),
 });
 
-export const renameListSchema = z.object({
+export const updateListSchema = z.object({
     name: z.string().trim().min(1, "اسم القائمة مطلوب").max(60, "الاسم طويل جدًا"),
+    isPrivate: z.boolean().optional(),
 });
