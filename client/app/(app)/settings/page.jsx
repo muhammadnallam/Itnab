@@ -867,7 +867,8 @@ export default function SettingsPage() {
     const activePanel = TABS.find((t) => t.id === activeTab)?.panel;
 
     return (
-        <PageContent leftPanel={<HelpPanel />}>
+        // <PageContent leftPanel={<HelpPanel />}>
+        <PageContent>
             <>
                 <div>
                     <div

@@ -6,3 +6,5 @@ NOTES.md
 .env
 .env.*
 !.env.example
+STACK.md
+mobile/
