@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
-import { getUserLists, createList, renameList, deleteList, saveList, unsaveList } from "@/lib/api/feed";
+import { getUserLists, createList, updateList, deleteList, saveList, unsaveList } from "@/lib/api/feed";
 import { saveArticle, unsaveArticle } from "@/lib/api/interactions";
 
 export function useLists({ author, articleId, enabled = true } = {}) {
@@ -47,10 +47,11 @@ export function useCreateList() {
     });
 }
 
-export function useRenameList() {
+export function useUpdateList() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: ({ listId, name }) => renameList(listId, name),
+        mutationFn: ({ listId, name, isPrivate }) =>
+            updateList(listId, { name, isPrivate }),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["lists"] });
         },

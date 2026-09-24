@@ -46,6 +46,7 @@ export function parseList(l, ownerName) {
     return {
         id: l.id,
         name: l.name,
+        isPrivate: l.isPrivate ?? false,
         ownerName,
         ownerInitials: getInitials(ownerName),
         authorUsername: l.author?.username,
@@ -129,12 +130,12 @@ export async function getUserLists(
     };
 }
 
-export async function createList(name) {
+export async function createList(name, isPrivate = false) {
     return fetcher("/api/feed/lists", {
         credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, isPrivate }),
     });
 }
 
@@ -142,12 +143,12 @@ export async function getList(listId) {
     return fetcher(`/api/feed/lists/${listId}`, { credentials: "include" });
 }
 
-export async function renameList(listId, name) {
+export async function updateList(listId, { name, isPrivate }) {
     return fetcher(`/api/feed/lists/${listId}`, {
         credentials: "include",
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, isPrivate }),
     });
 }
 

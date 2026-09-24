@@ -10,6 +10,7 @@ import {
     Share2,
     Copy,
     BookmarkPlus,
+    Lock,
 } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import RequireAuth from "@/components/RequireAuth";
@@ -18,10 +19,11 @@ import ShareModal from "@/components/ShareModal";
 import MoreMenu from "@/components/MoreMenu";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
+import Toggle from "@/components/ui/Toggle";
 import { UserContext } from "@/context/UserContext";
 import { useAuthModal } from "@/context/AuthModalContext";
 import {
-    useRenameList,
+    useUpdateList,
     useDeleteList,
     useSaveList,
     useUnsaveList,
@@ -36,12 +38,15 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
     const [removing, setRemoving] = useState(false);
     const [renameOpen, setRenameOpen] = useState(false);
     const [renameValue, setRenameValue] = useState(list.name);
+    const [isPrivateValue, setIsPrivateValue] = useState(
+        list.isPrivate ?? false,
+    );
     const [shareOpen, setShareOpen] = useState(false);
 
     const { user, loading: userLoading } = useContext(UserContext);
     const { openAuth } = useAuthModal();
 
-    const renameMutation = useRenameList();
+    const updateMutation = useUpdateList();
     const deleteMutation = useDeleteList();
     const saveListMutation = useSaveList();
     const unsaveListMutation = useUnsaveList();
@@ -59,25 +64,29 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
 
     const handleEditName = () => {
         setRenameValue(list.name);
+        setIsPrivateValue(list.isPrivate ?? false);
         setRenameOpen(true);
     };
 
     const handleRename = () => {
         const trimmed = renameValue.trim();
         if (!trimmed) return;
-        if (trimmed === list.name) {
+        if (
+            trimmed === list.name &&
+            isPrivateValue === (list.isPrivate ?? false)
+        ) {
             setRenameOpen(false);
             return;
         }
-        renameMutation.mutate(
-            { listId: list.id, name: trimmed },
+        updateMutation.mutate(
+            { listId: list.id, name: trimmed, isPrivate: isPrivateValue },
             {
                 onSuccess: () => {
                     setRenameOpen(false);
-                    toast.success("تم تعديل اسم القائمة");
+                    toast.success("تم تعديل القائمة");
                 },
                 onError: (err) => {
-                    toast.error(err?.message || "حدث خطأ أثناء تعديل الاسم");
+                    toast.error(err?.message || "حدث خطأ أثناء تعديل القائمة");
                 },
             },
         );
@@ -152,10 +161,22 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
     };
 
     const ownerOptions = [
-        { icon: Pencil, label: "تعديل اسم القائمة", onClick: handleEditName },
-        { separator: true },
-        { icon: Share2, label: "مشاركة القائمة", onClick: handleShare },
-        { icon: Copy, label: "نسخ رابط القائمة", onClick: handleCopy },
+        { icon: Pencil, label: "تعديل القائمة", onClick: handleEditName },
+        ...(list.isPrivate
+            ? []
+            : [
+                  { separator: true },
+                  {
+                      icon: Share2,
+                      label: "مشاركة القائمة",
+                      onClick: handleShare,
+                  },
+                  {
+                      icon: Copy,
+                      label: "نسخ رابط القائمة",
+                      onClick: handleCopy,
+                  },
+              ]),
         { separator: true },
         {
             icon: Trash2,
@@ -269,7 +290,7 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                         {list.storyCount} مقالة
                     </p>
                     <div className="flex-1"></div>
-                    {!isOwner && (
+                    {!isOwner && !list.isPrivate && (
                         <RequireAuth>
                             <button
                                 onClick={() => handleSaveList()}
@@ -289,6 +310,9 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                                 />
                             </button>
                         </RequireAuth>
+                    )}
+                    {isOwner && list.isPrivate && (
+                        <Lock size={19} color="var(--color-ink)" />
                     )}
                     {isOwner && (
                         <RequireAuth>
@@ -377,7 +401,7 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                         margin: "0 0 16px",
                     }}
                 >
-                    تعديل اسم القائمة
+                    تعديل القائمة
                 </h2>
                 <input
                     type="text"
@@ -399,6 +423,28 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                 <div
                     style={{
                         display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        direction: "rtl",
+                        marginTop: 14,
+                    }}
+                >
+                    <span
+                        style={{
+                            fontSize: 14,
+                            color: "var(--color-ink)",
+                        }}
+                    >
+                        قائمة خاصة
+                    </span>
+                    <Toggle
+                        checked={isPrivateValue}
+                        onChange={setIsPrivateValue}
+                    />
+                </div>
+                <div
+                    style={{
+                        display: "flex",
                         gap: 12,
                         justifyContent: "center",
                         marginTop: 20,
@@ -407,14 +453,14 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                     <Button
                         onClick={() => setRenameOpen(false)}
                         variant="secondary"
-                        disabled={renameMutation.isPending}
+                        disabled={updateMutation.isPending}
                         style={{ width: "50%" }}
                     >
                         إلغاء
                     </Button>
                     <Button
                         onClick={handleRename}
-                        loading={renameMutation.isPending}
+                        loading={updateMutation.isPending}
                         style={{ width: "50%" }}
                     >
                         تحديث
