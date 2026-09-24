@@ -138,8 +138,9 @@ const TabAccount = ({
         if (file.size > 3 * 1024 * 1024) {
             setProfileError((p) => ({
                 ...p,
-                avatar: "الحد الأقصى 3 ميغابايت",
+                avatar: "حجم الصورة كبير جدًا، الحد الأقصى ٣ ميغابايت",
             }));
+            e.target.value = "";
             return;
         }
         setProfileError((p) => ({ ...p, avatar: "" }));
@@ -288,6 +289,19 @@ const TabAccount = ({
                             onChange={handleAvatarChange}
                         />
                     </div>
+                    {profileError.avatar && (
+                        <p
+                            role="alert"
+                            style={{
+                                margin: "8px 0 0",
+                                fontSize: 13,
+                                color: "var(--color-error)",
+                                direction: "rtl",
+                            }}
+                        >
+                            {profileError.avatar}
+                        </p>
+                    )}
                 </div>
                 <div>
                     <label

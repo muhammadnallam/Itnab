@@ -224,9 +224,9 @@ export function validateProfileFields({ name, username, bio, avatar, banner }) {
             "اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام فقط";
 
     if (avatar && typeof avatar !== "string" && avatar.size > MAX_IMAGE_SIZE)
-        errors.avatar = "الحد الأقصى 3 ميغابايت";
+        errors.avatar = "حجم الصورة كبير جدًا، الحد الأقصى ٣ ميغابايت";
     if (banner && typeof banner !== "string" && banner.size > MAX_IMAGE_SIZE)
-        errors.banner = "الحد الأقصى 3 ميغابايت";
+        errors.banner = "حجم الصورة كبير جدًا، الحد الأقصى ٣ ميغابايت";
 
     return errors;
 }
