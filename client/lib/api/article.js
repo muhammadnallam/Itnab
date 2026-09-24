@@ -45,3 +45,21 @@ export async function downloadPdf(slug) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
+export async function exportArticles() {
+    const res = await fetch(`${API_URL}/api/article/export`, {
+        credentials: "include",
+    });
+    if (!res.ok) {
+        throw new Error("تعذر تصدير المقالات");
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "itnab-articles.zip";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}

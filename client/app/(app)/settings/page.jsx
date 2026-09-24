@@ -18,6 +18,7 @@ import Tabs from "@/components/ui/Tabs";
 
 import { UserContext } from "@/context/UserContext";
 import { signOut } from "@/lib/api/auth";
+import { exportArticles } from "@/lib/api/article";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useUser } from "@/hooks/useUser";
 import { Trash } from "lucide-react";
@@ -123,6 +124,7 @@ const TabAccount = ({
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleteError, setDeleteError] = useState(null);
     const [deletePassword, setDeletePassword] = useState("");
+    const [isExporting, setIsExporting] = useState(false);
     const { setUser } = useContext(UserContext);
     const avatarInputRef = useRef(null);
     const router = useRouter();
@@ -199,6 +201,18 @@ const TabAccount = ({
             toast.success("تم تحديث الروابط");
         } catch (err) {
             toast.error(err?.message || "حدث خطأ أثناء تحديث الروابط");
+        }
+    };
+
+    const handleExport = async () => {
+        setIsExporting(true);
+        try {
+            await exportArticles();
+            toast.success("تم تصدير المقالات");
+        } catch (err) {
+            toast.error(err?.message || "تعذر تصدير المقالات");
+        } finally {
+            setIsExporting(false);
         }
     };
 
@@ -452,6 +466,21 @@ const TabAccount = ({
             >
                 تحديث الروابط
             </Button>
+            <SectionHead title="تصدير المقالات" />
+            <SettingRow
+                topBorder={false}
+                label="تصدير مقالاتك"
+                desc="نزّل جميع مقالاتك بصيغة HTML داخل ملف مضغوط (ZIP)، بحيث يكون كل مقال في ملف مستقل."
+                control={
+                    <Button
+                        variant="secondary"
+                        onClick={handleExport}
+                        loading={isExporting}
+                    >
+                        تصدير
+                    </Button>
+                }
+            />
             <SectionHead title="منطقة خطر" />
             <SettingRow
                 topBorder={false}

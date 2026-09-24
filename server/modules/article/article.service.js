@@ -194,6 +194,19 @@ export async function createArticle(
     }
 }
 
+export async function getArticlesForExport(authorId) {
+    return prisma.article.findMany({
+        where: { authorId, deletedAt: null },
+        orderBy: { createdAt: "asc" },
+        select: {
+            slug: true,
+            title: true,
+            subtitle: true,
+            content: true,
+        },
+    });
+}
+
 export async function getArticle({ slug, id }) {
     try {
         return await prisma.article.findUniqueOrThrow({

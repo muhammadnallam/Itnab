@@ -5,9 +5,11 @@ import asyncErrorHandler from "../../middleware/asyncErrorHandler.js";
 import validateArticle from "./article.validate.js";
 import requireAuth from "../../middleware/requireAuth.js";
 import { generateArticlePdf } from "../../lib/pdf.js";
+import { buildArticlesZip } from "../../lib/article-export.js";
 import {
     createArticle,
     getArticle,
+    getArticlesForExport,
     updateArticle,
     deleteArticle,
 } from "./article.service.js";
@@ -39,6 +41,22 @@ router.post(
             admin,
         );
         res.status(200).json({ slug });
+    }),
+);
+
+router.get(
+    "/export",
+    requireAuth,
+    asyncErrorHandler(async (req, res) => {
+        const articles = await getArticlesForExport(req.user.id);
+        const zipBuffer = await buildArticlesZip(articles);
+
+        res.setHeader("Content-Type", "application/zip");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename*=UTF-8''${encodeURIComponent("itnab-articles.zip")}`,
+        );
+        res.send(zipBuffer);
     }),
 );
 
