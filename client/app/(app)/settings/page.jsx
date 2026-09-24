@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import ImagePicker from "@/components/ImagePicker";
 import PasswordInput from "@/components/auth/PasswordInput";
-import { ArrowUpRight, Globe, Pencil } from "lucide-react";
+import { ArrowUpRight, Globe, Pencil, TriangleAlert, LogOut } from "lucide-react";
 import { useState, useContext, useRef } from "react";
 import {
     validatePasswordFields,
@@ -716,9 +716,10 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
     const [newPass, setNewPass] = useState("");
     const [confirmPass, setConfirmPass] = useState("");
     const [errors, setErrors] = useState({});
+    const [confirmChange, setConfirmChange] = useState(false);
     const { setUser } = useContext(UserContext);
 
-    const handlePasswordClick = async () => {
+    const handlePasswordClick = () => {
         setErrors({});
         const errs = validatePasswordFields({
             currentPassword: currentPass,
@@ -729,6 +730,10 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
             setErrors(errs);
             return;
         }
+        setConfirmChange(true);
+    };
+
+    const handleConfirmChange = async () => {
         try {
             await updatePassword({
                 currentPassword: currentPass,
@@ -736,9 +741,11 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
             });
         } catch (err) {
             toast.error(err?.message || "حدث خطأ أثناء تحديث كلمة المرور");
+            setConfirmChange(false);
             return;
         }
 
+        setConfirmChange(false);
         toast.success("تم تحديث كلمة المرور");
         await signOut();
         setUser(null);
@@ -822,6 +829,30 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                         error={errors.confirmPass}
                     />
                 </div>
+                <div
+                    style={{
+                        display: "flex",
+                        gap: 8,
+                        alignItems: "flex-start",
+                        padding: "10px 12px",
+                        marginBottom: 20,
+                        background: "var(--color-accent-light)",
+                        borderRadius: "var(--border-radius)",
+                        fontSize: 13,
+                        color: "var(--color-ink)",
+                        lineHeight: 1.6,
+                        direction: "rtl",
+                    }}
+                >
+                    <TriangleAlert
+                        size={16}
+                        style={{ flexShrink: 0, marginTop: 2 }}
+                    />
+                    <span>
+                        سيؤدي تغيير كلمة المرور إلى تسجيل خروجك من جميع الأجهزة،
+                        وستحتاج إلى تسجيل الدخول من جديد.
+                    </span>
+                </div>
                 <Button
                     onClick={handlePasswordClick}
                     loading={isUpdatingPassword}
@@ -829,6 +860,18 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                     تحديث كلمة المرور
                 </Button>
             </div>
+            <ConfirmModal
+                isOpen={confirmChange}
+                onCancel={() => setConfirmChange(false)}
+                onConfirm={handleConfirmChange}
+                icon={LogOut}
+                color="var(--color-accent)"
+                icoBackground="var(--color-accent-light)"
+                title="تغيير كلمة المرور"
+                description="سيتم تسجيل خروجك من جميع الأجهزة، وسنطلب منك تسجيل الدخول من جديد. هل تريد المتابعة؟"
+                buttonText="تأكيد التغيير"
+                loading={isUpdatingPassword}
+            />
         </>
     );
 };
