@@ -7,6 +7,7 @@ import Avatar from "@/components/ui/Avatar";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import ImagePicker from "@/components/ImagePicker";
+import PasswordInput from "@/components/auth/PasswordInput";
 import { ArrowUpRight, Globe, Pencil } from "lucide-react";
 import { useState, useContext, useRef } from "react";
 import {
@@ -761,14 +762,15 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                     >
                         كلمة المرور الحالية
                     </label>
-                    <Input
-                        type="password"
+                    <PasswordInput
+                        name="currentPassword"
                         value={currentPass}
                         onChange={(e) => {
                             setCurrentPass(e.target.value);
                             setErrors((p) => ({ ...p, currentPass: "" }));
                         }}
                         placeholder="••••••••"
+                        autoComplete="current-password"
                         error={errors.currentPass}
                     />
                 </div>
@@ -784,14 +786,15 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                     >
                         كلمة المرور الجديدة
                     </label>
-                    <Input
-                        type="password"
+                    <PasswordInput
+                        name="newPassword"
                         value={newPass}
                         onChange={(e) => {
                             setNewPass(e.target.value);
                             setErrors((p) => ({ ...p, newPass: "" }));
                         }}
                         placeholder="٨ إلى ٦٤ حرفًا"
+                        autoComplete="new-password"
                         error={errors.newPass}
                     />
                 </div>
@@ -807,14 +810,15 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                     >
                         تأكيد كلمة المرور الجديدة
                     </label>
-                    <Input
-                        type="password"
+                    <PasswordInput
+                        name="confirmPassword"
                         value={confirmPass}
                         onChange={(e) => {
                             setConfirmPass(e.target.value);
                             setErrors((p) => ({ ...p, confirmPass: "" }));
                         }}
                         placeholder="أعد إدخال كلمة المرور"
+                        autoComplete="new-password"
                         error={errors.confirmPass}
                     />
                 </div>
