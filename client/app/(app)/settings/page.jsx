@@ -474,7 +474,6 @@ const TabAccount = ({
                 desc="نزّل جميع مقالاتك بصيغة HTML داخل ملف مضغوط (ZIP)، بحيث يكون كل مقال في ملف مستقل."
                 control={
                     <Button
-                        variant="secondary"
                         onClick={handleExport}
                         loading={isExporting}
                     >
@@ -776,7 +775,7 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                             setCurrentPass(e.target.value);
                             setErrors((p) => ({ ...p, currentPass: "" }));
                         }}
-                        placeholder="••••••••"
+                        placeholder="••••••••••••"
                         autoComplete="current-password"
                         error={errors.currentPass}
                     />
@@ -800,7 +799,7 @@ const TabSecurity = ({ updatePassword, isUpdatingPassword }) => {
                             setNewPass(e.target.value);
                             setErrors((p) => ({ ...p, newPass: "" }));
                         }}
-                        placeholder="٨ إلى ٦٤ حرفًا"
+                        placeholder="لا تقل عن 8 أحرف"
                         autoComplete="new-password"
                         error={errors.newPass}
                     />
