@@ -54,7 +54,7 @@ export default function LoginForm({
         <form onSubmit={handleSubmit} noValidate>
             <h2 style={headingStyle}>أهلاً بعودتك</h2>
             <p style={subTextStyle}>
-                أدخل بيانات الدخول أو{" "}
+                ليس لديك حساب؟{" "}
                 <button
                     type="button"
                     onClick={() => {

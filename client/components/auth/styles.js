@@ -5,7 +5,7 @@ export const linkBtnStyle = {
     border: "none",
     padding: 0,
     cursor: "pointer",
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 700,
     color: "var(--color-accent)",
 };
@@ -28,7 +28,7 @@ export const headingStyle = {
 };
 
 export const subTextStyle = {
-    fontSize: 13,
+    fontSize: 14,
     color: "var(--color-ink)",
     textAlign: "center",
     marginBottom: 24,
