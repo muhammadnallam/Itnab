@@ -331,17 +331,8 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                 </div>
             </div>
 
-            {/* ── Image strip (3 photos, descending widths) ─────────── */}
-            <div
-                className="list-card-strip"
-                style={{
-                    display: "flex",
-                    alignItems: "stretch",
-                    flexShrink: 0,
-                    borderRadius: 2,
-                    overflow: "hidden",
-                }}
-            >
+            {/* ── Image strip (3 photos) ────────────────────────────── */}
+            <div className="list-card-strip">
                 {[0, 1, 2].map((i) => {
                     const src = list.images?.[i];
 
@@ -350,16 +341,9 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                             key={i}
                             className={`list-card-img-${i}`}
                             style={{
-                                height: "100%",
-                                flexShrink: 0,
                                 background: src
                                     ? "var(--color-surface-subtle)"
                                     : "var(--color-white)",
-                                borderRight:
-                                    i > 0
-                                        ? "2px solid var(--color-border)"
-                                        : "none",
-                                overflow: "hidden",
                             }}
                         >
                             {src && (
@@ -418,7 +402,7 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                         borderRadius: "var(--border-radius)",
                         outline: "none",
                         boxSizing: "border-box",
-                    }}
+                    }}li
                 />
                 <div
                     style={{

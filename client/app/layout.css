@@ -300,11 +300,29 @@ html:not([data-hydrated]) .app-sidebar {
 }
 
 .list-card-strip {
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    border-radius: 2px;
+    overflow: hidden;
     height: 110px;
 }
 
 .list-card-title {
     font-size: 18px;
+}
+
+.list-card-img-0,
+.list-card-img-1,
+.list-card-img-2 {
+    height: 100%;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.list-card-img-1,
+.list-card-img-2 {
+    border-right: 2px solid var(--color-border);
 }
 
 .list-card-img-0 {
@@ -339,23 +357,42 @@ html:not([data-hydrated]) .app-sidebar {
     }
 
     .list-card-strip {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 2px;
+        width: 150px;
         height: 88px;
+        background: var(--color-border);
+        direction: ltr;
     }
 
     .list-card-title {
         font-size: 16px;
     }
 
+    .list-card-img-0,
+    .list-card-img-1,
+    .list-card-img-2 {
+        width: auto;
+        height: auto;
+        flex-shrink: 1;
+        border-right: none;
+    }
+
     .list-card-img-0 {
-        width: 88px;
+        grid-column: 1;
+        grid-row: 1 / span 2;
     }
 
     .list-card-img-1 {
-        width: 60px;
+        grid-column: 2;
+        grid-row: 1;
     }
 
     .list-card-img-2 {
-        width: 44px;
+        grid-column: 2;
+        grid-row: 2;
     }
 }
 
