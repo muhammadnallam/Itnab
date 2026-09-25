@@ -10,7 +10,7 @@ import ImagePicker from "@/components/ImagePicker";
 import ImageCropModal from "@/components/ui/ImageCropModal";
 import { IMAGE_PRESETS } from "@/lib/image-presets";
 import PasswordInput from "@/components/auth/PasswordInput";
-import { ArrowUpRight, Globe, Pencil, TriangleAlert, LogOut } from "lucide-react";
+import { ArrowUpRight, Globe, Pencil, TriangleAlert, LogOut, Trash2 } from "lucide-react";
 import { useState, useContext, useRef } from "react";
 import {
     validatePasswordFields,
@@ -164,6 +164,11 @@ const TabAccount = ({
         setAvatar(file);
     };
 
+    const handleAvatarRemove = () => {
+        setProfileError((p) => ({ ...p, avatar: "" }));
+        setAvatar(null);
+    };
+
     const handleProfileSubmit = async () => {
         setProfileError({});
         const errors = validateProfileFields({
@@ -292,6 +297,34 @@ const TabAccount = ({
                                 size={88}
                                 bg="var(--color-accent)"
                             />
+                            {avatar && (
+                                <button
+                                    type="button"
+                                    aria-label="حذف صورة الملف الشخصي"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAvatarRemove();
+                                    }}
+                                    style={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: 28,
+                                        height: 28,
+                                        borderRadius: "50%",
+                                        border: "2px solid var(--color-white)",
+                                        background: "var(--color-error)",
+                                        color: "var(--color-white)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        cursor: "pointer",
+                                        padding: 0,
+                                    }}
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            )}
                             <div
                                 style={{
                                     position: "absolute",
@@ -368,6 +401,7 @@ const TabAccount = ({
                             }
                             label="إضافة صورة غلاف"
                             changeLabel="تغيير صورة الغلاف"
+                            removable
                             cropAspect={IMAGE_PRESETS.banner.aspect}
                             cropOutputWidth={IMAGE_PRESETS.banner.outputWidth}
                             cropTitle={IMAGE_PRESETS.banner.title}

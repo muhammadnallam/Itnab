@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import ImageCropModal from "@/components/ui/ImageCropModal";
 import { useObjectUrl } from "@/hooks/useObjectUrl";
 import {
@@ -18,6 +19,7 @@ export default function ImagePicker({
     error,
     setError,
     borderRadius = "var(--border-radius)",
+    removable = false,
     cropAspect,
     cropOutputWidth = IMAGE_PRESETS.cover.outputWidth,
     cropTitle = "قص الصورة",
@@ -69,6 +71,33 @@ export default function ImagePicker({
                             display: "block",
                         }}
                     />
+                    {removable && (
+                        <button
+                            type="button"
+                            aria-label="حذف الصورة"
+                            onClick={() => {
+                                setImage(null);
+                                setError?.("");
+                            }}
+                            style={{
+                                position: "absolute",
+                                top: 8,
+                                left: 8,
+                                width: 30,
+                                height: 30,
+                                borderRadius: "50%",
+                                border: "none",
+                                background: "rgba(15,15,20,0.6)",
+                                color: "var(--color-white)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                            }}
+                        >
+                            <Trash2 size={16} />
+                        </button>
+                    )}
                 </div>
             )}
             <label
