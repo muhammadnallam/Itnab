@@ -7,6 +7,8 @@ import Avatar from "@/components/ui/Avatar";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import ImagePicker from "@/components/ImagePicker";
+import ImageCropModal from "@/components/ui/ImageCropModal";
+import { IMAGE_PRESETS } from "@/lib/image-presets";
 import PasswordInput from "@/components/auth/PasswordInput";
 import { ArrowUpRight, Globe, Pencil, TriangleAlert, LogOut } from "lucide-react";
 import { useState, useContext, useRef } from "react";
@@ -22,6 +24,7 @@ import { signOut } from "@/lib/api/auth";
 import { exportArticles } from "@/lib/api/article";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useUser } from "@/hooks/useUser";
+import { useObjectUrl } from "@/hooks/useObjectUrl";
 import { Trash } from "lucide-react";
 import { X, YouTube, Substack } from "@/components/ui/icons";
 
@@ -126,24 +129,35 @@ const TabAccount = ({
     const [deleteError, setDeleteError] = useState(null);
     const [deletePassword, setDeletePassword] = useState("");
     const [isExporting, setIsExporting] = useState(false);
+    const [avatarCropFile, setAvatarCropFile] = useState(null);
     const { setUser } = useContext(UserContext);
     const avatarInputRef = useRef(null);
     const router = useRouter();
 
-    const avatarDisplay =
-        avatar && typeof avatar !== "string"
-            ? URL.createObjectURL(avatar)
-            : avatar;
+    const avatarDisplay = useObjectUrl(avatar);
 
     const handleAvatarChange = (e) => {
         const file = e.target.files?.[0];
+        e.target.value = "";
         if (!file) return;
         if (file.size > 3 * 1024 * 1024) {
             setProfileError((p) => ({
                 ...p,
                 avatar: "حجم الصورة كبير جدًا، الحد الأقصى ٣ ميغابايت",
             }));
-            e.target.value = "";
+            return;
+        }
+        setProfileError((p) => ({ ...p, avatar: "" }));
+        setAvatarCropFile(file);
+    };
+
+    const handleAvatarCropConfirm = (file) => {
+        setAvatarCropFile(null);
+        if (file.size > 3 * 1024 * 1024) {
+            setProfileError((p) => ({
+                ...p,
+                avatar: "حجم الصورة كبير جدًا، الحد الأقصى ٣ ميغابايت",
+            }));
             return;
         }
         setProfileError((p) => ({ ...p, avatar: "" }));
@@ -317,6 +331,15 @@ const TabAccount = ({
                             {profileError.avatar}
                         </p>
                     )}
+                    <ImageCropModal
+                        open={Boolean(avatarCropFile)}
+                        file={avatarCropFile}
+                        aspect={IMAGE_PRESETS.avatar.aspect}
+                        title={IMAGE_PRESETS.avatar.title}
+                        outputWidth={IMAGE_PRESETS.avatar.outputWidth}
+                        onCancel={() => setAvatarCropFile(null)}
+                        onConfirm={handleAvatarCropConfirm}
+                    />
                 </div>
                 <div>
                     <label
@@ -345,6 +368,9 @@ const TabAccount = ({
                             }
                             label="إضافة صورة غلاف"
                             changeLabel="تغيير صورة الغلاف"
+                            cropAspect={IMAGE_PRESETS.banner.aspect}
+                            cropOutputWidth={IMAGE_PRESETS.banner.outputWidth}
+                            cropTitle={IMAGE_PRESETS.banner.title}
                         />
                     </div>
                 </div>

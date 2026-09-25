@@ -5,6 +5,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import TextareaField from "@/components/ui/TextareaField";
+import ImageCropModal from "@/components/ui/ImageCropModal";
+import { IMAGE_PRESETS } from "@/lib/image-presets";
+import { useObjectUrl } from "@/hooks/useObjectUrl";
 import TopicSelect from "@/components/editor/TopicSelect";
 import UserSelect from "@/components/editor/UserSelect";
 import ListSelect from "@/components/editor/ListSelect";
@@ -95,6 +98,8 @@ export default function PublishModal({
         return todayLocalIso();
     });
     const [listTarget, setListTarget] = useState(null);
+    const [coverCropFile, setCoverCropFile] = useState(null);
+    const coverPreview = useObjectUrl(coverImage);
     const router = useRouter();
     const qc = useQueryClient();
     const { publish, update } = useArticle(articleData?.slug);
@@ -109,6 +114,28 @@ export default function PublishModal({
     const handleClose = () => {
         setPlaceholderAck(false);
         onClose?.();
+    };
+
+    const handleCoverChange = (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file) return;
+        if (file.size > 3 * 1024 * 1024) {
+            setCoverError("الحد الأقصى 3 ميغابايت");
+            return;
+        }
+        setCoverError("");
+        setCoverCropFile(file);
+    };
+
+    const handleCoverCropConfirm = (file) => {
+        setCoverCropFile(null);
+        if (file.size > 3 * 1024 * 1024) {
+            setCoverError("الحد الأقصى 3 ميغابايت");
+            return;
+        }
+        setCoverError("");
+        setCoverImage(file);
     };
 
     const inputBase = {
@@ -262,24 +289,11 @@ export default function PublishModal({
                         type="file"
                         accept="image/*"
                         hidden
-                        onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-                            if (file.size > 3 * 1024 * 1024) {
-                                setCoverError("الحد الأقصى 3 ميغابايت");
-                                return;
-                            }
-                            setCoverError("");
-                            setCoverImage(file);
-                        }}
+                        onChange={handleCoverChange}
                     />
-                    {coverImage ? (
+                    {coverPreview ? (
                         <img
-                            src={
-                                typeof coverImage === "string"
-                                    ? coverImage
-                                    : URL.createObjectURL(coverImage)
-                            }
+                            src={coverPreview}
                             alt=""
                             style={FILE_PREVIEW}
                         />
@@ -290,6 +304,16 @@ export default function PublishModal({
                     )}
                 </label>
             </Input>
+
+            <ImageCropModal
+                open={Boolean(coverCropFile)}
+                file={coverCropFile}
+                aspect={IMAGE_PRESETS.cover.aspect}
+                title={IMAGE_PRESETS.cover.title}
+                outputWidth={IMAGE_PRESETS.cover.outputWidth}
+                onCancel={() => setCoverCropFile(null)}
+                onConfirm={handleCoverCropConfirm}
+            />
 
             <Input label="عنوان محركات البحث" error={seoTitleError}>
                 <div

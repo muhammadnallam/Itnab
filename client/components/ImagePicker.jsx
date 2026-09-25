@@ -1,3 +1,13 @@
+"use client";
+
+import { useState } from "react";
+import ImageCropModal from "@/components/ui/ImageCropModal";
+import { useObjectUrl } from "@/hooks/useObjectUrl";
+import {
+    IMAGE_PRESETS,
+    parseAspectRatio,
+} from "@/lib/image-presets";
+
 export default function ImagePicker({
     image,
     setImage,
@@ -8,29 +18,55 @@ export default function ImagePicker({
     error,
     setError,
     borderRadius = "var(--border-radius)",
+    cropAspect,
+    cropOutputWidth = IMAGE_PRESETS.cover.outputWidth,
+    cropTitle = "قص الصورة",
 }) {
+    const [pendingFile, setPendingFile] = useState(null);
+    const previewSrc = useObjectUrl(image);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file) return;
+        if (file.size > maxSize) {
+            setError?.(`الحد الأقصى ${maxSize / 1024 / 1024} ميغابايت`);
+            return;
+        }
+        setError?.("");
+        setPendingFile(file);
+    };
+
+    const handleCropConfirm = (file) => {
+        setPendingFile(null);
+        if (file.size > maxSize) {
+            setError?.(`الحد الأقصى ${maxSize / 1024 / 1024} ميغابايت`);
+            return;
+        }
+        setError?.("");
+        setImage(file);
+    };
+
     return (
         <>
-            {image && (
+            {previewSrc && (
                 <div
                     style={{
+                        position: "relative",
                         width: "100%",
                         maxWidth: "100%",
                         boxSizing: "border-box",
                     }}
                 >
                     <img
-                        src={
-                            typeof image === "string"
-                                ? image
-                                : URL.createObjectURL(image)
-                        }
+                        src={previewSrc}
                         alt=""
                         style={{
                             width: "100%",
                             aspectRatio,
                             objectFit: "cover",
                             borderRadius,
+                            display: "block",
                         }}
                     />
                 </div>
@@ -54,19 +90,19 @@ export default function ImagePicker({
                     type="file"
                     accept="image/*"
                     hidden
-                    onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        if (file.size > maxSize) {
-                            setError(`الحد الأقصى ${maxSize / 1024 / 1024} ميغابايت`);
-                            return;
-                        }
-                        setError("");
-                        setImage(file);
-                    }}
+                    onChange={handleFileChange}
                 />
                 {error || (image ? changeLabel : label)}
             </label>
+            <ImageCropModal
+                open={Boolean(pendingFile)}
+                file={pendingFile}
+                aspect={cropAspect ?? parseAspectRatio(aspectRatio)}
+                title={cropTitle}
+                outputWidth={cropOutputWidth}
+                onCancel={() => setPendingFile(null)}
+                onConfirm={handleCropConfirm}
+            />
         </>
     );
 }
