@@ -402,7 +402,7 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                         borderRadius: "var(--border-radius)",
                         outline: "none",
                         boxSizing: "border-box",
-                    }}li
+                    }}
                 />
                 <div
                     style={{
