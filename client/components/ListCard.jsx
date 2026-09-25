@@ -205,55 +205,22 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
           : guestOptions;
 
     return (
-        <article
-            style={{
-                display: "flex",
-                alignItems: "stretch",
-                gap: 0,
-                padding: "20px 0",
-                borderBottom: "1px solid var(--color-border)",
-                direction: "rtl",
-            }}
-        >
-            <div
-                style={{
-                    flex: 1,
-                    minWidth: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-around",
-                    paddingLeft: 16,
-                }}
-            >
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 7,
-                        marginBottom: 10,
-                    }}
-                >
+        <article className="list-card">
+            <div className="list-card__body">
+                <div className="list-card__author">
                     <Link
                         as={`/@${list.authorUsername}`} href={`/profile/${list.authorUsername}`}
                         className="flex items-center gap-2"
                     >
-                        <Avatar
-                            img={list.authorImage}
-                            initials={list.ownerInitials}
-                            size={20}
-                            bg="var(--color-accent)"
-                        />
-                        <span
-                            style={{
-                                fontSize: 13,
-                                color: "var(--color-ink)",
-                                fontWeight: 500,
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                            }}
-                            className="hover:underline"
-                        >
+                        <span className="list-card__author-avatar">
+                            <Avatar
+                                img={list.authorImage}
+                                initials={list.ownerInitials}
+                                size={24}
+                                bg="var(--color-accent)"
+                            />
+                        </span>
+                        <span className="list-card__author-name text-sm hover:underline">
                             {list.ownerName}
                         </span>
                     </Link>
@@ -262,7 +229,7 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                 {/* List title */}
                 <Link href={listUrl()}>
                     <h3
-                        className="list-card-title"
+                        className="list-card-title list-card__title"
                         style={{
                             fontWeight: 700,
                             color: "var(--color-ink)",
@@ -278,15 +245,10 @@ export default function ListCard({ list, isOwner: isOwnerProp }) {
                     </h3>
                 </Link>
 
-                {/* Actions row */}
-                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                {/* Meta + actions row */}
+                <div className="list-card__meta">
                     {/* Article count */}
-                    <p
-                        style={{
-                            fontSize: 13,
-                            color: "var(--color-light)",
-                        }}
-                    >
+                    <p className="list-card__count">
                         {list.storyCount} مقالة
                     </p>
                     <div className="flex-1"></div>
