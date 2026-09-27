@@ -37,7 +37,7 @@ export default function AuthModal({ open, onClose, defaultMode = "login" }) {
             setMode("verify");
             return;
         }
-        onClose?.();
+        window.location.reload();
     };
 
     return (
@@ -63,7 +63,7 @@ export default function AuthModal({ open, onClose, defaultMode = "login" }) {
                 <VerifyOtpForm
                     email={verifyEmail}
                     notice={notice}
-                    onVerified={() => onClose?.()}
+                    onVerified={() => window.location.reload()}
                     onBack={() => {
                         setMode("login");
                         setNotice("");
